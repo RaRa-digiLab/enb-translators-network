@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sigma example template</title>
-</head>
-
-<body>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Sigma example template
+  </title>
+ </head>
+ <body>
   <style>
-    html,
+   html,
     body,
 
     #sigma-container {
@@ -92,192 +92,320 @@
       margin-top: 3px;
     }
   </style>
-
-  <div id="sigma-container"></div>
-
-  <div id="contents">
-
-    <div class="small-panel" id="info-panel">
-      <h2>Eesti 20. sajandi tõlkekirjandus</h2>
-      <p>See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Sõlmedeks on võõrkeelsed autorid
-        ja tõlkijad, neid ühendavad tõlgitud teosed.
-      </p>
-      <p>Rakenduse alusandmed pärinevad <a href="https://doi.org/10.5281/zenodo.8228805">Eesti Rahvusbibliograafiast<img
-            src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg" alt="DOI"></a></p>
-    </div>
-
-    <div class="small-panel" id="search-box">
-      <h3>Otsing</h3>
-      <input type="text" id="search-input" list="suggestions" placeholder="Otsi isikut...">
-      <datalist id="suggestions"></datalist>
-    </div>
-
-    <div class="small-panel" id="language-filter">
-      <h3>Filtreeri keele järgi</h3>
-      <button id="select-all">vali kõik</button>
-      <button id="deselect-all">tühjenda kõik</button>
-      <br><br>
-
-      <div id="checkboxes">
-        <label>
-            <input type="checkbox" id="category-eng" value="eng" checked />
-                <span class="language-name"> inglise</span>
-                <span class="percentage">28.34 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-rus" value="rus" checked />
-                <span class="language-name"> vene</span>
-                <span class="percentage">22.91 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-ger" value="ger" checked />
-                <span class="language-name"> saksa</span>
-                <span class="percentage">13.48 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-fre" value="fre" checked />
-                <span class="language-name"> prantsuse</span>
-                <span class="percentage">6.42 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-fin" value="fin" checked />
-                <span class="language-name"> soome</span>
-                <span class="percentage">3.45 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-swe" value="swe" checked />
-                <span class="language-name"> rootsi</span>
-                <span class="percentage">2.89 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-lav" value="lav" checked />
-                <span class="language-name"> läti</span>
-                <span class="percentage">2.29 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-hun" value="hun" checked />
-                <span class="language-name"> ungari</span>
-                <span class="percentage">1.9 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-pol" value="pol" checked />
-                <span class="language-name"> poola</span>
-                <span class="percentage">1.79 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-spa" value="spa" checked />
-                <span class="language-name"> hispaania</span>
-                <span class="percentage">1.65 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-cze" value="cze" checked />
-                <span class="language-name"> tšehhi</span>
-                <span class="percentage">1.65 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-dan" value="dan" checked />
-                <span class="language-name"> taani</span>
-                <span class="percentage">1.24 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-ita" value="ita" checked />
-                <span class="language-name"> itaalia</span>
-                <span class="percentage">1.21 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-nor" value="nor" checked />
-                <span class="language-name"> norra</span>
-                <span class="percentage">1.05 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-lit" value="lit" checked />
-                <span class="language-name"> leedu</span>
-                <span class="percentage">1.05 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-rum" value="rum" checked />
-                <span class="language-name"> rumeenia</span>
-                <span class="percentage">0.66 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-ukr" value="ukr" checked />
-                <span class="language-name"> ukraina</span>
-                <span class="percentage">0.61 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-dut" value="dut" checked />
-                <span class="language-name"> hollandi</span>
-                <span class="percentage">0.44 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-bul" value="bul" checked />
-                <span class="language-name"> bulgaaria</span>
-                <span class="percentage">0.41 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-geo" value="geo" checked />
-                <span class="language-name"> gruusia</span>
-                <span class="percentage">0.41 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-bel" value="bel" checked />
-                <span class="language-name"> belgia</span>
-                <span class="percentage">0.41 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-slo" value="slo" checked />
-                <span class="language-name"> slovakkia</span>
-                <span class="percentage">0.33 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-arm" value="arm" checked />
-                <span class="language-name"> armeenia</span>
-                <span class="percentage">0.33 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-gre" value="gre" checked />
-                <span class="language-name"> kreeka</span>
-                <span class="percentage">0.3 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-ice" value="ice" checked />
-                <span class="language-name"> islandi</span>
-                <span class="percentage">0.25 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-heb" value="heb" checked />
-                <span class="language-name"> heebrea</span>
-                <span class="percentage">0.25 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-jpn" value="jpn" checked />
-                <span class="language-name"> jaapani</span>
-                <span class="percentage">0.22 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-por" value="por" checked />
-                <span class="language-name"> portugali</span>
-                <span class="percentage">0.19 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-lat" value="lat" checked />
-                <span class="language-name"> ladina</span>
-                <span class="percentage">0.17 %</span>
-        </label>
-        <label>
-            <input type="checkbox" id="category-other" value="other" checked />
-                <span class="language-name"> muu</span>
-                <span class="percentage">3.69 %</span>
-        </label>
-    </div>
-
-    </div>
-
+  <div id="sigma-container">
   </div>
-
-
-
-  <script src="build/bundle.js"></script>
-</body>
-
+  <div id="contents">
+   <div class="small-panel" id="info-panel">
+    <h2>
+     Eesti 20. sajandi tõlkekirjandus
+    </h2>
+    <p>
+     See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Sõlmedeks on võõrkeelsed autorid
+        ja tõlkijad, neid ühendavad tõlgitud teosed.
+    </p>
+    <p>
+     Rakenduse alusandmed pärinevad
+     <a href="https://doi.org/10.5281/zenodo.8228805">
+      Eesti Rahvusbibliograafiast
+      <img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg"/>
+     </a>
+    </p>
+   </div>
+   <div class="small-panel" id="search-box">
+    <h3>
+     Otsing
+    </h3>
+    <input id="search-input" list="suggestions" placeholder="Otsi isikut..." type="text"/>
+    <datalist id="suggestions">
+    </datalist>
+   </div>
+   <div class="small-panel" id="language-filter">
+    <h3>
+     Filtreeri keele järgi
+    </h3>
+    <button id="select-all">
+     vali kõik
+    </button>
+    <button id="deselect-all">
+     tühjenda kõik
+    </button>
+    <br/>
+    <br/>
+    <div id="checkboxes">
+     <label>
+      <input checked="" id="category-eng" type="checkbox" value="eng"/>
+      <span class="language-name">
+       inglise
+      </span>
+      <span class="percentage">
+       28.34 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-rus" type="checkbox" value="rus"/>
+      <span class="language-name">
+       vene
+      </span>
+      <span class="percentage">
+       22.91 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ger" type="checkbox" value="ger"/>
+      <span class="language-name">
+       saksa
+      </span>
+      <span class="percentage">
+       13.48 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-fre" type="checkbox" value="fre"/>
+      <span class="language-name">
+       prantsuse
+      </span>
+      <span class="percentage">
+       6.42 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-fin" type="checkbox" value="fin"/>
+      <span class="language-name">
+       soome
+      </span>
+      <span class="percentage">
+       3.45 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-swe" type="checkbox" value="swe"/>
+      <span class="language-name">
+       rootsi
+      </span>
+      <span class="percentage">
+       2.89 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lav" type="checkbox" value="lav"/>
+      <span class="language-name">
+       läti
+      </span>
+      <span class="percentage">
+       2.29 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-hun" type="checkbox" value="hun"/>
+      <span class="language-name">
+       ungari
+      </span>
+      <span class="percentage">
+       1.9 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-pol" type="checkbox" value="pol"/>
+      <span class="language-name">
+       poola
+      </span>
+      <span class="percentage">
+       1.79 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-spa" type="checkbox" value="spa"/>
+      <span class="language-name">
+       hispaania
+      </span>
+      <span class="percentage">
+       1.65 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-cze" type="checkbox" value="cze"/>
+      <span class="language-name">
+       tšehhi
+      </span>
+      <span class="percentage">
+       1.65 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-dan" type="checkbox" value="dan"/>
+      <span class="language-name">
+       taani
+      </span>
+      <span class="percentage">
+       1.24 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ita" type="checkbox" value="ita"/>
+      <span class="language-name">
+       itaalia
+      </span>
+      <span class="percentage">
+       1.21 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-nor" type="checkbox" value="nor"/>
+      <span class="language-name">
+       norra
+      </span>
+      <span class="percentage">
+       1.05 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lit" type="checkbox" value="lit"/>
+      <span class="language-name">
+       leedu
+      </span>
+      <span class="percentage">
+       1.05 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-rum" type="checkbox" value="rum"/>
+      <span class="language-name">
+       rumeenia
+      </span>
+      <span class="percentage">
+       0.66 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ukr" type="checkbox" value="ukr"/>
+      <span class="language-name">
+       ukraina
+      </span>
+      <span class="percentage">
+       0.61 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-dut" type="checkbox" value="dut"/>
+      <span class="language-name">
+       hollandi
+      </span>
+      <span class="percentage">
+       0.44 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-bul" type="checkbox" value="bul"/>
+      <span class="language-name">
+       bulgaaria
+      </span>
+      <span class="percentage">
+       0.41 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-geo" type="checkbox" value="geo"/>
+      <span class="language-name">
+       gruusia
+      </span>
+      <span class="percentage">
+       0.41 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-bel" type="checkbox" value="bel"/>
+      <span class="language-name">
+       belgia
+      </span>
+      <span class="percentage">
+       0.41 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-slo" type="checkbox" value="slo"/>
+      <span class="language-name">
+       slovakkia
+      </span>
+      <span class="percentage">
+       0.33 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-arm" type="checkbox" value="arm"/>
+      <span class="language-name">
+       armeenia
+      </span>
+      <span class="percentage">
+       0.33 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-gre" type="checkbox" value="gre"/>
+      <span class="language-name">
+       kreeka
+      </span>
+      <span class="percentage">
+       0.3 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ice" type="checkbox" value="ice"/>
+      <span class="language-name">
+       islandi
+      </span>
+      <span class="percentage">
+       0.25 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-heb" type="checkbox" value="heb"/>
+      <span class="language-name">
+       heebrea
+      </span>
+      <span class="percentage">
+       0.25 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-jpn" type="checkbox" value="jpn"/>
+      <span class="language-name">
+       jaapani
+      </span>
+      <span class="percentage">
+       0.22 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-por" type="checkbox" value="por"/>
+      <span class="language-name">
+       portugali
+      </span>
+      <span class="percentage">
+       0.19 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lat" type="checkbox" value="lat"/>
+      <span class="language-name">
+       ladina
+      </span>
+      <span class="percentage">
+       0.17 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-other" type="checkbox" value="other"/>
+      <span class="language-name">
+       muu
+      </span>
+      <span class="percentage">
+       3.69 %
+      </span>
+     </label>
+    </div>
+   </div>
+  </div>
+  <script src="build/bundle.js">
+  </script>
+ </body>
 </html>

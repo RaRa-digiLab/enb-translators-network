@@ -1,5 +1,6 @@
 import sys
 import json
+from bs4 import BeautifulSoup
 
 node_size_coefficient = 0.8
 edge_size_coefficient = 1.2
@@ -113,19 +114,34 @@ def write_language_checkboxes(language_counts, all_langs):
     checkbox_values.remove("other")
     checkbox_values.append("other")
 
-    with open("checkboxes.html", "w", encoding="utf8") as f:
-        f.write('<div id="checkboxes">\n')
-        for lang in checkbox_values:
-            lang_share = round((language_counts[lang] / all_langs * 100), 2)
-            f.write(
-                f"""    <label>
-        <input type="checkbox" id="category-{lang}" value="{lang}" checked />
-            <span class="language-name"> {languages[lang]}</span>
-            <span class="percentage">{lang_share} %</span>
+    html_string = '<div id="checkboxes">\n'
+
+    for lang in checkbox_values:
+        lang_share = round((language_counts[lang] / all_langs * 100), 2)
+        html_string += f"""    <label>
+            <input type="checkbox" id="category-{lang}" value="{lang}" checked />
+                <span class="language-name"> {languages[lang]}</span>
+                <span class="percentage">{lang_share} %</span>
     </label>
-"""
-                )
-        f.write('</div>')
+    """
+        
+    html_string += '</div>'
+    return html_string
+
+
+def replace_html_tag(file_path, tag_name, tag_attributes, new_content_string):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        html_content = file.read()
+    
+    soup = BeautifulSoup(html_content, 'html.parser')
+    tag_to_replace = soup.find(tag_name, tag_attributes)
+    new_content = BeautifulSoup(new_content_string, 'html.parser')
+    
+    if tag_to_replace:
+        tag_to_replace.replace_with(new_content)
+    
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.write(soup.prettify())
 
 
 if __name__ == "__main__":
@@ -148,56 +164,5 @@ if __name__ == "__main__":
     with open("../app/data/data.json", "w", encoding="utf8") as f:
         data = json.dump(data, f)
 
-    write_language_checkboxes(language_counts, all_langs)
-
-
-
-
-
-# languages = {
-#     "eng": "inglise",
-#     "rus": "vene",
-#     "ger": "saksa",
-#     "fre": "prantsuse",
-#     "fin": "soome",
-#     "swe": "rootsi",
-#     "lav": "läti",
-#     "hun": "ungari",
-#     "pol": "poola",
-#     "spa": "hispaania",
-#     "cze": "tšehhi",
-#     "dan": "taani",
-#     "ita": "itaalia",
-#     "nor": "norra",
-#     "lit": "leedu",
-#     "rum": "rumeenia",
-#     "dut": "hollandi",
-#     "ukr": "ukraina",
-#     "bul": "bulgaaria",
-#     "geo": "gruusia",
-#     "gre": "kreeka",
-#     "bel": "belgia",
-#     "slo": "slovakkia",
-#     "arm": "armeenia",
-#     "lat": "ladina",
-#     "jpn": "jaapani",
-#     "ice": "islandi",
-#     "heb": "heebrea",
-#     "por": "portugali",
-#     "tur": "türgi",
-#     "yid": "jidiš",
-#     "slv": "sloveenia",
-#     "aze": "azerbaidžaani",
-#     "oss": "osseedi",
-#     "srp": "serbia",
-#     "per": "pärsia",
-#     "peo": "vana-pärsia",
-#     "san": "sanskriti",
-#     "hin": "hindi",
-#     "ara": "araabia",
-#     "mul": "mitmekeelne",
-#     "epo": "esperanto",
-#     "uzb": "usbeki",
-#     "other": "muu",
-#     "und": "muu",
-# }
+    checkboxes_html_string = write_language_checkboxes(language_counts, all_langs)
+    replace_html_tag("../app/index.html", "div", {"id": "checkboxes"}, checkboxes_html_string)
