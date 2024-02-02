@@ -2,8 +2,8 @@ import sys
 import json
 from bs4 import BeautifulSoup
 
-node_size_coefficient = 0.8
-edge_size_coefficient = 1.2
+node_size_coefficient = 1.0
+edge_size_coefficient = 1.0
 node_alpha = 0.8
 edge_alpa = 0.9
 
