@@ -1,9 +1,3 @@
-/**
- * This example showcases sigma's reducers, which aim to facilitate dynamically
- * changing the appearance of nodes and edges, without actually changing the
- * main graphology data.
- */
-
 import Sigma from "sigma";
 import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import Graph from "graphology";
@@ -12,36 +6,27 @@ import { Attributes } from "graphology-types";
 // Instantiate sigma:
 const graph = new Graph();
 
-// import data from "./data/data.json";
-fetch('/data.json')
-  .then(response => {
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log("Data loaded:", data);
-    graph.import(data)
-  })
-  .catch(error => {
-    console.error("Failed to load data:", error);
-  });
-
-
 // Retrieve some useful DOM elements:
 const container = document.getElementById("sigma-container") as HTMLElement;
 const searchInput = document.getElementById("search-input") as HTMLInputElement;
 const searchSuggestions = document.getElementById("suggestions") as HTMLDataListElement;
 
-const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
-const languageOptions = new Set<string>();
-checkboxes.forEach((checkbox) => {
-  if (checkbox.checked) {
-    languageOptions.add(checkbox.value);
-  }
-});
+async function loadGraphDataAndPopulateSuggestions() {
+  const response = await fetch('data.json');
+  const graphData = await response.json();
+  
+  // Assume graph is an instance of your graph library initialized elsewhere
+  graph.import(graphData); // Load your graph data into the graph instance
+  
+  // Now that the data is loaded, populate the datalist
+  searchSuggestions.innerHTML = graph.nodes().map(node => {
+    const label = graph.getNodeAttribute(node, "label");
+    return `<option value="${label}"></option>`;
+  }).join("\n");
+}
 
+// Call the function to load data and populate suggestions
+loadGraphDataAndPopulateSuggestions();
 const renderer = new Sigma(graph, container);
 
 // configure renderer settings
@@ -63,14 +48,17 @@ interface State {
   // State derived from language selection:
   selectedLanguages: Set<string>;
 }
+
+const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+const languageOptions = new Set<string>();
+checkboxes.forEach((checkbox) => {
+  if (checkbox.checked) {
+    languageOptions.add(checkbox.value);
+  }
+});
+
 const state: State = { searchQuery: "",
   selectedLanguages: languageOptions };
-
-// Feed the datalist autocomplete values:
-searchSuggestions.innerHTML = graph
-  .nodes()
-  .map((node) => `<option value="${graph.getNodeAttribute(node, "label")}"></option>`)
-  .join("\n");
 
 // Actions:
 function setSearchQuery(query: string) {
@@ -129,8 +117,6 @@ function setHoveredNode(node?: string) {
   renderer.refresh();
 }
 
-// *** CHECKBOXES ***
-
 // Function to handle checkbox changes
 function handleCheckboxChange(event: Event) {
   const checkbox = event.target as HTMLInputElement;
@@ -143,7 +129,6 @@ function handleCheckboxChange(event: Event) {
     // Checkbox is unchecked, remove the language from selectedLanguages
     state.selectedLanguages.delete(language);
   }
-  console.log(state.selectedLanguages)
   renderer.refresh()
 }
 checkboxes.forEach((checkbox) => {
@@ -165,7 +150,6 @@ function handleSelectAllDeselectAllClick(selectAll: boolean) {
       state.selectedLanguages.delete(language);
     }
   });
-console.log(state.selectedLanguages);
 renderer.refresh()
 }
 
@@ -205,9 +189,7 @@ searchInput.addEventListener("blur", () => {
 
 // Bind graph interactions:
 renderer.on("enterNode", ({ node }) => {
-  console.log("entering", node)
   if (!state.selectedNode && !state.selectedNeighbors) {
-    console.log(true)
   setHoveredNode(node);
   }
 });
@@ -297,28 +279,3 @@ renderer.setSetting("edgeReducer", (edge, data) => {
 
   return res;
 });
-
-
-
-// // Function to re-render nodes based on selectedLanguages
-// function updateNodeRendering(selectedLanguages: Set<string>) {
-//   // Loop through nodes and update rendering based on selectedLanguages
-//   graph.forEachNode((node, attributes) => {
-//     const languageAttributeValue = attributes.author_lang; // Replace with your attribute name
-//     const res: Partial<NodeDisplayData> = { ...attributes };
-
-//     // Check if node's language is in selectedLanguages
-//     if (selectedLanguages.has(languageAttributeValue)) {
-//       // Node's language is selected, keep its original rendering
-//     } else {
-//       // Node's language is not selected, gray out the node
-//       res.label = "";
-//       res.color = "#f6f6f6";
-//     }
-
-//     // Update the renderer to reflect the changes
-//     graph.mergeNode(node, res);
-//   });
-
-//   renderer.refresh();
-// }

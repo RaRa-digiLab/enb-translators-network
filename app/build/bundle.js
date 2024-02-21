@@ -5769,11 +5769,15 @@ exports.getPixelColor = getPixelColor;
 
 "use strict";
 
-/**
- * This example showcases sigma's reducers, which aim to facilitate dynamically
- * changing the appearance of nodes and edges, without actually changing the
- * main graphology data.
- */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -5782,25 +5786,28 @@ const sigma_1 = __importDefault(__webpack_require__(/*! sigma */ "./node_modules
 const graphology_1 = __importDefault(__webpack_require__(/*! graphology */ "./node_modules/graphology/dist/graphology.umd.min.js"));
 // Instantiate sigma:
 const graph = new graphology_1.default();
-// import data from "./data/data.json";
-fetch('/data.json')
-    .then(response => {
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
-})
-    .then(data => {
-    console.log("Data loaded:", data);
-    graph.import(data);
-})
-    .catch(error => {
-    console.error("Failed to load data:", error);
-});
 // Retrieve some useful DOM elements:
 const container = document.getElementById("sigma-container");
 const searchInput = document.getElementById("search-input");
 const searchSuggestions = document.getElementById("suggestions");
+function loadGraphDataAndPopulateSuggestions() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch('data.json');
+        const graphData = yield response.json();
+        // Assume graph is an instance of your graph library initialized elsewhere
+        graph.import(graphData); // Load your graph data into the graph instance
+        // Now that the data is loaded, populate the datalist
+        searchSuggestions.innerHTML = graph.nodes().map(node => {
+            const label = graph.getNodeAttribute(node, "label");
+            return `<option value="${label}"></option>`;
+        }).join("\n");
+    });
+}
+// Call the function to load data and populate suggestions
+loadGraphDataAndPopulateSuggestions();
+const renderer = new sigma_1.default(graph, container);
+// configure renderer settings
+renderer.setSetting("labelRenderedSizeThreshold", 5);
 const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 const languageOptions = new Set();
 checkboxes.forEach((checkbox) => {
@@ -5808,16 +5815,8 @@ checkboxes.forEach((checkbox) => {
         languageOptions.add(checkbox.value);
     }
 });
-const renderer = new sigma_1.default(graph, container);
-// configure renderer settings
-renderer.setSetting("labelRenderedSizeThreshold", 5);
 const state = { searchQuery: "",
     selectedLanguages: languageOptions };
-// Feed the datalist autocomplete values:
-searchSuggestions.innerHTML = graph
-    .nodes()
-    .map((node) => `<option value="${graph.getNodeAttribute(node, "label")}"></option>`)
-    .join("\n");
 // Actions:
 function setSearchQuery(query) {
     state.searchQuery = query;
@@ -5869,7 +5868,6 @@ function setHoveredNode(node) {
     // Refresh rendering:
     renderer.refresh();
 }
-// *** CHECKBOXES ***
 // Function to handle checkbox changes
 function handleCheckboxChange(event) {
     const checkbox = event.target;
@@ -5882,7 +5880,6 @@ function handleCheckboxChange(event) {
         // Checkbox is unchecked, remove the language from selectedLanguages
         state.selectedLanguages.delete(language);
     }
-    console.log(state.selectedLanguages);
     renderer.refresh();
 }
 checkboxes.forEach((checkbox) => {
@@ -5903,7 +5900,6 @@ function handleSelectAllDeselectAllClick(selectAll) {
             state.selectedLanguages.delete(language);
         }
     });
-    console.log(state.selectedLanguages);
     renderer.refresh();
 }
 // Function to check if any neighbor of a node has a language attribute present in the given set
@@ -5935,9 +5931,7 @@ searchInput.addEventListener("blur", () => {
 });
 // Bind graph interactions:
 renderer.on("enterNode", ({ node }) => {
-    console.log("entering", node);
     if (!state.selectedNode && !state.selectedNeighbors) {
-        console.log(true);
         setHoveredNode(node);
     }
 });
@@ -6013,25 +6007,6 @@ renderer.setSetting("edgeReducer", (edge, data) => {
     }
     return res;
 });
-// // Function to re-render nodes based on selectedLanguages
-// function updateNodeRendering(selectedLanguages: Set<string>) {
-//   // Loop through nodes and update rendering based on selectedLanguages
-//   graph.forEachNode((node, attributes) => {
-//     const languageAttributeValue = attributes.author_lang; // Replace with your attribute name
-//     const res: Partial<NodeDisplayData> = { ...attributes };
-//     // Check if node's language is in selectedLanguages
-//     if (selectedLanguages.has(languageAttributeValue)) {
-//       // Node's language is selected, keep its original rendering
-//     } else {
-//       // Node's language is not selected, gray out the node
-//       res.label = "";
-//       res.color = "#f6f6f6";
-//     }
-//     // Update the renderer to reflect the changes
-//     graph.mergeNode(node, res);
-//   });
-//   renderer.refresh();
-// }
 
 
 /***/ })
