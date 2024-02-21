@@ -4,7 +4,8 @@
   "description": "A minimalist sigma usage example.",
   "main": "index.js",
   "scripts": {
-    "start": "kotatsu serve --typescript index.ts --public / ./public"
+    "start": "kotatsu serve --typescript ./src/index.ts --public / ./public",
+    "build": "kotatsu build client --typescript ./src/index.ts && cp -r ./public/* ./build/"
   },
   "license": "MIT",
   "dependencies": {

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Sigma example template
+  </title>
+ </head>
+ <body>
+  <style>
+   html,
+    body,
+
+    #sigma-container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font: 1em sans-serif;
+    }
+
+    /* Container for all panels */
+    #contents {
+      display: flex;
+      /* Use flexbox layout */
+      flex-direction: column;
+      /* Stack children vertically */
+      justify-content: flex-start;
+      /* Align children to the start of the container */
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 300px;
+      padding: 10px;
+      box-sizing: border-box;
+      /* No need to set a fixed width */
+    }
+
+    /* Styles for each small panel */
+    .small-panel {
+      font-size: small;
+      padding: 12px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(200, 200, 200, 1);
+      border-radius: 10px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      /* Keep space between panels */
+    }
+
+    .small-panel:last-child {
+      margin-bottom: 0;
+      /* Remove bottom margin for the last panel */
+      overflow-y: auto;
+      /* Enables vertical scrolling */
+      flex-grow: 1;
+      /* Allow the last panel to grow and fill available space */
+      max-height: calc(100vh - 20px - 500px);
+    }
+
+    #search-input {
+      width: 220px;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      /* Aligns children to each end */
+      align-items: center;
+      /* Centers children vertically */
+    }
+
+    .language-name {
+      flex-grow: 1;
+      text-align: left;
+      padding-left: 10px;
+    }
+
+    .percentage {
+      font-family: monospace;
+      text-align: right;
+    }
+
+    h2 {
+      margin-top: 10px;
+    }
+
+    h3 {
+      margin-top: 3px;
+    }
+  </style>
+  <div id="sigma-container">
+  </div>
+  <div id="contents">
+   <div class="small-panel" id="info-panel">
+    <h2>
+     Eesti 20. sajandi tõlkekirjandus
+    </h2>
+    <p>
+     See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Sõlmedeks on võõrkeelsed autorid
+        ja tõlkijad, neid ühendavad tõlgitud teosed.
+    </p>
+    <p>
+     Rakenduse alusandmed pärinevad
+     <a href="https://doi.org/10.5281/zenodo.8228805">
+      Eesti Rahvusbibliograafiast
+      <img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg"/>
+     </a>
+    </p>
+   </div>
+   <div class="small-panel" id="search-box">
+    <h3>
+     Otsing
+    </h3>
+    <input id="search-input" list="suggestions" placeholder="Otsi isikut..." type="text"/>
+    <datalist id="suggestions">
+    </datalist>
+   </div>
+   <div class="small-panel" id="language-filter">
+    <h3>
+     Filtreeri keele järgi
+    </h3>
+    <button id="select-all">
+     vali kõik
+    </button>
+    <button id="deselect-all">
+     tühjenda kõik
+    </button>
+    <br/>
+    <br/>
+    <div id="checkboxes">
+     <label>
+      <input checked="" id="category-eng" type="checkbox" value="eng"/>
+      <span class="language-name">
+       inglise
+      </span>
+      <span class="percentage">
+       28.34 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-rus" type="checkbox" value="rus"/>
+      <span class="language-name">
+       vene
+      </span>
+      <span class="percentage">
+       22.91 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ger" type="checkbox" value="ger"/>
+      <span class="language-name">
+       saksa
+      </span>
+      <span class="percentage">
+       13.48 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-fre" type="checkbox" value="fre"/>
+      <span class="language-name">
+       prantsuse
+      </span>
+      <span class="percentage">
+       6.42 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-fin" type="checkbox" value="fin"/>
+      <span class="language-name">
+       soome
+      </span>
+      <span class="percentage">
+       3.45 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-swe" type="checkbox" value="swe"/>
+      <span class="language-name">
+       rootsi
+      </span>
+      <span class="percentage">
+       2.89 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lav" type="checkbox" value="lav"/>
+      <span class="language-name">
+       läti
+      </span>
+      <span class="percentage">
+       2.29 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-hun" type="checkbox" value="hun"/>
+      <span class="language-name">
+       ungari
+      </span>
+      <span class="percentage">
+       1.9 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-pol" type="checkbox" value="pol"/>
+      <span class="language-name">
+       poola
+      </span>
+      <span class="percentage">
+       1.79 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-spa" type="checkbox" value="spa"/>
+      <span class="language-name">
+       hispaania
+      </span>
+      <span class="percentage">
+       1.65 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-cze" type="checkbox" value="cze"/>
+      <span class="language-name">
+       tšehhi
+      </span>
+      <span class="percentage">
+       1.65 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-dan" type="checkbox" value="dan"/>
+      <span class="language-name">
+       taani
+      </span>
+      <span class="percentage">
+       1.24 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ita" type="checkbox" value="ita"/>
+      <span class="language-name">
+       itaalia
+      </span>
+      <span class="percentage">
+       1.21 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-nor" type="checkbox" value="nor"/>
+      <span class="language-name">
+       norra
+      </span>
+      <span class="percentage">
+       1.05 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lit" type="checkbox" value="lit"/>
+      <span class="language-name">
+       leedu
+      </span>
+      <span class="percentage">
+       1.05 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-rum" type="checkbox" value="rum"/>
+      <span class="language-name">
+       rumeenia
+      </span>
+      <span class="percentage">
+       0.66 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ukr" type="checkbox" value="ukr"/>
+      <span class="language-name">
+       ukraina
+      </span>
+      <span class="percentage">
+       0.61 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-dut" type="checkbox" value="dut"/>
+      <span class="language-name">
+       hollandi
+      </span>
+      <span class="percentage">
+       0.44 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-bul" type="checkbox" value="bul"/>
+      <span class="language-name">
+       bulgaaria
+      </span>
+      <span class="percentage">
+       0.41 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-geo" type="checkbox" value="geo"/>
+      <span class="language-name">
+       gruusia
+      </span>
+      <span class="percentage">
+       0.41 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-bel" type="checkbox" value="bel"/>
+      <span class="language-name">
+       belgia
+      </span>
+      <span class="percentage">
+       0.41 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-slo" type="checkbox" value="slo"/>
+      <span class="language-name">
+       slovakkia
+      </span>
+      <span class="percentage">
+       0.33 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-arm" type="checkbox" value="arm"/>
+      <span class="language-name">
+       armeenia
+      </span>
+      <span class="percentage">
+       0.33 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-gre" type="checkbox" value="gre"/>
+      <span class="language-name">
+       kreeka
+      </span>
+      <span class="percentage">
+       0.3 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ice" type="checkbox" value="ice"/>
+      <span class="language-name">
+       islandi
+      </span>
+      <span class="percentage">
+       0.25 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-heb" type="checkbox" value="heb"/>
+      <span class="language-name">
+       heebrea
+      </span>
+      <span class="percentage">
+       0.25 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-jpn" type="checkbox" value="jpn"/>
+      <span class="language-name">
+       jaapani
+      </span>
+      <span class="percentage">
+       0.22 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-por" type="checkbox" value="por"/>
+      <span class="language-name">
+       portugali
+      </span>
+      <span class="percentage">
+       0.19 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lat" type="checkbox" value="lat"/>
+      <span class="language-name">
+       ladina
+      </span>
+      <span class="percentage">
+       0.17 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-other" type="checkbox" value="other"/>
+      <span class="language-name">
+       muu
+      </span>
+      <span class="percentage">
+       3.69 %
+      </span>
+     </label>
+    </div>
+   </div>
+  </div>
+  <script src="/bundle.js">
+  </script>
+ </body>
+</html>

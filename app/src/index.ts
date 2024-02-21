@@ -9,7 +9,25 @@ import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import Graph from "graphology";
 import { Attributes } from "graphology-types";
 
-import data from "./data/data.json";
+// Instantiate sigma:
+const graph = new Graph();
+
+// import data from "./data/data.json";
+fetch('/data.json')
+  .then(response => {
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log("Data loaded:", data);
+    graph.import(data)
+  })
+  .catch(error => {
+    console.error("Failed to load data:", error);
+  });
+
 
 // Retrieve some useful DOM elements:
 const container = document.getElementById("sigma-container") as HTMLElement;
@@ -24,9 +42,6 @@ checkboxes.forEach((checkbox) => {
   }
 });
 
-// Instantiate sigma:
-const graph = new Graph();
-graph.import(data);
 const renderer = new Sigma(graph, container);
 
 // configure renderer settings
@@ -191,7 +206,8 @@ searchInput.addEventListener("blur", () => {
 // Bind graph interactions:
 renderer.on("enterNode", ({ node }) => {
   console.log("entering", node)
-  if (!state.selectedNode) {
+  if (!state.selectedNode && !state.selectedNeighbors) {
+    console.log(true)
   setHoveredNode(node);
   }
 });
