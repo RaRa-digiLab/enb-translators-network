@@ -1,7 +1,7 @@
 {
-  "name": "sigma-example-template",
+  "name": "erb-tolkevorgustik-20saj",
   "version": "1.0.0",
-  "description": "A minimalist sigma usage example.",
+  "description": "20. sajandi eesti ilukirjanduse tõlkevõrgustikud ",
   "main": "index.js",
   "scripts": {
     "start": "kotatsu serve --typescript ./src/index.ts --public / ./public",
