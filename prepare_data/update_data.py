@@ -109,7 +109,7 @@ def update_languages_and_colors(data, language_colors):
     return data, language_counts, all_langs
 
 # write html structure for language checkboxes
-def write_language_checkboxes(language_counts, all_langs):
+def write_language_checkboxes(language_counts, all_langs, language_colors):
     checkbox_values = [lang for lang, count in sorted(language_counts.items(), key=lambda item: item[1], reverse=True)]
     checkbox_values.remove("other")
     checkbox_values.append("other")
@@ -120,7 +120,7 @@ def write_language_checkboxes(language_counts, all_langs):
         lang_share = round((language_counts[lang] / all_langs * 100), 2)
         html_string += f"""    <label>
             <input type="checkbox" id="category-{lang}" value="{lang}" checked />
-                <span class="language-name"> {languages[lang]}</span>
+                <span class="language-name" style="color: {language_colors[lang]};"> {languages[lang]}</span>
                 <span class="percentage">{lang_share} %</span>
     </label>
     """
@@ -161,8 +161,8 @@ if __name__ == "__main__":
     data = update_edges(data, edge_size_coefficient)
     data, language_counts, all_langs = update_languages_and_colors(data, language_colors)
 
-    with open("../app/data/data.json", "w", encoding="utf8") as f:
+    with open("../app/public/data.json", "w", encoding="utf8") as f:
         data = json.dump(data, f)
 
-    checkboxes_html_string = write_language_checkboxes(language_counts, all_langs)
-    replace_html_tag("../app/index.html", "div", {"id": "checkboxes"}, checkboxes_html_string)
+    checkboxes_html_string = write_language_checkboxes(language_counts, all_langs, language_colors)
+    replace_html_tag("../app/public/index.html", "div", {"id": "checkboxes"}, checkboxes_html_string)
