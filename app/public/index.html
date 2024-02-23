@@ -33,7 +33,7 @@
       position: absolute;
       top: 10px;
       left: 10px;
-      width: 300px;
+      width: 320px;
       padding: 10px;
       box-sizing: border-box;
       /* No need to set a fixed width */
@@ -100,14 +100,22 @@
      Eesti 20. sajandi tõlkekirjandus
     </h2>
     <p>
-     See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Sõlmedeks on võõrkeelsed autorid
-        ja tõlkijad, neid ühendavad tõlgitud teosed.
+     See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Võrgustik koosneb 1881 tõlkijast ja 3590 võõrkeelsest autorist. Tõlkijaid ja autoreid ühendavad kaared kujutavad eestindatud teoseid, värvid sümboliseerivad erinevaid keeli.
+    </p>
+    <p>
+     Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste sõlmedega. Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud keeli.
     </p>
     <p>
      Rakenduse alusandmed pärinevad
      <a href="https://doi.org/10.5281/zenodo.8228805">
       Eesti Rahvusbibliograafiast
       <img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg"/>
+     </a>
+    </p>
+    <p>
+     Lähtekood on leitav
+     <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
+      Githubis
      </a>
     </p>
    </div>
@@ -134,7 +142,7 @@
     <div id="checkboxes">
      <label>
       <input checked="" id="category-eng" type="checkbox" value="eng"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 221, 235);">
        inglise
       </span>
       <span class="percentage">
@@ -143,7 +151,7 @@
      </label>
      <label>
       <input checked="" id="category-rus" type="checkbox" value="rus"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(255, 111, 36);">
        vene
       </span>
       <span class="percentage">
@@ -152,7 +160,7 @@
      </label>
      <label>
       <input checked="" id="category-ger" type="checkbox" value="ger"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(255, 130, 255);">
        saksa
       </span>
       <span class="percentage">
@@ -161,7 +169,7 @@
      </label>
      <label>
       <input checked="" id="category-fre" type="checkbox" value="fre"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(54, 224, 0);">
        prantsuse
       </span>
       <span class="percentage">
@@ -170,7 +178,7 @@
      </label>
      <label>
       <input checked="" id="category-fin" type="checkbox" value="fin"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(223, 170, 0);">
        soome
       </span>
       <span class="percentage">
@@ -179,7 +187,7 @@
      </label>
      <label>
       <input checked="" id="category-swe" type="checkbox" value="swe"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(152, 204, 243);">
        rootsi
       </span>
       <span class="percentage">
@@ -188,7 +196,7 @@
      </label>
      <label>
       <input checked="" id="category-lav" type="checkbox" value="lav"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(255, 163, 139);">
        läti
       </span>
       <span class="percentage">
@@ -197,7 +205,7 @@
      </label>
      <label>
       <input checked="" id="category-hun" type="checkbox" value="hun"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(139, 216, 144);">
        ungari
       </span>
       <span class="percentage">
@@ -206,7 +214,7 @@
      </label>
      <label>
       <input checked="" id="category-pol" type="checkbox" value="pol"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(255, 91, 190);">
        poola
       </span>
       <span class="percentage">
@@ -215,7 +223,7 @@
      </label>
      <label>
       <input checked="" id="category-spa" type="checkbox" value="spa"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(167, 165, 255);">
        hispaania
       </span>
       <span class="percentage">
@@ -224,7 +232,7 @@
      </label>
      <label>
       <input checked="" id="category-cze" type="checkbox" value="cze"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(95, 80, 137);">
        tšehhi
       </span>
       <span class="percentage">
@@ -233,7 +241,7 @@
      </label>
      <label>
       <input checked="" id="category-dan" type="checkbox" value="dan"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(255, 172, 226);">
        taani
       </span>
       <span class="percentage">
@@ -242,7 +250,7 @@
      </label>
      <label>
       <input checked="" id="category-ita" type="checkbox" value="ita"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 211, 151);">
        itaalia
       </span>
       <span class="percentage">
@@ -251,7 +259,7 @@
      </label>
      <label>
       <input checked="" id="category-nor" type="checkbox" value="nor"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(66, 117, 5);">
        norra
       </span>
       <span class="percentage">
@@ -260,7 +268,7 @@
      </label>
      <label>
       <input checked="" id="category-lit" type="checkbox" value="lit"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(168, 50, 83);">
        leedu
       </span>
       <span class="percentage">
@@ -269,7 +277,7 @@
      </label>
      <label>
       <input checked="" id="category-rum" type="checkbox" value="rum"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 109, 76);">
        rumeenia
       </span>
       <span class="percentage">
@@ -278,7 +286,7 @@
      </label>
      <label>
       <input checked="" id="category-ukr" type="checkbox" value="ukr"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(125, 83, 0);">
        ukraina
       </span>
       <span class="percentage">
@@ -287,7 +295,7 @@
      </label>
      <label>
       <input checked="" id="category-dut" type="checkbox" value="dut"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(255, 81, 114);">
        hollandi
       </span>
       <span class="percentage">
@@ -296,7 +304,7 @@
      </label>
      <label>
       <input checked="" id="category-bul" type="checkbox" value="bul"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(185, 171, 153);">
        bulgaaria
       </span>
       <span class="percentage">
@@ -305,7 +313,7 @@
      </label>
      <label>
       <input checked="" id="category-geo" type="checkbox" value="geo"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 184, 255);">
        gruusia
       </span>
       <span class="percentage">
@@ -314,7 +322,7 @@
      </label>
      <label>
       <input checked="" id="category-bel" type="checkbox" value="bel"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 86, 111);">
        belgia
       </span>
       <span class="percentage">
@@ -323,7 +331,7 @@
      </label>
      <label>
       <input checked="" id="category-slo" type="checkbox" value="slo"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 229, 255);">
        slovakkia
       </span>
       <span class="percentage">
@@ -332,7 +340,7 @@
      </label>
      <label>
       <input checked="" id="category-arm" type="checkbox" value="arm"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(161, 195, 0);">
        armeenia
       </span>
       <span class="percentage">
@@ -341,7 +349,7 @@
      </label>
      <label>
       <input checked="" id="category-gre" type="checkbox" value="gre"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(235, 190, 95);">
        kreeka
       </span>
       <span class="percentage">
@@ -350,7 +358,7 @@
      </label>
      <label>
       <input checked="" id="category-ice" type="checkbox" value="ice"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 209, 69);">
        islandi
       </span>
       <span class="percentage">
@@ -359,7 +367,7 @@
      </label>
      <label>
       <input checked="" id="category-heb" type="checkbox" value="heb"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(203, 83, 192);">
        heebrea
       </span>
       <span class="percentage">
@@ -368,7 +376,7 @@
      </label>
      <label>
       <input checked="" id="category-jpn" type="checkbox" value="jpn"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(255, 146, 0);">
        jaapani
       </span>
       <span class="percentage">
@@ -377,7 +385,7 @@
      </label>
      <label>
       <input checked="" id="category-por" type="checkbox" value="por"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 186, 205);">
        portugali
       </span>
       <span class="percentage">
@@ -386,7 +394,7 @@
      </label>
      <label>
       <input checked="" id="category-lat" type="checkbox" value="lat"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(216, 76, 32);">
        ladina
       </span>
       <span class="percentage">
@@ -395,7 +403,7 @@
      </label>
      <label>
       <input checked="" id="category-other" type="checkbox" value="other"/>
-      <span class="language-name">
+      <span class="language-name" style="color: rgb(0, 186, 205);">
        muu
       </span>
       <span class="percentage">
