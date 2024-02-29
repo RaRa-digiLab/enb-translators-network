@@ -279,3 +279,17 @@ renderer.setSetting("edgeReducer", (edge, data) => {
 
   return res;
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const menuButton = document.querySelector('.menu-button');
+  if (menuButton) {
+    menuButton.addEventListener('click', () => {
+      console.log("clicked button")
+      const panels = document.querySelectorAll('.small-panel');
+      panels.forEach((panel) => {
+        // Toggle a class that controls visibility
+        panel.classList.toggle('is-visible');
+      });
+    });
+  }
+});
