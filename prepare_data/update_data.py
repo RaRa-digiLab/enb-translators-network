@@ -50,6 +50,9 @@ def update_nodes(data, size_coefficient):
         node_key = node.pop("id")
         node["key"] = node_key
 
+        for val in ["activity_start", "activity_end"]:
+            node["attributes"][val] = int(node["attributes"][val])
+
         for val in ["x", "y", "color", "size", "label"]:
             node["attributes"][val] = node[val]
             del node[val]
@@ -63,6 +66,9 @@ def update_edges(data, size_coefficient):
     for edge in data["edges"]:
         edge_key = edge.pop("id")
         edge["key"] = edge_key
+
+        for val in ["activity_start", "activity_end"]:
+            edge["attributes"][val] = int(edge["attributes"][val])
 
         for val in ["color", "size"]:
             edge["attributes"][val] = edge[val]
