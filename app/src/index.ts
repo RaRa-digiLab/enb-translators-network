@@ -10,6 +10,12 @@ const graph = new Graph();
 const container = document.getElementById("sigma-container") as HTMLElement;
 const searchInput = document.getElementById("search-input") as HTMLInputElement;
 const searchSuggestions = document.getElementById("suggestions") as HTMLDataListElement;
+const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+
+const minYearInput = document.getElementById("min-year") as HTMLInputElement;
+const maxYearInput = document.getElementById("max-year") as HTMLInputElement;
+const minYear = parseFloat(minYearInput.value)
+const maxYear = parseFloat(maxYearInput.value)
 
 async function loadGraphDataAndPopulateSuggestions() {
   const response = await fetch('data.json');
@@ -47,9 +53,12 @@ interface State {
 
   // State derived from language selection:
   selectedLanguages: Set<string>;
+
+  // State derived from range slider:
+  minYear: number;
+  maxYear: number;
 }
 
-const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
 const languageOptions = new Set<string>();
 checkboxes.forEach((checkbox) => {
   if (checkbox.checked) {
@@ -57,8 +66,11 @@ checkboxes.forEach((checkbox) => {
   }
 });
 
+// Declare application state
 const state: State = { searchQuery: "",
-  selectedLanguages: languageOptions };
+  selectedLanguages: languageOptions,
+  minYear: minYear,
+  maxYear: maxYear };
 
 // Actions:
 function setSearchQuery(query: string) {
@@ -117,6 +129,24 @@ function setHoveredNode(node?: string) {
   renderer.refresh();
 }
 
+// Function to handle input changes for both min and max year inputs
+function handleYearInputChange(event: Event) {
+  // Get the target input element that triggered the event
+  const targetInput = event.target as HTMLInputElement;
+
+  // Parse the input value as a number
+  const yearValue = parseFloat(targetInput.value);
+
+  // Update the appropriate state variable based on the input element's id
+  if (targetInput.id === "min-year") {
+    // Update min year state variable
+    state.minYear = yearValue;
+  } else if (targetInput.id === "max-year") {
+    // Update max year state variable
+    state.maxYear = yearValue;
+  }
+}
+
 // Function to handle checkbox changes
 function handleCheckboxChange(event: Event) {
   const checkbox = event.target as HTMLInputElement;
@@ -159,6 +189,10 @@ function hasNeighborWithLanguages(graph: Graph, nodeKey: string, languages = sta
     return languages.has(attributes.author_lang);
   });
 }
+
+// Attach event listeners to handle input changes for both min and max year inputs
+minYearInput.addEventListener("input", handleYearInputChange);
+maxYearInput.addEventListener("input", handleYearInputChange);
 
 // Attach event listeners to checkboxes
 // const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -225,6 +259,11 @@ renderer.setSetting("nodeReducer", (node, data) => {
     res.label = "";
     res.color = "#f6f6f6";
 
+    // grey if the node's activity is outside the selected timerange
+  } else if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
+    res.label = "";
+    res.color = "#f6f6f6";
+
     // grey if the suggestion box is open and the node is not suggested
   } else if (state.suggestions && !state.suggestions.has(node)) {
     res.label = "";
@@ -258,6 +297,11 @@ renderer.setSetting("edgeReducer", (edge, data) => {
     res.hidden = true;
   }
 
+  // grey if the node's activity is outside the selected timerange
+  else if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
+    res.hidden = true
+  }
+
   // hide edge if nodes are not suggested
   else if (state.suggestions && (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))) {
     res.hidden = true;
@@ -279,6 +323,7 @@ renderer.setSetting("edgeReducer", (edge, data) => {
 
   return res;
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const menuButton = document.querySelector('.menu-button');
