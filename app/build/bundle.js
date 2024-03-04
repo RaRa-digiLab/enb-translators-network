@@ -6060,46 +6060,18 @@ renderer.setSetting("edgeReducer", (edge, data) => {
     }
     return res;
 });
-// document.addEventListener('DOMContentLoaded', () => {
-//   const menuButton = document.querySelector('.menu-button');
-//   if (menuButton) {
-//     menuButton.addEventListener('click', () => {
-//       console.log("clicked button")
-//       const panels = document.querySelectorAll('.small-panel');
-//       panels.forEach((panel) => {
-//         // Toggle a class that controls visibility
-//         panel.classList.toggle('is-visible');
-//       });
-//     });
-//   }
-// });
 document.addEventListener('DOMContentLoaded', () => {
     const menuButton = document.querySelector('.menu-button');
-    const panels = Array.from(document.querySelectorAll('.small-panel'));
-    menuButton.addEventListener('click', () => {
-        const isAnyPanelVisible = panels.some(panel => panel.classList.contains('is-visible'));
-        panels.forEach((panel) => {
-            if (isAnyPanelVisible) {
-                // If any panel is visible, hide all
-                panel.classList.remove('is-visible');
-            }
-            else {
-                // If no panels are visible, show all
-                panel.classList.add('is-visible');
-            }
+    if (menuButton) {
+        menuButton.addEventListener('click', () => {
+            console.log("clicked button");
+            const panels = document.querySelectorAll('.small-panel');
+            panels.forEach((panel) => {
+                // Toggle a class that controls visibility
+                panel.classList.toggle('is-visible');
+            });
         });
-    });
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            // For wider screens, ensure that panels are visible
-            panels.forEach((panel) => panel.classList.add('is-visible'));
-        }
-        else {
-            // For narrow screens, respect the toggle state
-            // Optional: Add logic here if you want to change the behavior on narrow screens
-        }
-    });
+    }
 });
 document.addEventListener('DOMContentLoaded', () => {
     const descriptionToggle = document.getElementById('description-toggle');
