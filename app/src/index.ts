@@ -16,6 +16,7 @@ const minYearInput = document.getElementById("min-year") as HTMLInputElement;
 const maxYearInput = document.getElementById("max-year") as HTMLInputElement;
 const minYear = parseFloat(minYearInput.value)
 const maxYear = parseFloat(maxYearInput.value)
+const timerangeButton = document.getElementById("timerange-button") as HTMLButtonElement;
 
 async function loadGraphDataAndPopulateSuggestions() {
   const response = await fetch('data.json');
@@ -129,23 +130,39 @@ function setHoveredNode(node?: string) {
   renderer.refresh();
 }
 
-// Function to handle input changes for both min and max year inputs
-function handleYearInputChange(event: Event) {
-  // Get the target input element that triggered the event
-  const targetInput = event.target as HTMLInputElement;
+// Event listener for the apply button
+timerangeButton.addEventListener("click", function() {
+  // Get the values from the input elements
+  const minYear = parseInt(minYearInput.value);
+  const maxYear = parseInt(maxYearInput.value);
+  state.minYear = minYear
+  state.maxYear = maxYear
 
-  // Parse the input value as a number
-  const yearValue = parseFloat(targetInput.value);
+  // Use the values as needed in your JavaScript code
+  console.log("Min Year:", minYear);
+  console.log("Max Year:", maxYear);
 
-  // Update the appropriate state variable based on the input element's id
-  if (targetInput.id === "min-year") {
-    // Update min year state variable
-    state.minYear = yearValue;
-  } else if (targetInput.id === "max-year") {
-    // Update max year state variable
-    state.maxYear = yearValue;
-  }
-}
+  // For example, update the rendering based on the new year range
+  renderer.refresh()
+});
+
+// // Function to handle input changes for both min and max year inputs
+// function handleYearInputChange(event: Event) {
+//   // Get the target input element that triggered the event
+//   const targetInput = event.target as HTMLInputElement;
+
+//   // Parse the input value as a number
+//   const yearValue = parseFloat(targetInput.value);
+
+//   // Update the appropriate state variable based on the input element's id
+//   if (targetInput.id === "min-year") {
+//     // Update min year state variable
+//     state.minYear = yearValue;
+//   } else if (targetInput.id === "max-year") {
+//     // Update max year state variable
+//     state.maxYear = yearValue;
+//   }
+// }
 
 // Function to handle checkbox changes
 function handleCheckboxChange(event: Event) {
@@ -191,8 +208,8 @@ function hasNeighborWithLanguages(graph: Graph, nodeKey: string, languages = sta
 }
 
 // Attach event listeners to handle input changes for both min and max year inputs
-minYearInput.addEventListener("input", handleYearInputChange);
-maxYearInput.addEventListener("input", handleYearInputChange);
+//minYearInput.addEventListener("input", handleYearInputChange);
+//maxYearInput.addEventListener("input", handleYearInputChange);
 
 // Attach event listeners to checkboxes
 // const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -245,6 +262,12 @@ renderer.on("clickStage", () => {
 renderer.setSetting("nodeReducer", (node, data) => {
   const res: Partial<NodeDisplayData> = { ...data };
 
+  // grey if the node's activity is outside the selected timerange
+  if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
+  res.label = "";
+  res.color = "#f6f6f6";
+  }
+
   // is the node hovered or neighbors a hovered node
   if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
     res.label = "";
@@ -287,6 +310,11 @@ renderer.setSetting("nodeReducer", (node, data) => {
 renderer.setSetting("edgeReducer", (edge, data) => {
   const res: Partial<EdgeDisplayData> = { ...data };
 
+  // grey if the node's activity is outside the selected timerange
+  if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
+    res.hidden = true
+  }
+
   // hide edge if nodes are not hovered
   if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
     res.hidden = true;
@@ -295,11 +323,6 @@ renderer.setSetting("edgeReducer", (edge, data) => {
   // hide edge if nodes are not selected
   else if (state.selectedNode && !graph.hasExtremity(edge, state.selectedNode)) {
     res.hidden = true;
-  }
-
-  // grey if the node's activity is outside the selected timerange
-  else if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
-    res.hidden = true
   }
 
   // hide edge if nodes are not suggested
@@ -338,3 +361,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const descriptionToggle = document.getElementById('description-toggle');
+  const descriptionContent = document.getElementById('description-content');
+  // Get all elements with class 'small-panel' and select the last one
+  const allSmallPanels = Array.from(document.querySelectorAll('.small-panel'));
+  const lastSmallPanel = allSmallPanels[allSmallPanels.length - 1];
+
+  descriptionToggle?.addEventListener('click', () => {
+    if (descriptionContent && descriptionContent instanceof HTMLElement) {
+      if (descriptionContent.style.display === 'none') {
+        descriptionContent.style.display = 'block';
+        descriptionToggle.innerHTML = '<u><i>peida kirjeldus</i></u>';
+        // Adjust the height of the last small panel here
+        if (lastSmallPanel && lastSmallPanel instanceof HTMLElement) {
+          lastSmallPanel.style.maxHeight = 'calc(100vh - 20px - 650px)'; // Or any other value
+        }
+      } else {
+        descriptionContent.style.display = 'none';
+        descriptionToggle.innerHTML = '<u><i>näita kirjeldust</i></u>';
+        // Reset the height of the last small panel here
+        if (lastSmallPanel && lastSmallPanel instanceof HTMLElement) {
+          lastSmallPanel.style.maxHeight = 'calc(100vh - 20px - 350px)'; // Or any other initial value
+        }
+      }
+    }
+  });
+});
+
+

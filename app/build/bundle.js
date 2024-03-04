@@ -5795,6 +5795,7 @@ const minYearInput = document.getElementById("min-year");
 const maxYearInput = document.getElementById("max-year");
 const minYear = parseFloat(minYearInput.value);
 const maxYear = parseFloat(maxYearInput.value);
+const timerangeButton = document.getElementById("timerange-button");
 function loadGraphDataAndPopulateSuggestions() {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch('data.json');
@@ -5875,22 +5876,34 @@ function setHoveredNode(node) {
     // Refresh rendering:
     renderer.refresh();
 }
-// Function to handle input changes for both min and max year inputs
-function handleYearInputChange(event) {
-    // Get the target input element that triggered the event
-    const targetInput = event.target;
-    // Parse the input value as a number
-    const yearValue = parseFloat(targetInput.value);
-    // Update the appropriate state variable based on the input element's id
-    if (targetInput.id === "min-year") {
-        // Update min year state variable
-        state.minYear = yearValue;
-    }
-    else if (targetInput.id === "max-year") {
-        // Update max year state variable
-        state.maxYear = yearValue;
-    }
-}
+// Event listener for the apply button
+timerangeButton.addEventListener("click", function () {
+    // Get the values from the input elements
+    const minYear = parseInt(minYearInput.value);
+    const maxYear = parseInt(maxYearInput.value);
+    state.minYear = minYear;
+    state.maxYear = maxYear;
+    // Use the values as needed in your JavaScript code
+    console.log("Min Year:", minYear);
+    console.log("Max Year:", maxYear);
+    // For example, update the rendering based on the new year range
+    renderer.refresh();
+});
+// // Function to handle input changes for both min and max year inputs
+// function handleYearInputChange(event: Event) {
+//   // Get the target input element that triggered the event
+//   const targetInput = event.target as HTMLInputElement;
+//   // Parse the input value as a number
+//   const yearValue = parseFloat(targetInput.value);
+//   // Update the appropriate state variable based on the input element's id
+//   if (targetInput.id === "min-year") {
+//     // Update min year state variable
+//     state.minYear = yearValue;
+//   } else if (targetInput.id === "max-year") {
+//     // Update max year state variable
+//     state.maxYear = yearValue;
+//   }
+// }
 // Function to handle checkbox changes
 function handleCheckboxChange(event) {
     const checkbox = event.target;
@@ -5932,8 +5945,8 @@ function hasNeighborWithLanguages(graph, nodeKey, languages = state.selectedLang
     });
 }
 // Attach event listeners to handle input changes for both min and max year inputs
-minYearInput.addEventListener("input", handleYearInputChange);
-maxYearInput.addEventListener("input", handleYearInputChange);
+//minYearInput.addEventListener("input", handleYearInputChange);
+//maxYearInput.addEventListener("input", handleYearInputChange);
 // Attach event listeners to checkboxes
 // const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 checkboxes.forEach((checkbox) => {
@@ -5976,6 +5989,11 @@ renderer.on("clickStage", () => {
 });
 renderer.setSetting("nodeReducer", (node, data) => {
     const res = Object.assign({}, data);
+    // grey if the node's activity is outside the selected timerange
+    if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
+        res.label = "";
+        res.color = "#f6f6f6";
+    }
     // is the node hovered or neighbors a hovered node
     if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
         res.label = "";
@@ -6014,16 +6032,16 @@ renderer.setSetting("nodeReducer", (node, data) => {
 });
 renderer.setSetting("edgeReducer", (edge, data) => {
     const res = Object.assign({}, data);
+    // grey if the node's activity is outside the selected timerange
+    if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
+        res.hidden = true;
+    }
     // hide edge if nodes are not hovered
     if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
         res.hidden = true;
     }
     // hide edge if nodes are not selected
     else if (state.selectedNode && !graph.hasExtremity(edge, state.selectedNode)) {
-        res.hidden = true;
-    }
-    // grey if the node's activity is outside the selected timerange
-    else if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
         res.hidden = true;
     }
     // hide edge if nodes are not suggested
@@ -6042,18 +6060,73 @@ renderer.setSetting("edgeReducer", (edge, data) => {
     }
     return res;
 });
+// document.addEventListener('DOMContentLoaded', () => {
+//   const menuButton = document.querySelector('.menu-button');
+//   if (menuButton) {
+//     menuButton.addEventListener('click', () => {
+//       console.log("clicked button")
+//       const panels = document.querySelectorAll('.small-panel');
+//       panels.forEach((panel) => {
+//         // Toggle a class that controls visibility
+//         panel.classList.toggle('is-visible');
+//       });
+//     });
+//   }
+// });
 document.addEventListener('DOMContentLoaded', () => {
     const menuButton = document.querySelector('.menu-button');
-    if (menuButton) {
-        menuButton.addEventListener('click', () => {
-            console.log("clicked button");
-            const panels = document.querySelectorAll('.small-panel');
-            panels.forEach((panel) => {
-                // Toggle a class that controls visibility
-                panel.classList.toggle('is-visible');
-            });
+    const panels = Array.from(document.querySelectorAll('.small-panel'));
+    menuButton.addEventListener('click', () => {
+        const isAnyPanelVisible = panels.some(panel => panel.classList.contains('is-visible'));
+        panels.forEach((panel) => {
+            if (isAnyPanelVisible) {
+                // If any panel is visible, hide all
+                panel.classList.remove('is-visible');
+            }
+            else {
+                // If no panels are visible, show all
+                panel.classList.add('is-visible');
+            }
         });
-    }
+    });
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            // For wider screens, ensure that panels are visible
+            panels.forEach((panel) => panel.classList.add('is-visible'));
+        }
+        else {
+            // For narrow screens, respect the toggle state
+            // Optional: Add logic here if you want to change the behavior on narrow screens
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const descriptionToggle = document.getElementById('description-toggle');
+    const descriptionContent = document.getElementById('description-content');
+    // Get all elements with class 'small-panel' and select the last one
+    const allSmallPanels = Array.from(document.querySelectorAll('.small-panel'));
+    const lastSmallPanel = allSmallPanels[allSmallPanels.length - 1];
+    descriptionToggle === null || descriptionToggle === void 0 ? void 0 : descriptionToggle.addEventListener('click', () => {
+        if (descriptionContent && descriptionContent instanceof HTMLElement) {
+            if (descriptionContent.style.display === 'none') {
+                descriptionContent.style.display = 'block';
+                descriptionToggle.innerHTML = '<u><i>peida kirjeldus</i></u>';
+                // Adjust the height of the last small panel here
+                if (lastSmallPanel && lastSmallPanel instanceof HTMLElement) {
+                    lastSmallPanel.style.maxHeight = 'calc(100vh - 20px - 650px)'; // Or any other value
+                }
+            }
+            else {
+                descriptionContent.style.display = 'none';
+                descriptionToggle.innerHTML = '<u><i>näita kirjeldust</i></u>';
+                // Reset the height of the last small panel here
+                if (lastSmallPanel && lastSmallPanel instanceof HTMLElement) {
+                    lastSmallPanel.style.maxHeight = 'calc(100vh - 20px - 350px)'; // Or any other initial value
+                }
+            }
+        }
+    });
 });
 
 

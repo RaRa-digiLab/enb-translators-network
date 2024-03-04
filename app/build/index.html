@@ -79,6 +79,11 @@
       top: 8px;
     }
 
+    .description-toggle {
+      cursor: pointer;
+      color: #0000EE;
+    }
+
     /* Styles for each small panel */
     .small-panel {
       font-size: small;
@@ -98,14 +103,16 @@
       /* Enables vertical scrolling */
       flex-grow: 1;
       /* Allow the last panel to grow and fill available space */
-      max-height: calc(100vh - 20px - 500px);
+      max-height: calc(100vh - 20px - 350px);
     }
 
-
-
     .timerange-input {
-      width: 100px;
-      margin-right: 20px;
+      width: 50px;
+    }
+
+    #timerange-button {
+      width: 35px;
+      margin-left: 8px;
     }
 
     #search-input {
@@ -165,35 +172,42 @@
       <span class="hamburger-icon"></span>
     </button>
     <div class="small-panel" id="info-panel">
-      <h2>
-        Eesti 20. sajandi tõlkekirjandus
-      </h2>
-      <p>
-        See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Võrgustik koosneb 1881 tõlkijast
-        ja 3590 võõrkeelsest autorist. Tõlkijaid ja autoreid ühendavad kaared kujutavad eestindatud teoseid, värvid
-        sümboliseerivad erinevaid keeli.
-      </p>
-      <p>
-        Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste sõlmedega.
-        Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud keeli.
-      </p>
-      <p>
-        Rakenduse alusandmed pärinevad
-        <a href="https://doi.org/10.5281/zenodo.8228805">
-          Eesti Rahvusbibliograafiast
-          <img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg" />
-        </a>
-      </p>
-      <p>
-        Lähtekood on leitav
-        <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
-          Githubis
-        </a>
-      </p>
+      <div id="title-container">
+        <h2>Eesti 20. sajandi tõlkekirjandus</h2>
+        <div id="description-toggle" class="description-toggle"><i><u>näita kirjeldust</u></i></div>
+      </div>
+      <div id="description-content" style="display: none;">
+        <p>
+          See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Võrgustik koosneb 1881
+          tõlkijast
+          ja 3590 võõrkeelsest autorist. Tõlkijaid ja autoreid ühendavad kaared kujutavad eestindatud teoseid, värvid
+          sümboliseerivad erinevaid keeli.
+        </p>
+        <p>
+          Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste
+          sõlmedega.
+          Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud keeli.
+        </p>
+        <p>
+          Rakenduse alusandmed pärinevad
+          <a href="https://doi.org/10.5281/zenodo.8228805">
+            Eesti Rahvusbibliograafiast
+            <img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg" />
+          </a>
+        </p>
+        <p>
+          Lähtekood on leitav
+          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
+            Githubis
+          </a>
+        </p>
+      </div>
     </div>
     <div class="small-panel" id="slider-container">
-      <span><input class="timerange-input" id="min-year" type="number" value="1900"/></span>
-      <span><input class="timerange-input" id="max-year" type="number" value="2000"/></span>
+      <span>Ajavahemik:</span>
+      <span><input class="timerange-input" id="min-year" type="number" value="1900" /> &#8211; </span>
+      <span><input class="timerange-input" id="max-year" type="number" value="2000" /></span>
+      <span><button id="timerange-button">vali</button></span>
     </div>
     <div class="small-panel" id="search-box">
       <h3>
