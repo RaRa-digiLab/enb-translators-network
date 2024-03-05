@@ -97,7 +97,7 @@ def write_language_checkboxes(language_counts, all_langs, language_colors):
     html_string = '<div id="checkboxes">\n'
 
     for lang in checkbox_values:
-        lang_share = round((language_counts[lang] / all_langs * 100), 2)
+        lang_share = format(round((language_counts[lang] / all_langs * 100), 2), ".2f")
         html_string += f"""    <label>
             <input type="checkbox" id="category-{lang}" value="{lang}" checked />
                 <span class="language-name" style="color: {language_colors[lang]};"> {language_codes[lang]}</span>
