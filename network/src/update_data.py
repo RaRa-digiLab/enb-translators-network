@@ -3,42 +3,16 @@ import json
 from bs4 import BeautifulSoup
 
 node_size_coefficient = 1.0
-edge_size_coefficient = 1.0
+edge_size_coefficient = 0.5
 node_alpha = 0.8
 edge_alpa = 0.9
 
-languages = {
-    "eng": "inglise",
-    "rus": "vene",
-    "ger": "saksa",
-    "fre": "prantsuse",
-    "fin": "soome",
-    "swe": "rootsi",
-    "lav": "läti",
-    "hun": "ungari",
-    "pol": "poola",
-    "spa": "hispaania",
-    "cze": "tšehhi",
-    "dan": "taani",
-    "ita": "itaalia",
-    "nor": "norra",
-    "lit": "leedu",
-    "rum": "rumeenia",
-    "dut": "hollandi",
-    "ukr": "ukraina",
-    "bul": "bulgaaria",
-    "geo": "gruusia",
-    "gre": "kreeka",
-    "bel": "belgia",
-    "slo": "slovakkia",
-    "arm": "armeenia",
-    "lat": "ladina",
-    "jpn": "jaapani",
-    "ice": "islandi",
-    "heb": "heebrea",
-    "por": "portugali",
-    "other": "muu",
-}
+# load color scheme
+with open("../data/languages.json", "r", encoding="utf8") as f:
+    language_data = json.load(f)
+    language_codes = language_data["codes"]
+    language_colors = language_data["colors"]
+    language_colors["tlk"] = "rgb(129, 129, 236)"
 
 # adding transparency to nodes or edges
 def add_alpha_to_color(rgb_code: str, alpha):
@@ -51,7 +25,7 @@ def update_nodes(data, size_coefficient):
         node["key"] = node_key
 
         for val in ["activity_start", "activity_end"]:
-            node["attributes"][val] = int(node["attributes"][val])
+            node["attributes"][val] = int(float(node["attributes"][val]))
 
         for val in ["x", "y", "color", "size", "label"]:
             node["attributes"][val] = node[val]
@@ -68,7 +42,7 @@ def update_edges(data, size_coefficient):
         edge["key"] = edge_key
 
         for val in ["activity_start", "activity_end"]:
-            edge["attributes"][val] = int(edge["attributes"][val])
+            edge["attributes"][val] = int(float(edge["attributes"][val]))
 
         for val in ["color", "size"]:
             edge["attributes"][val] = edge[val]
@@ -79,12 +53,12 @@ def update_edges(data, size_coefficient):
 
 # update languages and match them with colors
 def update_languages_and_colors(data, language_colors):
-    language_counts = dict(zip(languages.keys(), [0]*len(languages)))
+    language_counts = dict(zip(language_codes.keys(), [0]*len(language_codes)))
     for node in data["nodes"]:
         node_lang = node["attributes"]["author_lang"]
         if node_lang == "tõlkija": # replace tõlkija -> tlk
              node["attributes"]["author_lang"] = "tlk"
-        elif node_lang in languages.keys():
+        elif node_lang in language_codes.keys():
             language_counts[node_lang] += 1
         else:
             # if language is not in the languages dict, categorize it as other
@@ -97,7 +71,7 @@ def update_languages_and_colors(data, language_colors):
     for node in data["nodes"]:
         node_lang = node["attributes"]["author_lang"]
         if node_lang != "tlk":
-            if node_lang not in languages.keys():
+            if node_lang not in language_codes.keys():
                 node["attributes"]["author_lang"] = "other"
         if node_lang in language_colors.keys():
             node["attributes"]["color"] = add_alpha_to_color(language_colors[node_lang], node_alpha)
@@ -126,7 +100,7 @@ def write_language_checkboxes(language_counts, all_langs, language_colors):
         lang_share = round((language_counts[lang] / all_langs * 100), 2)
         html_string += f"""    <label>
             <input type="checkbox" id="category-{lang}" value="{lang}" checked />
-                <span class="language-name" style="color: {language_colors[lang]};"> {languages[lang]}</span>
+                <span class="language-name" style="color: {language_colors[lang]};"> {language_codes[lang]}</span>
                 <span class="percentage">{lang_share} %</span>
     </label>
     """
@@ -153,16 +127,10 @@ def replace_html_tag(file_path, tag_name, tag_attributes, new_content_string):
 if __name__ == "__main__":
 
     #filepath = sys.argv[1]
-    filepath = "../data/gephi.data.json"
+    filepath = "../data/gephi/data.json"
 
     with open(filepath, "r", encoding="utf8") as f:
         data = json.load(f)
-
-    # load color scheme
-    with open("language_rgb_codes.txt", "r", encoding="utf8") as f:
-        colors = [line.strip() for line in f.readlines()]
-        language_colors = dict(zip(languages.keys(), colors))
-        language_colors["tlk"] = "rgb(129, 129, 236)"
 
     data = update_nodes(data, node_size_coefficient)
     data = update_edges(data, edge_size_coefficient)
