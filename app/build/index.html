@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="utf-8" />
-  <meta content="IE=edge" http-equiv="X-UA-Compatible" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="/icons/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+  <link href="/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+  <link href="/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
   <title>
-    20. saj. tõlkevõrgustik
+   20. saj. tõlkevõrgustik
   </title>
-</head>
-
-<body>
+ </head>
+ <body>
   <style>
-    html,
+   html,
     body,
 
     #sigma-container {
@@ -169,345 +167,624 @@
   </style>
   <div id="sigma-container">
   </div>
-
   <div id="contents">
-    <button class="menu-button">
-      <span class="hamburger-icon"></span>
-    </button>
-    <div class="small-panel" id="info-panel">
-      <div id="title-container">
-        <h2>Eesti 20. sajandi tõlkekirjandus</h2>
-        <div id="description-toggle" class="description-toggle"><i><u>näita kirjeldust</u></i></div>
-      </div>
-      <div id="description-content" style="display: none;">
-        <p>
-          See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Võrgustik koosneb 1881
+   <button class="menu-button">
+    <span class="hamburger-icon">
+    </span>
+   </button>
+   <div class="small-panel" id="info-panel">
+    <div id="title-container">
+     <h2>
+      Eesti 20. sajandi tõlkekirjandus
+     </h2>
+     <div class="description-toggle" id="description-toggle">
+      <i>
+       <u>
+        näita kirjeldust
+       </u>
+      </i>
+     </div>
+    </div>
+    <div id="description-content" style="display: none;">
+     <p>
+      See rakendus visualiseerib eesti 20. sajandi tõlkekirjandust võrgustiku kujul. Võrgustik koosneb 1881
           tõlkijast
           ja 3590 võõrkeelsest autorist. Tõlkijaid ja autoreid ühendavad kaared kujutavad eestindatud teoseid, värvid
           sümboliseerivad erinevaid keeli.
-        </p>
-        <p>
-          Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste
+     </p>
+     <p>
+      Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste
           sõlmedega.
           Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud keeli.
-        </p>
-        <p>
-          Rakenduse alusandmed pärinevad
-          <a href="https://doi.org/10.5281/zenodo.8228805">
-            Eesti Rahvusbibliograafiast
-            <img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg" />
-          </a>
-        </p>
-        <p>
-          Lähtekood on leitav
-          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
-            Githubis
-          </a>
-        </p>
-      </div>
+     </p>
+     <p>
+      Rakenduse alusandmed pärinevad
+      <a href="https://doi.org/10.5281/zenodo.8228805">
+       Eesti Rahvusbibliograafiast
+       <img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.8228805.svg"/>
+      </a>
+     </p>
+     <p>
+      Lähtekood on leitav
+      <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
+       Githubis
+      </a>
+     </p>
     </div>
-    <div class="small-panel" id="slider-container">
-      <span>Ajavahemik:</span>
-      <span><input class="timerange-input" id="min-year" type="number" value="1900" /> &#8211; </span>
-      <span><input class="timerange-input" id="max-year" type="number" value="2000" /></span>
-      <span><button id="timerange-button">vali</button></span>
+   </div>
+   <div class="small-panel" id="slider-container">
+    <span>
+     Ajavahemik:
+    </span>
+    <span>
+     <input class="timerange-input" id="min-year" type="number" value="1590"/>
+     –
+    </span>
+    <span>
+     <input class="timerange-input" id="max-year" type="number" value="2024"/>
+    </span>
+    <span>
+     <button id="timerange-button">
+      vali
+     </button>
+    </span>
+   </div>
+   <div class="small-panel" id="search-box">
+    <h3>
+     Otsing
+    </h3>
+    <input id="search-input" list="suggestions" placeholder="Otsi isikut..." type="text"/>
+    <datalist id="suggestions">
+    </datalist>
+   </div>
+   <div class="small-panel" id="language-filter">
+    <h3>
+     Filtreeri keele järgi
+    </h3>
+    <button id="select-all">
+     vali kõik
+    </button>
+    <button id="deselect-all">
+     tühjenda kõik
+    </button>
+    <br/>
+    <br/>
+    <div id="checkboxes">
+     <label>
+      <input checked="" id="category-eng" type="checkbox" value="eng"/>
+      <span class="language-name" style="color: rgb(0, 221, 235);">
+       inglise
+      </span>
+      <span class="percentage">
+       45.85 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-rus" type="checkbox" value="rus"/>
+      <span class="language-name" style="color: rgb(255, 111, 36);">
+       vene
+      </span>
+      <span class="percentage">
+       13.25 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ger" type="checkbox" value="ger"/>
+      <span class="language-name" style="color: rgb(255, 130, 255);">
+       saksa
+      </span>
+      <span class="percentage">
+       11.81 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-fre" type="checkbox" value="fre"/>
+      <span class="language-name" style="color: rgb(54, 224, 0);">
+       prantsuse
+      </span>
+      <span class="percentage">
+       5.78 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-fin" type="checkbox" value="fin"/>
+      <span class="language-name" style="color: rgb(223, 170, 0);">
+       soome
+      </span>
+      <span class="percentage">
+       3.91 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-swe" type="checkbox" value="swe"/>
+      <span class="language-name" style="color: rgb(152, 204, 243);">
+       rootsi
+      </span>
+      <span class="percentage">
+       3.5 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-spa" type="checkbox" value="spa"/>
+      <span class="language-name" style="color: rgb(255, 163, 139);">
+       hispaania
+      </span>
+      <span class="percentage">
+       1.31 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ita" type="checkbox" value="ita"/>
+      <span class="language-name" style="color: rgb(139, 216, 144);">
+       itaalia
+      </span>
+      <span class="percentage">
+       1.21 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-pol" type="checkbox" value="pol"/>
+      <span class="language-name" style="color: rgb(255, 91, 190);">
+       poola
+      </span>
+      <span class="percentage">
+       1.18 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lav" type="checkbox" value="lav"/>
+      <span class="language-name" style="color: rgb(167, 165, 255);">
+       läti
+      </span>
+      <span class="percentage">
+       1.17 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-nor" type="checkbox" value="nor"/>
+      <span class="language-name" style="color: rgb(95, 80, 137);">
+       norra
+      </span>
+      <span class="percentage">
+       1.06 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-hun" type="checkbox" value="hun"/>
+      <span class="language-name" style="color: rgb(255, 172, 226);">
+       ungari
+      </span>
+      <span class="percentage">
+       1.01 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-dan" type="checkbox" value="dan"/>
+      <span class="language-name" style="color: rgb(0, 211, 151);">
+       taani
+      </span>
+      <span class="percentage">
+       0.94 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-cze" type="checkbox" value="cze"/>
+      <span class="language-name" style="color: rgb(66, 117, 5);">
+       tšehhi
+      </span>
+      <span class="percentage">
+       0.71 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lit" type="checkbox" value="lit"/>
+      <span class="language-name" style="color: rgb(168, 50, 83);">
+       leedu
+      </span>
+      <span class="percentage">
+       0.66 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-dut" type="checkbox" value="dut"/>
+      <span class="language-name" style="color: rgb(0, 109, 76);">
+       hollandi
+      </span>
+      <span class="percentage">
+       0.56 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-jpn" type="checkbox" value="jpn"/>
+      <span class="language-name" style="color: rgb(255, 81, 114);">
+       jaapani
+      </span>
+      <span class="percentage">
+       0.3 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-rum" type="checkbox" value="rum"/>
+      <span class="language-name" style="color: rgb(125, 83, 0);">
+       rumeenia
+      </span>
+      <span class="percentage">
+       0.29 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ukr" type="checkbox" value="ukr"/>
+      <span class="language-name" style="color: rgb(185, 171, 153);">
+       ukraina
+      </span>
+      <span class="percentage">
+       0.28 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-gre" type="checkbox" value="gre"/>
+      <span class="language-name" style="color: rgb(0, 184, 255);">
+       kreeka
+      </span>
+      <span class="percentage">
+       0.26 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ice" type="checkbox" value="ice"/>
+      <span class="language-name" style="color: rgb(235, 190, 95);">
+       islandi
+      </span>
+      <span class="percentage">
+       0.23 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-heb" type="checkbox" value="heb"/>
+      <span class="language-name" style="color: rgb(0, 86, 111);">
+       heebrea
+      </span>
+      <span class="percentage">
+       0.22 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-por" type="checkbox" value="por"/>
+      <span class="language-name" style="color: rgb(0, 229, 255);">
+       portugali
+      </span>
+      <span class="percentage">
+       0.22 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-bul" type="checkbox" value="bul"/>
+      <span class="language-name" style="color: rgb(161, 195, 0);">
+       bulgaaria
+      </span>
+      <span class="percentage">
+       0.19 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-bel" type="checkbox" value="bel"/>
+      <span class="language-name" style="color: rgb(216, 76, 32);">
+       belgia
+      </span>
+      <span class="percentage">
+       0.19 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-lat" type="checkbox" value="lat"/>
+      <span class="language-name" style="color: rgb(255, 146, 0);">
+       ladina
+      </span>
+      <span class="percentage">
+       0.18 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-geo" type="checkbox" value="geo"/>
+      <span class="language-name" style="color: rgb(0, 209, 69);">
+       gruusia
+      </span>
+      <span class="percentage">
+       0.16 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-slo" type="checkbox" value="slo"/>
+      <span class="language-name" style="color: rgb(203, 83, 192);">
+       slovakkia
+      </span>
+      <span class="percentage">
+       0.15 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-udm" type="checkbox" value="udm"/>
+      <span class="language-name" style="color: rgb(0, 186, 205);">
+       udmurdi
+      </span>
+      <span class="percentage">
+       0.14 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-tur" type="checkbox" value="tur"/>
+      <span class="language-name" style="color: rgb(178, 47, 33);">
+       türgi
+      </span>
+      <span class="percentage">
+       0.13 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-arm" type="checkbox" value="arm"/>
+      <span class="language-name" style="color: rgb(230, 17, 3);">
+       armeenia
+      </span>
+      <span class="percentage">
+       0.13 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-chi" type="checkbox" value="chi"/>
+      <span class="language-name" style="color: rgb(27, 177, 255);">
+       hiina
+      </span>
+      <span class="percentage">
+       0.11 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-ara" type="checkbox" value="ara"/>
+      <span class="language-name" style="color: rgb(118, 255, 118);">
+       araabia
+      </span>
+      <span class="percentage">
+       0.1 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-cat" type="checkbox" value="cat"/>
+      <span class="language-name" style="color: rgb(156, 0, 206);">
+       katalaani
+      </span>
+      <span class="percentage">
+       0.08 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-slv" type="checkbox" value="slv"/>
+      <span class="language-name" style="color: rgb(0, 57, 243);">
+       sloveeni
+      </span>
+      <span class="percentage">
+       0.08 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-kom" type="checkbox" value="kom"/>
+      <span class="language-name" style="color: rgb(255, 193, 148);">
+       komi
+      </span>
+      <span class="percentage">
+       0.08 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-hin" type="checkbox" value="hin"/>
+      <span class="language-name" style="color: rgb(101, 185, 207);">
+       hindi
+      </span>
+      <span class="percentage">
+       0.07 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-yid" type="checkbox" value="yid"/>
+      <span class="language-name" style="color: rgb(202, 119, 197);">
+       jidiš
+      </span>
+      <span class="percentage">
+       0.06 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-san" type="checkbox" value="san"/>
+      <span class="language-name" style="color: rgb(83, 255, 151);">
+       sanskriti
+      </span>
+      <span class="percentage">
+       0.06 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-grc" type="checkbox" value="grc"/>
+      <span class="language-name" style="color: rgb(250, 253, 154);">
+       vanakreeka
+      </span>
+      <span class="percentage">
+       0.05 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-per" type="checkbox" value="per"/>
+      <span class="language-name" style="color: rgb(119, 133, 81);">
+       pärsia
+      </span>
+      <span class="percentage">
+       0.05 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-srp" type="checkbox" value="srp"/>
+      <span class="language-name" style="color: rgb(162, 233, 187);">
+       serbia
+      </span>
+      <span class="percentage">
+       0.05 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-fiu" type="checkbox" value="fiu"/>
+      <span class="language-name" style="color: rgb(181, 4, 54);">
+       soomeugri (muu)
+      </span>
+      <span class="percentage">
+       0.04 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-chm" type="checkbox" value="chm"/>
+      <span class="language-name" style="color: rgb(60, 0, 133);">
+       mari
+      </span>
+      <span class="percentage">
+       0.04 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-kor" type="checkbox" value="kor"/>
+      <span class="language-name" style="color: rgb(74, 190, 158);">
+       korea
+      </span>
+      <span class="percentage">
+       0.03 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-epo" type="checkbox" value="epo"/>
+      <span class="language-name" style="color: rgb(129, 0, 39);">
+       esperanto
+      </span>
+      <span class="percentage">
+       0.03 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-hrv" type="checkbox" value="hrv"/>
+      <span class="language-name" style="color: rgb(95, 219, 196);">
+       horvaadi
+      </span>
+      <span class="percentage">
+       0.03 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-aze" type="checkbox" value="aze"/>
+      <span class="language-name" style="color: rgb(15, 54, 131);">
+       aserbaidžaani
+      </span>
+      <span class="percentage">
+       0.03 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-mac" type="checkbox" value="mac"/>
+      <span class="language-name" style="color: rgb(167, 182, 202);">
+       makedoonia
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-tgk" type="checkbox" value="tgk"/>
+      <span class="language-name" style="color: rgb(255, 70, 0);">
+       tadžiki
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-smi" type="checkbox" value="smi"/>
+      <span class="language-name" style="color: rgb(90, 127, 207);">
+       saami
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-pro" type="checkbox" value="pro"/>
+      <span class="language-name" style="color: rgb(125, 38, 13);">
+       provansaali
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-uzb" type="checkbox" value="uzb"/>
+      <span class="language-name" style="color: rgb(206, 21, 0);">
+       usbeki
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-peo" type="checkbox" value="peo"/>
+      <span class="language-name" style="color: rgb(54, 23, 198);">
+       vanapärsia
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-kaz" type="checkbox" value="kaz"/>
+      <span class="language-name" style="color: rgb(25, 144, 182);">
+       kasahhi
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-oss" type="checkbox" value="oss"/>
+      <span class="language-name" style="color: rgb(28, 125, 255);">
+       osseedi
+      </span>
+      <span class="percentage">
+       0.02 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-tat" type="checkbox" value="tat"/>
+      <span class="language-name" style="color: rgb(184, 0, 123);">
+       tatari
+      </span>
+      <span class="percentage">
+       0.01 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-krl" type="checkbox" value="krl"/>
+      <span class="language-name" style="color: rgb(57, 189, 69);">
+       karjala
+      </span>
+      <span class="percentage">
+       0.01 %
+      </span>
+     </label>
+     <label>
+      <input checked="" id="category-other" type="checkbox" value="other"/>
+      <span class="language-name" style="color: rgb(150, 150, 150);">
+       muu/puuduv
+      </span>
+      <span class="percentage">
+       1.89 %
+      </span>
+     </label>
     </div>
-    <div class="small-panel" id="search-box">
-      <h3>
-        Otsing
-      </h3>
-      <input id="search-input" list="suggestions" placeholder="Otsi isikut..." type="text" />
-      <datalist id="suggestions">
-      </datalist>
-    </div>
-    <div class="small-panel" id="language-filter">
-      <h3>
-        Filtreeri keele järgi
-      </h3>
-      <button id="select-all">
-        vali kõik
-      </button>
-      <button id="deselect-all">
-        tühjenda kõik
-      </button>
-      <br />
-      <br />
-      <div id="checkboxes">
-        <label>
-          <input checked="" id="category-eng" type="checkbox" value="eng" />
-          <span class="language-name" style="color: rgb(0, 221, 235);">
-            inglise
-          </span>
-          <span class="percentage">
-            28.34 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-rus" type="checkbox" value="rus" />
-          <span class="language-name" style="color: rgb(255, 111, 36);">
-            vene
-          </span>
-          <span class="percentage">
-            22.91 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-ger" type="checkbox" value="ger" />
-          <span class="language-name" style="color: rgb(255, 130, 255);">
-            saksa
-          </span>
-          <span class="percentage">
-            13.48 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-fre" type="checkbox" value="fre" />
-          <span class="language-name" style="color: rgb(54, 224, 0);">
-            prantsuse
-          </span>
-          <span class="percentage">
-            6.42 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-fin" type="checkbox" value="fin" />
-          <span class="language-name" style="color: rgb(223, 170, 0);">
-            soome
-          </span>
-          <span class="percentage">
-            3.45 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-swe" type="checkbox" value="swe" />
-          <span class="language-name" style="color: rgb(152, 204, 243);">
-            rootsi
-          </span>
-          <span class="percentage">
-            2.89 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-lav" type="checkbox" value="lav" />
-          <span class="language-name" style="color: rgb(255, 163, 139);">
-            läti
-          </span>
-          <span class="percentage">
-            2.29 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-hun" type="checkbox" value="hun" />
-          <span class="language-name" style="color: rgb(139, 216, 144);">
-            ungari
-          </span>
-          <span class="percentage">
-            1.9 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-pol" type="checkbox" value="pol" />
-          <span class="language-name" style="color: rgb(255, 91, 190);">
-            poola
-          </span>
-          <span class="percentage">
-            1.79 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-spa" type="checkbox" value="spa" />
-          <span class="language-name" style="color: rgb(167, 165, 255);">
-            hispaania
-          </span>
-          <span class="percentage">
-            1.65 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-cze" type="checkbox" value="cze" />
-          <span class="language-name" style="color: rgb(95, 80, 137);">
-            tšehhi
-          </span>
-          <span class="percentage">
-            1.65 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-dan" type="checkbox" value="dan" />
-          <span class="language-name" style="color: rgb(255, 172, 226);">
-            taani
-          </span>
-          <span class="percentage">
-            1.24 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-ita" type="checkbox" value="ita" />
-          <span class="language-name" style="color: rgb(0, 211, 151);">
-            itaalia
-          </span>
-          <span class="percentage">
-            1.21 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-nor" type="checkbox" value="nor" />
-          <span class="language-name" style="color: rgb(66, 117, 5);">
-            norra
-          </span>
-          <span class="percentage">
-            1.05 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-lit" type="checkbox" value="lit" />
-          <span class="language-name" style="color: rgb(168, 50, 83);">
-            leedu
-          </span>
-          <span class="percentage">
-            1.05 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-rum" type="checkbox" value="rum" />
-          <span class="language-name" style="color: rgb(0, 109, 76);">
-            rumeenia
-          </span>
-          <span class="percentage">
-            0.66 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-ukr" type="checkbox" value="ukr" />
-          <span class="language-name" style="color: rgb(125, 83, 0);">
-            ukraina
-          </span>
-          <span class="percentage">
-            0.61 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-dut" type="checkbox" value="dut" />
-          <span class="language-name" style="color: rgb(255, 81, 114);">
-            hollandi
-          </span>
-          <span class="percentage">
-            0.44 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-bul" type="checkbox" value="bul" />
-          <span class="language-name" style="color: rgb(185, 171, 153);">
-            bulgaaria
-          </span>
-          <span class="percentage">
-            0.41 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-geo" type="checkbox" value="geo" />
-          <span class="language-name" style="color: rgb(0, 184, 255);">
-            gruusia
-          </span>
-          <span class="percentage">
-            0.41 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-bel" type="checkbox" value="bel" />
-          <span class="language-name" style="color: rgb(0, 86, 111);">
-            belgia
-          </span>
-          <span class="percentage">
-            0.41 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-slo" type="checkbox" value="slo" />
-          <span class="language-name" style="color: rgb(0, 229, 255);">
-            slovakkia
-          </span>
-          <span class="percentage">
-            0.33 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-arm" type="checkbox" value="arm" />
-          <span class="language-name" style="color: rgb(161, 195, 0);">
-            armeenia
-          </span>
-          <span class="percentage">
-            0.33 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-gre" type="checkbox" value="gre" />
-          <span class="language-name" style="color: rgb(235, 190, 95);">
-            kreeka
-          </span>
-          <span class="percentage">
-            0.3 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-ice" type="checkbox" value="ice" />
-          <span class="language-name" style="color: rgb(0, 209, 69);">
-            islandi
-          </span>
-          <span class="percentage">
-            0.25 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-heb" type="checkbox" value="heb" />
-          <span class="language-name" style="color: rgb(203, 83, 192);">
-            heebrea
-          </span>
-          <span class="percentage">
-            0.25 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-jpn" type="checkbox" value="jpn" />
-          <span class="language-name" style="color: rgb(255, 146, 0);">
-            jaapani
-          </span>
-          <span class="percentage">
-            0.22 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-por" type="checkbox" value="por" />
-          <span class="language-name" style="color: rgb(0, 186, 205);">
-            portugali
-          </span>
-          <span class="percentage">
-            0.19 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-lat" type="checkbox" value="lat" />
-          <span class="language-name" style="color: rgb(216, 76, 32);">
-            ladina
-          </span>
-          <span class="percentage">
-            0.17 %
-          </span>
-        </label>
-        <label>
-          <input checked="" id="category-other" type="checkbox" value="other" />
-          <span class="language-name" style="color: rgb(0, 186, 205);">
-            muu
-          </span>
-          <span class="percentage">
-            3.69 %
-          </span>
-        </label>
-      </div>
-    </div>
+   </div>
   </div>
   <script src="bundle.js">
   </script>
-</body>
-
+ </body>
 </html>
