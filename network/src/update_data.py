@@ -127,7 +127,7 @@ def replace_html_tag(file_path, tag_name, tag_attributes, new_content_string):
 if __name__ == "__main__":
 
     #filepath = sys.argv[1]
-    filepath = "../data/gephi/data.json"
+    filepath = "../data/gephi/data_from_gephi.json"
 
     with open(filepath, "r", encoding="utf8") as f:
         data = json.load(f)
