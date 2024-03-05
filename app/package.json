@@ -1,7 +1,7 @@
 {
-  "name": "erb-tolkevorgustik-20saj",
-  "version": "1.0.0",
-  "description": "20. sajandi eesti ilukirjanduse tõlkevõrgustikud ",
+  "name": "erb-tolkevorgustik",
+  "version": "1.2.0",
+  "description": "Eesti tõlkekirjanduse võrgustik",
   "main": "index.js",
   "scripts": {
     "start": "kotatsu serve --typescript ./src/index.ts --public / ./public",
