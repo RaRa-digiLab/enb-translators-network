@@ -80,51 +80,52 @@ def create_translations_graph(erb, timerange, min_count=1, only_living=True, onl
         # Extract and process person data from the dataframe row
         creators = [extract_person_info(name.strip()) for name in row['creator'].split(';') if name.strip() != '']
         translators = [extract_person_info(person) for person in row["translators"]]
-        people = creators + translators
-        pairs = list(itertools.product([p[0] for p in creators], [p[0] for p in translators]))
-        #print(pairs)
+        if len(translators) > 0:
+            people = creators + translators
+            pairs = list(itertools.product([p[0] for p in creators], [p[0] for p in translators]))
+            #print(pairs)
 
-        for pair in pairs:
-            current_year = row['year']  # The year of the current publication
-            
-            if G.has_edge(pair[0], pair[1]):
-                G[pair[0]][pair[1]]['weight'] += 1
-                G[pair[0]][pair[1]]['works'].append((row['title'], current_year, current_year))
-                G[pair[0]][pair[1]]["languages"].append(row["language_original"])    # LANGUAGE
+            for pair in pairs:
+                current_year = row['year']  # The year of the current publication
                 
-                # Update the activity_end for the edge
-                G[pair[0]][pair[1]]['activity_end'] = max(G[pair[0]][pair[1]].get('activity_end', current_year), current_year)
-                
-                # Ensure the activity_start is the smallest value
-                G[pair[0]][pair[1]]['activity_start'] = min(G[pair[0]][pair[1]].get('activity_start', current_year), current_year)
-                
-            else:
-                G.add_edge(pair[0], pair[1], weight=1, activity_start=current_year, activity_end=current_year)
-                G[pair[0]][pair[1]]['works'] = [(row['title'], current_year, current_year)]
-                G[pair[0]][pair[1]]["languages"] = [row["language_original"]]
+                if G.has_edge(pair[0], pair[1]):
+                    G[pair[0]][pair[1]]['weight'] += 1
+                    G[pair[0]][pair[1]]['works'].append((row['title'], current_year, current_year))
+                    G[pair[0]][pair[1]]["languages"].append(row["language_original"])    # LANGUAGE
+                    
+                    # Update the activity_end for the edge
+                    G[pair[0]][pair[1]]['activity_end'] = max(G[pair[0]][pair[1]].get('activity_end', current_year), current_year)
+                    
+                    # Ensure the activity_start is the smallest value
+                    G[pair[0]][pair[1]]['activity_start'] = min(G[pair[0]][pair[1]].get('activity_start', current_year), current_year)
+                    
+                else:
+                    G.add_edge(pair[0], pair[1], weight=1, activity_start=current_year, activity_end=current_year)
+                    G[pair[0]][pair[1]]['works'] = [(row['title'], current_year, current_year)]
+                    G[pair[0]][pair[1]]["languages"] = [row["language_original"]]
 
-        # Process nodes (authors)
-        for person in people:
-            name, dates, role = person
-            if G.has_node(name):
-                if role:
-                    if role in roles.keys():
-                        role_count_key = f"{roles[role]}_count"
-                    else:
-                        role_count_key = "muu_count"
-                    G.nodes[name][role_count_key] = G.nodes[name].get(role_count_key, 0) + 1
-                G.nodes[name]['activity_end'] = max(G.nodes[name].get('activity_end', row['year']), row['year'])
-                G.nodes[name]['activity_start'] = min(G.nodes[name].get('activity_start', row['year']), row['year'])
-            else:
-                node_attrs = {
-                    'date_of_birth': int(dates[0]) if dates[0].isnumeric() else dates[0],
-                    'date_of_death': int(dates[1]) if dates[1].isnumeric() else dates[1],
-                    'activity_start': row['year'],
-                    'activity_end': row['year']
-                }
-                if role:
-                    node_attrs[f"{roles[role]}_count"] = 1
-                G.add_node(name, **node_attrs)
+            # Process nodes (authors)
+            for person in people:
+                name, dates, role = person
+                if G.has_node(name):
+                    if role:
+                        if role in roles.keys():
+                            role_count_key = f"{roles[role]}_count"
+                        else:
+                            role_count_key = "muu_count"
+                        G.nodes[name][role_count_key] = G.nodes[name].get(role_count_key, 0) + 1
+                    G.nodes[name]['activity_end'] = max(G.nodes[name].get('activity_end', row['year']), row['year'])
+                    G.nodes[name]['activity_start'] = min(G.nodes[name].get('activity_start', row['year']), row['year'])
+                else:
+                    node_attrs = {
+                        'date_of_birth': int(dates[0]) if dates[0].isnumeric() else dates[0],
+                        'date_of_death': int(dates[1]) if dates[1].isnumeric() else dates[1],
+                        'activity_start': row['year'],
+                        'activity_end': row['year']
+                    }
+                    if role:
+                        node_attrs[f"{roles[role]}_count"] = 1
+                    G.add_node(name, **node_attrs)
 
     # Remove self-loops (if any)
     G.remove_edges_from(list(nx.selfloop_edges(G)))
