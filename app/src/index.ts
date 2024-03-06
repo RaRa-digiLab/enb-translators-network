@@ -17,6 +17,7 @@ const maxYearInput = document.getElementById("max-year") as HTMLInputElement;
 const minYear = parseFloat(minYearInput.value)
 const maxYear = parseFloat(maxYearInput.value)
 const timerangeButton = document.getElementById("timerange-button") as HTMLButtonElement;
+const timerangeResetButton = document.getElementById("timerange-reset-button") as HTMLButtonElement;
 
 async function loadGraphDataAndPopulateSuggestions() {
   const response = await fetch('data.json');
@@ -138,11 +139,21 @@ timerangeButton.addEventListener("click", function() {
   state.minYear = minYear
   state.maxYear = maxYear
 
-  // Use the values as needed in your JavaScript code
-  console.log("Min Year:", minYear);
-  console.log("Max Year:", maxYear);
+  // Refresh rendering:
+  renderer.refresh()
+});
 
-  // For example, update the rendering based on the new year range
+// Event listener for the reset button
+timerangeResetButton.addEventListener("click", function() {
+  // Get the values from the input elements
+  minYearInput.value = '1590'
+  maxYearInput.value = '2024'
+  const minYear = parseInt(minYearInput.value);
+  const maxYear = parseInt(maxYearInput.value);
+  state.minYear = minYear
+  state.maxYear = maxYear
+
+  // Refresh rendering:
   renderer.refresh()
 });
 

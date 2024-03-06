@@ -5796,6 +5796,7 @@ const maxYearInput = document.getElementById("max-year");
 const minYear = parseFloat(minYearInput.value);
 const maxYear = parseFloat(maxYearInput.value);
 const timerangeButton = document.getElementById("timerange-button");
+const timerangeResetButton = document.getElementById("timerange-reset-button");
 function loadGraphDataAndPopulateSuggestions() {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch('data.json');
@@ -5883,27 +5884,21 @@ timerangeButton.addEventListener("click", function () {
     const maxYear = parseInt(maxYearInput.value);
     state.minYear = minYear;
     state.maxYear = maxYear;
-    // Use the values as needed in your JavaScript code
-    console.log("Min Year:", minYear);
-    console.log("Max Year:", maxYear);
-    // For example, update the rendering based on the new year range
+    // Refresh rendering:
     renderer.refresh();
 });
-// // Function to handle input changes for both min and max year inputs
-// function handleYearInputChange(event: Event) {
-//   // Get the target input element that triggered the event
-//   const targetInput = event.target as HTMLInputElement;
-//   // Parse the input value as a number
-//   const yearValue = parseFloat(targetInput.value);
-//   // Update the appropriate state variable based on the input element's id
-//   if (targetInput.id === "min-year") {
-//     // Update min year state variable
-//     state.minYear = yearValue;
-//   } else if (targetInput.id === "max-year") {
-//     // Update max year state variable
-//     state.maxYear = yearValue;
-//   }
-// }
+// Event listener for the reset button
+timerangeResetButton.addEventListener("click", function () {
+    // Get the values from the input elements
+    minYearInput.value = '1590';
+    maxYearInput.value = '2024';
+    const minYear = parseInt(minYearInput.value);
+    const maxYear = parseInt(maxYearInput.value);
+    state.minYear = minYear;
+    state.maxYear = maxYear;
+    // Refresh rendering:
+    renderer.refresh();
+});
 // Function to handle checkbox changes
 function handleCheckboxChange(event) {
     const checkbox = event.target;
