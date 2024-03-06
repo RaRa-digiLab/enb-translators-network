@@ -268,6 +268,19 @@ renderer.setSetting("nodeReducer", (node, data) => {
   res.color = "#f6f6f6";
   }
 
+  else {
+    const hasEdgeActivityInRange = graph.edges(node).some(edge => {
+      const edgeData = graph.getEdgeAttributes(edge);
+      return edgeData.activity_start <= state.maxYear && edgeData.activity_end >= state.minYear;
+    });
+
+    // Grey out the node if none of its edges have activity within the timerange
+    if (!hasEdgeActivityInRange) {
+      res.label = "";
+      res.color = "#f6f6f6";
+    }
+  }
+
   // is the node hovered or neighbors a hovered node
   if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
     res.label = "";
