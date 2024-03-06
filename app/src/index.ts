@@ -146,7 +146,7 @@ timerangeButton.addEventListener("click", function() {
 // Event listener for the reset button
 timerangeResetButton.addEventListener("click", function() {
   // Get the values from the input elements
-  minYearInput.value = '1590'
+  minYearInput.value = '1800'
   maxYearInput.value = '2024'
   const minYear = parseInt(minYearInput.value);
   const maxYear = parseInt(maxYearInput.value);

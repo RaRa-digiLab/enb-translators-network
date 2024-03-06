@@ -179,10 +179,10 @@ if __name__ == "__main__":
     erb["translators"] = erb.contributor.apply(tidy_translators)
 
     print("Creating graph")
-    G = create_translations_graph(erb, timerange=range(1500, 2025), min_count=1,
+    G = create_translations_graph(erb, timerange=range(1800, 2025), min_count=1,
                               only_living=False, only_to_estonian=True, allowed_genres=fiction)
     
     print("Writing file")
-    nx.write_gexf(G, "../data/gephi/translators_1500_2025_fiction.gexf")
+    nx.write_gexf(G, "../data/gephi/translators_1800_2025_fiction.gexf")
 
     print("Finished")
