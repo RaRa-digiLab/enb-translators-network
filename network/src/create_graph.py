@@ -164,7 +164,17 @@ def create_translations_graph(erb, timerange, min_count=1, only_living=True, onl
 
 if __name__ == "__main__":
 
+    import sys
     print("Loading data")
+    if len(sys.argv) == 2:
+        erb = pd.read_csv("../data/raw/erb_translators.tsv", sep="\t", encoding="utf8")
+        savefile = sys.argv[1]
+    elif len(sys.argv) == 3:
+        filename = sys.argv[1]
+        savefile = sys.argv[2]
+        erb = pd.read_csv(f"../data/raw/{filename}", sep="\t", encoding="utf8")
+    else:
+        raise KeyError("Must provide either a input file (.tsv) and output file (.gexf), or just the output file for default graph.")
 
     with open("../data/roles.json", "r", encoding="utf8") as f:
         roles = json.load(f)
@@ -174,15 +184,13 @@ if __name__ == "__main__":
         genres = json.load(f)
         fiction = genres["fiction"]
 
-    erb = pd.read_csv("../data/raw/erb_translators.tsv", sep="\t", encoding="utf8")
-
     erb["translators"] = erb.contributor.apply(tidy_translators)
 
     print("Creating graph")
     G = create_translations_graph(erb, timerange=range(1800, 2025), min_count=1,
                               only_living=False, only_to_estonian=True, allowed_genres=fiction)
     
-    print("Writing file")
-    nx.write_gexf(G, "../data/gephi/translators_1800_2025_fiction.gexf")
+    print(f"Writing file: ../data/gephi/{savefile}")
+    nx.write_gexf(G, f"../data/gephi/{savefile}")
 
     print("Finished")
