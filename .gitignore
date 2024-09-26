@@ -1,3 +1,4 @@
 network/.venv/
 app/node_modules/
 app/build.zip
+.vscode
