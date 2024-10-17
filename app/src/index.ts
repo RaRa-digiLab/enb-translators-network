@@ -17,8 +17,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const searchSuggestions = document.getElementById(
     "suggestions"
   ) as HTMLDataListElement;
-  const checkboxes = document.querySelectorAll<HTMLInputElement>(
+
+  // Language checkboxes
+  const languageCheckboxes = document.querySelectorAll<HTMLInputElement>(
     '#language-tab input[type="checkbox"]'
+  );
+
+  // Genre checkboxes
+  const genreCheckboxes = document.querySelectorAll<HTMLInputElement>(
+    '#genre-tab input[type="checkbox"]'
   );
 
   const minYearInput = document.getElementById("min-year") as HTMLInputElement;
@@ -30,11 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "timerange-reset-button"
   ) as HTMLButtonElement;
 
-  const genreSelect = document.getElementById(
-    "genre-select"
-  ) as HTMLSelectElement;
-
-  // Declare application state with selectedGenre
+  // Declare application state with selectedGenres
   interface State {
     hoveredNode?: string;
     searchQuery: string;
@@ -43,29 +46,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     suggestions?: Set<string>;
     hoveredNeighbors?: Set<string>;
     selectedLanguages: Set<string>;
+    selectedGenres: Set<string>;
     minYear: number;
     maxYear: number;
-    selectedGenre?: string | null; // Add selectedGenre to state
   }
 
   // Initialize minYear and maxYear from inputs
   const minYear = parseInt(minYearInput.value);
   const maxYear = parseInt(maxYearInput.value);
 
+  // Initialize selected languages
   const languageOptions = new Set<string>();
-  checkboxes.forEach((checkbox) => {
+  languageCheckboxes.forEach((checkbox) => {
     if (checkbox.checked) {
       languageOptions.add(checkbox.value);
     }
   });
 
-  // Initialize state with selectedGenre
+  // Initialize selected genres
+  const genreOptions = new Set<string>();
+  genreCheckboxes.forEach((checkbox) => {
+    if (checkbox.checked) {
+      genreOptions.add(checkbox.value);
+    }
+  });
+
+  // Initialize state with selectedGenres
   const state: State = {
     searchQuery: "",
     selectedLanguages: languageOptions,
+    selectedGenres: genreOptions,
     minYear: minYear,
     maxYear: maxYear,
-    selectedGenre: null,
   };
 
   // Function to load graph data and populate suggestions and genres
@@ -84,23 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       })
       .join("\n");
 
-    // Collect unique genres from edges
-    const genreSet = new Set<string>();
-    graph.forEachEdge((edge) => {
-      const genres = graph.getEdgeAttribute(edge, "genres") as string[];
-      genres.forEach((genre) => genreSet.add(genre));
-    });
-
-    // Sort genres alphabetically
-    const genreList = Array.from(genreSet).sort();
-
-    // Populate the genre select element
-    genreList.forEach((genre) => {
-      const option = document.createElement("option");
-      option.value = genre;
-      option.textContent = genre;
-      genreSelect.appendChild(option);
-    });
+    // Since we're using dummy genres, we don't need to populate genre checkboxes from data here
   }
 
   await loadGraphDataAndPopulateSuggestions();
@@ -108,17 +104,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renderer = new Sigma(graph, container);
   // Configure renderer settings
   renderer.setSetting("labelRenderedSizeThreshold", 5);
-
-  // Add event listener for the genre select element
-  genreSelect.addEventListener("change", () => {
-    const selectedGenre = genreSelect.value;
-    if (selectedGenre === "") {
-      state.selectedGenre = null; // No genre selected
-    } else {
-      state.selectedGenre = selectedGenre;
-    }
-    renderer.refresh();
-  });
 
   // Tab switching logic
   const tabButtons = document.querySelectorAll(".tablinks");
@@ -130,9 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Remove 'active' class from all buttons and contents
       tabButtons.forEach((btn) => btn.classList.remove("active"));
-      tabContents.forEach((content) =>
-        content.classList.remove("active")
-      );
+      tabContents.forEach((content) => content.classList.remove("active"));
 
       // Add 'active' class to the selected tab and content
       button.classList.add("active");
@@ -145,25 +128,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     .querySelector('.tablinks[data-tab="language-tab"]')
     ?.classList.add("active");
   document.getElementById("language-tab")?.classList.add("active");
-
-  // Clear filters button logic
-  const clearFiltersButton = document.getElementById(
-    "clear-filters"
-  ) as HTMLButtonElement;
-  clearFiltersButton.addEventListener("click", () => {
-    // Reset language selections
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = true;
-      state.selectedLanguages.add(checkbox.value);
-    });
-
-    // Reset genre selection
-    genreSelect.value = "";
-    state.selectedGenre = null;
-
-    // Refresh the renderer
-    renderer.refresh();
-  });
 
   // Actions:
   function setSearchQuery(query: string) {
@@ -247,8 +211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderer.refresh();
   });
 
-  // Function to handle checkbox changes
-  function handleCheckboxChange(event: Event) {
+  // Function to handle language checkbox changes
+  function handleLanguageCheckboxChange(event: Event) {
     const checkbox = event.target as HTMLInputElement;
     const language = checkbox.value;
 
@@ -261,29 +225,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     renderer.refresh();
   }
-  checkboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", handleCheckboxChange);
+  languageCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", handleLanguageCheckboxChange);
   });
 
-  // Function to handle the "Select All" and "Deselect All" buttons
-  function handleSelectAllDeselectAllClick(selectAll: boolean) {
-    // Loop through checkboxes and set their checked state
-    checkboxes.forEach((checkbox) => {
+  // Function to handle genre checkbox changes
+  function handleGenreCheckboxChange(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    const genre = checkbox.value;
+
+    if (checkbox.checked) {
+      // Checkbox is checked, add the genre to selectedGenres
+      state.selectedGenres.add(genre);
+    } else {
+      // Checkbox is unchecked, remove the genre from selectedGenres
+      state.selectedGenres.delete(genre);
+    }
+    renderer.refresh();
+  }
+  genreCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", handleGenreCheckboxChange);
+  });
+
+  // Function to handle the "Select All" and "Deselect All" buttons for languages
+  function handleSelectAllDeselectAllLanguages(selectAll: boolean) {
+    // Loop through language checkboxes and set their checked state
+    languageCheckboxes.forEach((checkbox) => {
       const language = checkbox.value;
       checkbox.checked = selectAll;
 
       if (selectAll) {
-        // If "Select All" is clicked, add all languages to selectedLanguages
         state.selectedLanguages.add(language);
       } else {
-        // If "Deselect All" is clicked, remove all languages
         state.selectedLanguages.delete(language);
       }
     });
     renderer.refresh();
   }
 
-  // Attach event listeners to "Select All" and "Deselect All" buttons
+  // Attach event listeners to "Select All" and "Deselect All" buttons for languages
   const selectAllButton = document.getElementById(
     "select-all"
   ) as HTMLButtonElement;
@@ -292,11 +272,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   ) as HTMLButtonElement;
 
   selectAllButton?.addEventListener("click", () => {
-    handleSelectAllDeselectAllClick(true);
+    handleSelectAllDeselectAllLanguages(true);
   });
 
   deselectAllButton?.addEventListener("click", () => {
-    handleSelectAllDeselectAllClick(false);
+    handleSelectAllDeselectAllLanguages(false);
+  });
+
+  // Function to handle the "Select All" and "Deselect All" buttons for genres
+  function handleSelectAllDeselectAllGenres(selectAll: boolean) {
+    // Loop through genre checkboxes and set their checked state
+    genreCheckboxes.forEach((checkbox) => {
+      const genre = checkbox.value;
+      checkbox.checked = selectAll;
+
+      if (selectAll) {
+        state.selectedGenres.add(genre);
+      } else {
+        state.selectedGenres.delete(genre);
+      }
+    });
+    renderer.refresh();
+  }
+
+  // Attach event listeners to "Select All" and "Deselect All" buttons for genres
+  const selectAllGenresButton = document.getElementById(
+    "select-all-genres"
+  ) as HTMLButtonElement;
+  const deselectAllGenresButton = document.getElementById(
+    "deselect-all-genres"
+  ) as HTMLButtonElement;
+
+  selectAllGenresButton?.addEventListener("click", () => {
+    handleSelectAllDeselectAllGenres(true);
+  });
+
+  deselectAllGenresButton?.addEventListener("click", () => {
+    handleSelectAllDeselectAllGenres(false);
   });
 
   // Bind search input interactions:
@@ -385,7 +397,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     ) {
       res.label = "";
       res.color = "#f6f6f6";
-    } else if (state.suggestions && !state.suggestions.has(node)) {
+    } else if (
+      state.suggestions &&
+      !state.suggestions.has(node)
+    ) {
       res.label = "";
       res.color = "#f6f6f6";
     } else if (
@@ -403,17 +418,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Apply genre filtering
-    if (state.selectedGenre) {
-      const hasEdgeWithGenre = graph
+    if (state.selectedGenres.size === 0) {
+      // No genres selected; grey out all nodes
+      res.label = "";
+      res.color = "#f6f6f6";
+    } else {
+      const hasEdgeWithSelectedGenres = graph
         .edges(node)
         .some((edge) => {
-          const edgeGenres = graph.getEdgeAttribute(
-            edge,
-            "genres"
-          ) as string[];
-          return edgeGenres.includes(state.selectedGenre!);
+          const edgeGenres = graph.getEdgeAttribute(edge, "genres") as string[];
+          return edgeGenres.some((genre) => state.selectedGenres.has(genre));
         });
-      if (!hasEdgeWithGenre) {
+      if (!hasEdgeWithSelectedGenres) {
         res.label = "";
         res.color = "#f6f6f6";
       }
@@ -469,12 +485,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Apply genre filtering
-    if (state.selectedGenre) {
-      const edgeGenres = graph.getEdgeAttribute(
-        edge,
-        "genres"
-      ) as string[];
-      if (!edgeGenres.includes(state.selectedGenre)) {
+    if (state.selectedGenres.size === 0) {
+      // No genres selected; hide all edges
+      res.hidden = true;
+    } else {
+      const edgeGenres = graph.getEdgeAttribute(edge, "genres") as string[];
+      const hasSelectedGenre = edgeGenres.some((genre) =>
+        state.selectedGenres.has(genre)
+      );
+      if (!hasSelectedGenre) {
         res.hidden = true;
       }
     }

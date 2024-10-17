@@ -178,6 +178,12 @@
       padding-left: 10px;
     }
 
+    .genre-name {
+      flex-grow: 1;
+      text-align: left;
+      padding-left: 10px;
+    }
+
     .percentage {
       font-family: monospace;
       text-align: right;
@@ -300,8 +306,8 @@
     <div class="small-panel" id="filter-panel">
       <h3>Filtreeri</h3>
       <div class="tab">
-        <button class="tablinks active" data-tab="language-tab" onclick="console.log('Language tab clicked')">Keele järgi</button>
-        <button class="tablinks" data-tab="genre-tab" onclick="console.log('Genre tab clicked')">Žanri järgi</button>
+        <button class="tablinks active" data-tab="language-tab">Keele järgi</button>
+        <button class="tablinks" data-tab="genre-tab">Žanri järgi</button>
       </div>
       <div id="language-tab" class="tabcontent active">
         <h3>
@@ -850,17 +856,31 @@
         </div>
       </div>
       <div id="genre-tab" class="tabcontent">
-        <!-- Genre filter content -->
         <h3>Filtreeri žanri järgi</h3>
-        <select id="genre-select">
-          <option value="">Kõik žanrid</option>
-        </select>
+        <button id="select-all-genres">vali kõik</button>
+        <button id="deselect-all-genres">tühjenda kõik</button>
+        <br /><br />
+        <div id="genre-checkboxes">
+          <label>
+            <input type="checkbox" value="anekdoodid" checked />
+            <span class="genre-name">anekdoodid</span>
+            <span class="percentage">30%</span>
+          </label>
+          <label>
+            <input type="checkbox" value="biograafiad" checked />
+            <span class="genre-name">biograafiad</span>
+            <span class="percentage">20%</span>
+          </label>
+          <label>
+            <input type="checkbox" value="jutustused" checked />
+            <span class="genre-name">jutustused</span>
+            <span class="percentage">15%</span>
+          </label>
+        </div>
       </div>
-      <button id="clear-filters">Lähtesta filtrid</button>
     </div>
   </div>
-  <script src="bundle.js">
-  </script>
+  <script src="bundle.js"></script>
 </body>
 
 </html>
