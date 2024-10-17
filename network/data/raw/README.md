@@ -1,0 +1,1 @@
+This folder includes a copy of the `erb_all_books` dataset of the Curated Edition of the Estonian National Bibliography (ENB)
