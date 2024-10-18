@@ -148,7 +148,7 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
             translator_names = [get_node_identifier(p[0], p[1], p[2]) for p in translators]
             pairs = itertools.product(author_names, translator_names)
             current_year = row['publication_date_cleaned']  # The year of the current publication
-            work_info = (row['title'], current_year, current_year)
+            work_info = (row['title'], current_year)
             language = row["language_original"]
             genres = set(process_genres(row["genre_keyword"]))
             
@@ -183,7 +183,7 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
                 # Update node attributes once
                 current_node.update({
                     "label": node_id,
-                    "label_short": name,
+                    #"label_short": name,
                     'date_of_birth': birth_date or 0,
                     'date_of_death': death_date or 0,
                 })
