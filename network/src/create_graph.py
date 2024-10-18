@@ -95,7 +95,8 @@ def extract_person_info(person_str, role=True):
 
 def create_graph(erb, min_year, max_year, id_to_int=False):
     """
-    Create a graph from the 'erb' DataFrame filtered by publication year range.
+    Create a directed graph from the 'erb' DataFrame filtered by publication year range.
+    Edges are directed from translators to authors.
 
     Parameters:
     - erb: pd.DataFrame containing publication data.
@@ -103,8 +104,12 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
     - max_year: Maximum publication year.
 
     Returns:
-    - G: A NetworkX graph with nodes and edges representing authors and their collaborations.
+    - G: A NetworkX DiGraph with nodes and edges representing authors and their collaborations.
     """
+    import networkx as nx
+    import itertools
+    from collections import Counter
+    from tqdm import tqdm
 
     # Helper function to process genres
     def process_genres(genre_str, to_remove=["ilukirjandus", "e-raamatud"]):
@@ -131,9 +136,10 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
         'publication_date_cleaned >= @min_year and publication_date_cleaned <= @max_year and creator.notna() and contributor.notna()'
     )
 
-    G = nx.Graph()
+    # Initialize a directed graph
+    G = nx.DiGraph()
     
-    for _, row in tqdm(df.iterrows()):
+    for _, row in tqdm(df.iterrows(), total=df.shape[0]):
         # Extract and process person data from the dataframe row
         creators = [extract_person_info(name) for name in row['creator'].split('; ') if name.strip()]
         contributors = [extract_person_info(name) for name in row['contributor'].split('; ') if name.strip()]
@@ -146,13 +152,13 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
             # Get node identifiers for authors and translators
             author_names = [get_node_identifier(p[0], p[1], p[2]) for p in authors]
             translator_names = [get_node_identifier(p[0], p[1], p[2]) for p in translators]
-            pairs = itertools.product(author_names, translator_names)
+            pairs = itertools.product(translator_names, author_names)  # Edges from translators to authors
             current_year = row['publication_date_cleaned']  # The year of the current publication
             work_info = (row['title'], current_year)
             language = row["language_original"]
             genres = set(process_genres(row["genre_keyword"]))
             
-            # Update edges between authors and translators
+            # Update edges from translators to authors
             for node_u, node_v in pairs:
                 if G.has_edge(node_u, node_v):
                     edge = G.edges[node_u, node_v]
@@ -172,7 +178,7 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
                         activity_start=current_year,
                         activity_end=current_year
                     )
-                    
+                        
             # Process nodes (authors and translators)
             for person in people:
                 name, birth_date, death_date, role = person if len(person) == 4 else (*person, None)
@@ -183,7 +189,7 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
                 # Update node attributes once
                 current_node.update({
                     "label": node_id,
-                    #"label_short": name,
+                    #'label_short': name,
                     'date_of_birth': birth_date or 0,
                     'date_of_death': death_date or 0,
                 })
@@ -207,6 +213,7 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
     # Remove self-loops (if any)
     G.remove_edges_from(nx.selfloop_edges(G))
     
+    print("Updating node and edge attributes")
     # Calculate and store the total_count and main_role for each node
     for node_id, attributes in G.nodes(data=True):
         # Calculate total role counts and determine the main role
