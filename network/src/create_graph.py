@@ -5,6 +5,7 @@ import networkx as nx
 import itertools
 from collections import Counter
 import sys
+from tqdm import tqdm
 
 def extract_person_info(person_str, role=True):
     # Remove any titles enclosed in quotes
@@ -132,7 +133,7 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
 
     G = nx.Graph()
     
-    for _, row in df.iterrows():
+    for _, row in tqdm(df.iterrows()):
         # Extract and process person data from the dataframe row
         creators = [extract_person_info(name) for name in row['creator'].split('; ') if name.strip()]
         contributors = [extract_person_info(name) for name in row['contributor'].split('; ') if name.strip()]
