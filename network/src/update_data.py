@@ -1,7 +1,6 @@
 import json
 import sys
 import os
-from bs4 import BeautifulSoup
 
 # Constants for size coefficients and alpha transparency
 node_size_coefficient = 1.0
@@ -94,7 +93,7 @@ def update_edges(graphology_data, size_coefficient):
 
 def update_languages_and_colors(graphology_data, language_codes, language_colors):
     """
-    Updates node and edge colors based on language data and counts language occurrences.
+    Updates node and edge colors based on language data.
 
     Parameters:
     - graphology_data: The Graphology format JSON object.
@@ -102,14 +101,9 @@ def update_languages_and_colors(graphology_data, language_codes, language_colors
     - language_colors: A dictionary mapping language codes to colors.
 
     Returns:
-    - Updated graphology_data, language_counts, and total language count.
+    - Updated graphology_data.
     """
-    # Initialize the language counts with keys from language_codes and add 'other' and 'tlk' manually
-    language_counts = dict.fromkeys(language_codes.keys(), 0)
-    language_counts["other"] = 0  # Include 'other' category
-    language_counts["tlk"] = 0    # Include 'tlk' (translators)
-
-    # Update node colors and count languages
+    # Update node colors
     for node in graphology_data["nodes"]:
         node_lang = node["attributes"].get("author_lang", "other")
         if node_lang == "tõlkija":
@@ -119,14 +113,9 @@ def update_languages_and_colors(graphology_data, language_codes, language_colors
             node_lang = "other"
             node["attributes"]["author_lang"] = "other"
 
-        # Increment language count
-        language_counts[node_lang] += 1
-
         # Update node color
         color = language_colors.get(node_lang, language_colors["other"])
         node["attributes"]["color"] = add_alpha_to_color(color, node_alpha)
-
-    total_languages = sum(language_counts.values())
 
     # Update edge colors
     for edge in graphology_data["edges"]:
@@ -137,68 +126,7 @@ def update_languages_and_colors(graphology_data, language_codes, language_colors
         color = language_colors.get(edge_lang, language_colors["other"])
         edge["attributes"]["color"] = add_alpha_to_color(color, edge_alpha)
 
-    return graphology_data, language_counts, total_languages
-
-def write_language_checkboxes(language_counts, total_languages, language_colors):
-    """
-    Generates HTML code for language checkboxes based on language counts.
-
-    Parameters:
-    - language_counts: A dictionary with language counts.
-    - total_languages: The total number of languages.
-    - language_colors: A dictionary mapping language codes to colors.
-
-    Returns:
-    - A string containing the HTML code for language checkboxes.
-    """
-    # Sort languages by count
-    sorted_languages = sorted(language_counts.items(), key=lambda item: item[1], reverse=True)
-    checkbox_values = [lang for lang, _ in sorted_languages if lang != "other"]
-    checkbox_values.append("other")  # Add 'other' at the end
-
-    html_string = '<div id="checkboxes">\n'
-
-    for lang in checkbox_values:
-        lang_count = language_counts[lang]
-        lang_percentage = (lang_count / total_languages) * 100 if total_languages > 0 else 0
-        lang_name = language_codes.get(lang, "Other")
-        color = language_colors.get(lang, language_colors["other"])
-
-        html_string += f'''    <label>
-        <input type="checkbox" id="category-{lang}" value="{lang}" checked />
-        <span class="language-name" style="color: {color};"> {lang_name}</span>
-        <span class="percentage">{lang_percentage:.2f}%</span>
-    </label>
-    '''
-
-    html_string += '</div>'
-    return html_string
-
-def replace_html_tag(file_path, tag_name, tag_attributes, new_content_string):
-    """
-    Replaces a specific HTML tag in a file with new content.
-
-    Parameters:
-    - file_path: Path to the HTML file.
-    - tag_name: The name of the tag to replace.
-    - tag_attributes: A dictionary of attributes to identify the tag.
-    - new_content_string: The new HTML content to insert.
-
-    Returns:
-    - None
-    """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        html_content = file.read()
-
-    soup = BeautifulSoup(html_content, 'html.parser')
-    tag_to_replace = soup.find(tag_name, tag_attributes)
-    new_content = BeautifulSoup(new_content_string, 'html.parser')
-
-    if tag_to_replace:
-        tag_to_replace.replace_with(new_content)
-
-    with open(file_path, 'w', encoding='utf-8') as file:
-        file.write(str(soup))
+    return graphology_data
 
 if __name__ == "__main__":
 
@@ -223,19 +151,12 @@ if __name__ == "__main__":
     graphology_data = update_edges(graphology_data, edge_size_coefficient)
 
     # Update languages and colors
-    graphology_data, language_counts, total_languages = update_languages_and_colors(
+    graphology_data = update_languages_and_colors(
         graphology_data, language_codes, language_colors
     )
 
     # Save the updated Graphology JSON file
     with open(f"../data/{key}_updated.json", "w", encoding="utf8") as f:
         json.dump(graphology_data, f, ensure_ascii=False, indent=4)
-
-    # Generate HTML code for language checkboxes
-    checkboxes_html_string = write_language_checkboxes(language_counts, total_languages, language_colors)
-
-    # Update the HTML file with the new checkboxes
-    html_file_path = "../../app/public/index.html"  # Adjust the path as necessary
-    replace_html_tag(html_file_path, "div", {"id": "checkboxes"}, checkboxes_html_string)
 
     print(f"Graph file with updated data saved to {key}_updated.json.\nRename this file 'data.json' and copy it to the app/public folder.")
