@@ -7,7 +7,7 @@ import {
 import Graph from "graphology";
 import { Attributes } from "graphology-types";
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Instantiate sigma:
   const graph = new Graph();
 
@@ -19,10 +19,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   ) as HTMLDataListElement;
 
   // Language checkboxes container
-  const languageCheckboxesContainer = document.getElementById("checkboxes") as HTMLElement;
+  const languageCheckboxesContainer = document.getElementById(
+    "checkboxes"
+  ) as HTMLElement;
 
   // Genre checkboxes container
-  const genreCheckboxesContainer = document.getElementById("genre-checkboxes") as HTMLElement;
+  const genreCheckboxesContainer = document.getElementById(
+    "genre-checkboxes"
+  ) as HTMLElement;
 
   const minYearInput = document.getElementById("min-year") as HTMLInputElement;
   const maxYearInput = document.getElementById("max-year") as HTMLInputElement;
@@ -151,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "heb": "heebrea",
     "por": "portugali",
     "bul": "bulgaaria",
-    "bel": "belgia",
+    "bel": "valgevene",
     "lat": "ladina",
     "geo": "gruusia",
     "slo": "slovakkia",
@@ -219,24 +223,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Function to count languages and generate checkboxes
   function generateLanguageCheckboxes() {
-    // Count the languages
+    // Count the languages from edge attributes
     const languageCounts: { [code: string]: number } = {};
     let totalLanguages = 0;
 
-    // Assuming language information is stored in node attributes
-    graph.forEachNode((node, attributes) => {
-      const lang = attributes.author_lang;
-      if (lang && lang !== "tlk") { // Exclude 'tlk' if it's for translators
-        languageCounts[lang] = (languageCounts[lang] || 0) + 1;
+    // Iterate over all edges to extract languages
+    graph.forEachEdge((edge, attributes) => {
+      const languages = attributes.languages as string[];
+      if (Array.isArray(languages) && languages.length > 0) {
+        languages.forEach((lang) => {
+          languageCounts[lang] = (languageCounts[lang] || 0) + 1;
+          totalLanguages++;
+        });
+      } else {
+        // Handle edges with no languages (optional)
+        languageCounts["other"] = (languageCounts["other"] || 0) + 1;
         totalLanguages++;
       }
     });
 
     // Sort languages by count in descending order
-    const sortedLanguages = Object.entries(languageCounts).sort((a, b) => b[1] - a[1]);
+    const sortedLanguages = Object.entries(languageCounts).sort(
+      (a, b) => b[1] - a[1]
+    );
 
     // Ensure 'other' is added at the end if it exists
-    const checkboxValues = sortedLanguages.map(([lang, _]) => lang).filter(lang => lang !== "other");
+    const checkboxValues = sortedLanguages
+      .map(([lang, _]) => lang)
+      .filter((lang) => lang !== "other");
     if (languageCounts["other"]) {
       checkboxValues.push("other");
     }
@@ -246,7 +260,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     checkboxValues.forEach((lang) => {
       const langCount = languageCounts[lang];
-      const langPercentage = totalLanguages > 0 ? (langCount / totalLanguages) * 100 : 0;
+      const langPercentage =
+        totalLanguages > 0 ? (langCount / totalLanguages) * 100 : 0;
       const langName = languageCodes[lang] || lang;
       const color = languageColors[lang] || languageColors["other"];
 
@@ -263,9 +278,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     languageCheckboxesContainer.innerHTML = htmlString;
 
     // After adding the checkboxes to the DOM, select them for event listeners
-    const languageCheckboxes = languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
-      'input[type="checkbox"]'
-    );
+    const languageCheckboxes =
+      languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
+        'input[type="checkbox"]'
+      );
 
     // Initialize selectedLanguages state
     languageCheckboxes.forEach((checkbox) => {
@@ -306,14 +322,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Sort genres by count in descending order
-    const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+    const sortedGenres = Object.entries(genreCounts).sort(
+      (a, b) => b[1] - a[1]
+    );
 
     // Generate the HTML for checkboxes
     let htmlString = "";
 
     sortedGenres.forEach(([genre, count]) => {
       const genreCount = count;
-      const genrePercentage = totalGenres > 0 ? (genreCount / totalGenres) * 100 : 0;
+      const genrePercentage =
+        totalGenres > 0 ? (genreCount / totalGenres) * 100 : 0;
 
       // Use genre as the label (you can map to display names if needed)
       const genreLabel = genre;
@@ -331,9 +350,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     genreCheckboxesContainer.innerHTML = htmlString;
 
     // After adding the checkboxes to the DOM, select them for event listeners
-    const genreCheckboxes = genreCheckboxesContainer.querySelectorAll<HTMLInputElement>(
-      'input[type="checkbox"]'
-    );
+    const genreCheckboxes =
+      genreCheckboxesContainer.querySelectorAll<HTMLInputElement>(
+        'input[type="checkbox"]'
+      );
 
     // Initialize selectedGenres state
     genreCheckboxes.forEach((checkbox) => {
@@ -581,7 +601,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   renderer.on("clickNode", ({ node }) => {
     state.selectedNode = node;
-    state.selectedNeighbors = new Set(graph.neighbors(node));
+    state.selectedNeighbors = new Set(graph.neighbors(state.selectedNode));
     setHoveredNode(undefined);
   });
   renderer.on("clickStage", () => {
@@ -590,46 +610,127 @@ document.addEventListener('DOMContentLoaded', async () => {
     setHoveredNode(undefined);
   });
 
-  // Function to check if any neighbor of a node has a language in the set
-  function hasNeighborWithLanguages(
-    graph: Graph,
-    nodeKey: string,
-    languages = state.selectedLanguages
-  ): boolean {
-    return graph.someNeighbor(
-      nodeKey,
-      (neighbor: string, attributes: Attributes) => {
-        return languages.has(attributes.author_lang);
+  // Function to check if node has any visible edges based on current state
+  function nodeHasVisibleEdges(node: string): boolean {
+    return graph.someEdge(node, (edge, attributes, source, target) => {
+      const edgeAttributes = graph.getEdgeAttributes(edge);
+
+      // Time range filtering
+      if (
+        edgeAttributes.activity_end < state.minYear ||
+        edgeAttributes.activity_start > state.maxYear
+      ) {
+        return false;
       }
-    );
+
+      // Genre filtering
+      if (state.selectedGenres.size === 0) {
+        // No genres selected; hide all edges
+        return false;
+      } else {
+        const edgeGenres = edgeAttributes.genres as string[];
+        const hasSelectedGenre = edgeGenres.some((genre) =>
+          state.selectedGenres.has(genre)
+        );
+        if (!hasSelectedGenre) {
+          return false;
+        }
+      }
+
+      // Language filtering
+      const edgeLanguages = edgeAttributes.languages as string[];
+      const hasSelectedLanguage = edgeLanguages.some((lang) =>
+        state.selectedLanguages.has(lang)
+      );
+      if (!hasSelectedLanguage) {
+        return false;
+      }
+
+      return true;
+    });
   }
+
+  renderer.setSetting("edgeReducer", (edge, data) => {
+    const res: Partial<EdgeDisplayData> = { ...data };
+
+    const edgeAttributes = graph.getEdgeAttributes(edge);
+
+    // Existing logic for time range
+    if (
+      edgeAttributes.activity_end < state.minYear ||
+      edgeAttributes.activity_start > state.maxYear
+    ) {
+      res.hidden = true;
+      return res;
+    }
+
+    // Apply genre filtering
+    if (state.selectedGenres.size === 0) {
+      // No genres selected; hide all edges
+      res.hidden = true;
+      return res;
+    } else {
+      const edgeGenres = edgeAttributes.genres as string[];
+      const hasSelectedGenre = edgeGenres.some((genre) =>
+        state.selectedGenres.has(genre)
+      );
+      if (!hasSelectedGenre) {
+        res.hidden = true;
+        return res;
+      }
+    }
+
+    // Apply language filtering based on edge languages
+    const edgeLanguages = edgeAttributes.languages as string[];
+    const hasSelectedLanguage = edgeLanguages.some((lang) =>
+      state.selectedLanguages.has(lang)
+    );
+    if (!hasSelectedLanguage) {
+      res.hidden = true;
+      return res;
+    }
+
+    // Existing logic for hover and selection
+    if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
+      res.hidden = true;
+    } else if (
+      state.selectedNode &&
+      !graph.hasExtremity(edge, state.selectedNode)
+    ) {
+      res.hidden = true;
+    } else if (
+      state.suggestions &&
+      (!state.suggestions.has(graph.source(edge)) ||
+        !state.suggestions.has(graph.target(edge)))
+    ) {
+      res.hidden = true;
+    } else {
+      res.hidden = false;
+    }
+
+    return res;
+  });
 
   renderer.setSetting("nodeReducer", (node, data) => {
     const res: Partial<NodeDisplayData> = { ...data };
 
+    const nodeAttributes = graph.getNodeAttributes(node);
+
     // Existing logic for time range
     if (
-      data.activity_end < state.minYear ||
-      data.activity_start > state.maxYear
+      nodeAttributes.activity_end < state.minYear ||
+      nodeAttributes.activity_start > state.maxYear
     ) {
       res.label = "";
       res.color = "#f6f6f6";
-    } else {
-      const hasEdgeActivityInRange = graph
-        .edges(node)
-        .some((edge) => {
-          const edgeData = graph.getEdgeAttributes(edge);
-          return (
-            edgeData.activity_start <= state.maxYear &&
-            edgeData.activity_end >= state.minYear
-          );
-        });
+      return res;
+    }
 
-      // Grey out the node if none of its edges are in range
-      if (!hasEdgeActivityInRange) {
-        res.label = "";
-        res.color = "#f6f6f6";
-      }
+    // Check if node has any visible edges
+    if (!nodeHasVisibleEdges(node)) {
+      res.label = "";
+      res.color = "#f6f6f6";
+      return res;
     }
 
     // Existing logic for hover and selection
@@ -648,105 +749,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     ) {
       res.label = "";
       res.color = "#f6f6f6";
-    } else if (
-      state.suggestions &&
-      !state.suggestions.has(node)
-    ) {
+    } else if (state.suggestions && !state.suggestions.has(node)) {
       res.label = "";
       res.color = "#f6f6f6";
-    } else if (
-      data.author_lang !== "tlk" &&
-      !state.selectedLanguages.has(data.author_lang)
-    ) {
-      res.label = "";
-      res.color = "#f6f6f6";
-    } else if (
-      data.author_lang === "tlk" &&
-      !hasNeighborWithLanguages(graph, node, state.selectedLanguages)
-    ) {
-      res.label = "";
-      res.color = "#f6f6f6";
-    }
-
-    // Apply genre filtering
-    if (state.selectedGenres.size === 0) {
-      // No genres selected; grey out all nodes
-      res.label = "";
-      res.color = "#f6f6f6";
-    } else {
-      const hasEdgeWithSelectedGenres = graph
-        .edges(node)
-        .some((edge) => {
-          const edgeGenres = graph.getEdgeAttribute(edge, "genres") as string[];
-          return edgeGenres.some((genre) => state.selectedGenres.has(genre));
-        });
-      if (!hasEdgeWithSelectedGenres) {
-        res.label = "";
-        res.color = "#f6f6f6";
-      }
-    }
-
-    return res;
-  });
-
-  renderer.setSetting("edgeReducer", (edge, data) => {
-    const res: Partial<EdgeDisplayData> = { ...data };
-
-    // Existing logic for time range
-    if (
-      data.activity_end < state.minYear ||
-      data.activity_start > state.maxYear
-    ) {
-      res.hidden = true;
-    }
-
-    // Existing logic for hover and selection
-    if (
-      state.hoveredNode &&
-      !graph.hasExtremity(edge, state.hoveredNode)
-    ) {
-      res.hidden = true;
-    } else if (
-      state.selectedNode &&
-      !graph.hasExtremity(edge, state.selectedNode)
-    ) {
-      res.hidden = true;
-    } else if (
-      state.suggestions &&
-      (!state.suggestions.has(graph.source(edge)) ||
-        !state.suggestions.has(graph.target(edge)))
-    ) {
-      res.hidden = true;
-    } else {
-      const sourceNodeLanguage = graph.getNodeAttribute(
-        graph.source(edge),
-        "author_lang"
-      );
-      const targetNodeLanguage = graph.getNodeAttribute(
-        graph.target(edge),
-        "author_lang"
-      );
-
-      if (
-        !state.selectedLanguages.has(sourceNodeLanguage) &&
-        !state.selectedLanguages.has(targetNodeLanguage)
-      ) {
-        res.hidden = true;
-      }
-    }
-
-    // Apply genre filtering
-    if (state.selectedGenres.size === 0) {
-      // No genres selected; hide all edges
-      res.hidden = true;
-    } else {
-      const edgeGenres = graph.getEdgeAttribute(edge, "genres") as string[];
-      const hasSelectedGenre = edgeGenres.some((genre) =>
-        state.selectedGenres.has(genre)
-      );
-      if (!hasSelectedGenre) {
-        res.hidden = true;
-      }
     }
 
     return res;
