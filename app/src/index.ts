@@ -615,11 +615,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return graph.someEdge(node, (edge, attributes, source, target) => {
       const edgeAttributes = graph.getEdgeAttributes(edge);
 
-      // Time range filtering
-      if (
-        edgeAttributes.activity_end < state.minYear ||
-        edgeAttributes.activity_start > state.maxYear
-      ) {
+      // Time range filtering based on works
+      const works = edgeAttributes.works as [string, number][];
+      const hasWorkInTimeRange = works.some((work) => {
+        const year = work[1];
+        return year >= state.minYear && year <= state.maxYear;
+      });
+
+      if (!hasWorkInTimeRange) {
         return false;
       }
 
@@ -655,11 +658,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const edgeAttributes = graph.getEdgeAttributes(edge);
 
-    // Existing logic for time range
-    if (
-      edgeAttributes.activity_end < state.minYear ||
-      edgeAttributes.activity_start > state.maxYear
-    ) {
+    // Time range filtering based on works
+    const works = edgeAttributes.works as [string, number][];
+    const hasWorkInTimeRange = works.some((work) => {
+      const year = work[1];
+      return year >= state.minYear && year <= state.maxYear;
+    });
+
+    if (!hasWorkInTimeRange) {
       res.hidden = true;
       return res;
     }
@@ -714,17 +720,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderer.setSetting("nodeReducer", (node, data) => {
     const res: Partial<NodeDisplayData> = { ...data };
 
-    const nodeAttributes = graph.getNodeAttributes(node);
-
-    // Existing logic for time range
-    if (
-      nodeAttributes.activity_end < state.minYear ||
-      nodeAttributes.activity_start > state.maxYear
-    ) {
-      res.label = "";
-      res.color = "#f6f6f6";
-      return res;
-    }
+    // Remove time range filtering based on nodeAttributes
 
     // Check if node has any visible edges
     if (!nodeHasVisibleEdges(node)) {
