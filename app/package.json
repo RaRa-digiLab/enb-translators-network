@@ -4,9 +4,9 @@
   "description": "Eesti tõlkekirjanduse võrgustik",
   "main": "index.js",
   "scripts": {
-    "start": "kotatsu serve --typescript ./src/index.ts --public / ./public",
-    "build": "kotatsu build client --typescript ./src/index.ts && copy -r ./public/* ./build/"
-  },
+  "start": "kotatsu serve --typescript ./src/index.ts",
+  "build": "kotatsu build client --typescript ./src/index.ts && xcopy /s /e /y .\\public\\* .\\build\\"
+},
   "license": "MIT",
   "dependencies": {
     "graphology": "^0.23.0",
