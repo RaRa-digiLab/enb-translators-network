@@ -224,43 +224,38 @@ document.addEventListener("DOMContentLoaded", async () => {
   function generateLanguageCheckboxes() {
     const languageCounts: { [code: string]: number } = {};
     let totalLanguages = 0;
-
+  
     graph.forEachEdge((edge, attributes) => {
       const languages = attributes.languages as string[] | undefined;
       if (languages && languages.length > 0) {
         languages.forEach((lang) => {
-          languageCounts[lang] = (languageCounts[lang] || 0) + 1;
+          // Map unmapped languages to 'other'
+          const mappedLang = languageCodes.hasOwnProperty(lang) ? lang : 'other';
+          languageCounts[mappedLang] = (languageCounts[mappedLang] || 0) + 1;
           totalLanguages++;
         });
       } else {
-        // Handle edges with no languages
-        languageCounts["other"] = (languageCounts["other"] || 0) + 1;
+        // Edges with no languages are considered 'other'
+        languageCounts['other'] = (languageCounts['other'] || 0) + 1;
         totalLanguages++;
       }
     });
-
-    // Sort languages by count descending
-    const sortedLanguages = Object.entries(languageCounts).sort(
-      (a, b) => b[1] - a[1]
-    );
-
-    // Ensure 'other' is at the end
-    const checkboxValues = sortedLanguages
-      .map(([lang, _]) => lang)
-      .filter((lang) => lang !== "other");
-    if (languageCounts["other"]) {
-      checkboxValues.push("other");
-    }
-
+  
+    // Sort languages, placing 'other' at the end
+    const sortedLanguages = Object.entries(languageCounts).sort((a, b) => {
+      if (a[0] === 'other') return 1;
+      if (b[0] === 'other') return -1;
+      return b[1] - a[1];
+    });
+  
     // Generate HTML for checkboxes
     let htmlString = "";
-    checkboxValues.forEach((lang) => {
-      const langCount = languageCounts[lang];
+    sortedLanguages.forEach(([lang, count]) => {
       const langPercentage =
-        totalLanguages > 0 ? (langCount / totalLanguages) * 100 : 0;
-      const langName = languageCodes[lang] || lang;
+        totalLanguages > 0 ? (count / totalLanguages) * 100 : 0;
+      const langName = languageCodes[lang] || "Muu/Puuduv";
       const color = languageColors[lang] || languageColors["other"];
-
+  
       htmlString += `
         <label>
           <input type="checkbox" value="${lang}" checked />
@@ -269,17 +264,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         </label>
       `;
     });
-
+  
     // Insert into container
     languageCheckboxesContainer.innerHTML = htmlString;
-
+  
     // Select checkboxes and initialize state
     const languageCheckboxes =
       languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
         'input[type="checkbox"]'
       );
     state.languageCheckboxes = languageCheckboxes;
-
+  
     languageCheckboxes.forEach((checkbox) => {
       if (checkbox.checked) {
         state.selectedLanguages.add(checkbox.value);
@@ -288,6 +283,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       checkbox.addEventListener("change", handleLanguageCheckboxChange);
     });
   }
+  
 
   // Generate Genre Checkboxes
   function generateGenreCheckboxes() {
@@ -469,7 +465,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize Sigma renderer
   const renderer = new Sigma(graph, container);
   // Configure renderer settings
-  renderer.setSetting("labelRenderedSizeThreshold", 7); // Adjust threshold as needed
+  renderer.setSetting("labelRenderedSizeThreshold", 5.5); // Adjust threshold as needed
 
   // Tab Switching Logic (if applicable)
   const tabButtons = document.querySelectorAll(".tablinks");
@@ -826,15 +822,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         res.color = "#f6f6f6";
         return res;
       }
-    }
-
-    // Default behavior: display labels for larger nodes
-    const nodeSize = data.size || 1;
-    const labelThreshold = 7; // Adjust based on your data
-    if (nodeSize >= labelThreshold) {
-      res.label = graph.getNodeAttribute(node, "label") as string;
-    } else {
-      res.label = "";
     }
 
     return res;
