@@ -496,7 +496,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("language-tab")?.classList.add("active");
 
   // Event listener for the Apply Time Range button
-  timerangeButton.addEventListener("click", function () {
+  timerangeButton.addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default form submission
     const minYear = parseInt(minYearInput.value) || 1800;
     const maxYear = parseInt(maxYearInput.value) || 2024;
     state.minYear = minYear;
@@ -511,7 +512,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Event listener for the Reset Time Range button
-  timerangeResetButton.addEventListener("click", function () {
+  timerangeResetButton.addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default form submission
     minYearInput.value = "1800";
     maxYearInput.value = "2024";
     state.minYear = 1800;
