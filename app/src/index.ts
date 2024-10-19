@@ -8,26 +8,25 @@ import Graph from "graphology";
 import { Attributes } from "graphology-types";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Instantiate sigma:
+  // Instantiate Graphology graph
   const graph = new Graph();
 
-  // Retrieve some useful DOM elements:
+  // Retrieve DOM elements
   const container = document.getElementById("sigma-container") as HTMLElement;
   const searchInput = document.getElementById("search-input") as HTMLInputElement;
   const searchSuggestions = document.getElementById(
     "suggestions"
   ) as HTMLDataListElement;
 
-  // Language checkboxes container
+  // Language and Genre checkboxes containers
   const languageCheckboxesContainer = document.getElementById(
     "checkboxes"
   ) as HTMLElement;
-
-  // Genre checkboxes container
   const genreCheckboxesContainer = document.getElementById(
     "genre-checkboxes"
   ) as HTMLElement;
 
+  // Time range input elements and buttons
   const minYearInput = document.getElementById("min-year") as HTMLInputElement;
   const maxYearInput = document.getElementById("max-year") as HTMLInputElement;
   const timerangeButton = document.getElementById(
@@ -37,14 +36,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     "timerange-reset-button"
   ) as HTMLButtonElement;
 
-  // Declare application state
+  // Application state interface
   interface State {
     hoveredNode?: string;
     searchQuery: string;
     selectedNode?: string;
     selectedNeighbors?: Set<string>;
     suggestions?: Set<string>;
-    hoveredNeighbors?: Set<string>;
     selectedLanguages: Set<string>;
     selectedGenres: Set<string>;
     minYear: number;
@@ -54,200 +52,199 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Initialize minYear and maxYear from inputs
-  const minYear = parseInt(minYearInput.value);
-  const maxYear = parseInt(maxYearInput.value);
+  const initialMinYear = parseInt(minYearInput.value) || 1800;
+  const initialMaxYear = parseInt(maxYearInput.value) || 2024;
 
-  // Initialize state with empty selectedLanguages and selectedGenres
+  // Initialize state
   const state: State = {
     searchQuery: "",
     selectedLanguages: new Set<string>(),
     selectedGenres: new Set<string>(),
-    minYear: minYear,
-    maxYear: maxYear,
+    minYear: initialMinYear,
+    maxYear: initialMaxYear,
   };
 
-  // Define language colors mapping
+  // Language colors mapping
   const languageColors: { [code: string]: string } = {
     "eng": "rgb(0, 221, 235)",
-    "rus": "rgb(255, 111, 36)",
-    "ger": "rgb(255, 130, 255)",
-    "fre": "rgb(54, 224, 0)",
-    "fin": "rgb(223, 170, 0)",
-    "swe": "rgb(152, 204, 243)",
-    "spa": "rgb(255, 163, 139)",
-    "ita": "rgb(139, 216, 144)",
-    "pol": "rgb(255, 91, 190)",
-    "lav": "rgb(167, 165, 255)",
-    "nor": "rgb(95, 80, 137)",
-    "hun": "rgb(255, 172, 226)",
-    "dan": "rgb(0, 211, 151)",
-    "cze": "rgb(66, 117, 5)",
-    "lit": "rgb(168, 50, 83)",
-    "dut": "rgb(0, 109, 76)",
-    "jpn": "rgb(255, 81, 114)",
-    "rum": "rgb(125, 83, 0)",
-    "ukr": "rgb(185, 171, 153)",
-    "gre": "rgb(0, 184, 255)",
-    "ice": "rgb(235, 190, 95)",
-    "heb": "rgb(0, 86, 111)",
-    "por": "rgb(0, 229, 255)",
-    "bul": "rgb(161, 195, 0)",
-    "bel": "rgb(216, 76, 32)",
-    "lat": "rgb(255, 146, 0)",
-    "geo": "rgb(0, 209, 69)",
-    "slo": "rgb(203, 83, 192)",
-    "udm": "rgb(0, 186, 205)",
-    "tur": "rgb(178, 47, 33)",
-    "arm": "rgb(230, 17, 3)",
-    "chi": "rgb(27, 177, 255)",
-    "ara": "rgb(118, 255, 118)",
-    "cat": "rgb(156, 0, 206)",
-    "slv": "rgb(0, 57, 243)",
-    "kom": "rgb(255, 193, 148)",
-    "hin": "rgb(101, 185, 207)",
-    "yid": "rgb(202, 119, 197)",
-    "san": "rgb(83, 255, 151)",
-    "grc": "rgb(250, 253, 154)",
-    "per": "rgb(119, 133, 81)",
-    "srp": "rgb(162, 233, 187)",
-    "fiu": "rgb(181, 4, 54)",
-    "chm": "rgb(60, 0, 133)",
-    "kor": "rgb(74, 190, 158)",
-    "epo": "rgb(129, 0, 39)",
-    "hrv": "rgb(95, 219, 196)",
-    "aze": "rgb(15, 54, 131)",
-    "mac": "rgb(167, 182, 202)",
-    "tgk": "rgb(255, 70, 0)",
-    "smi": "rgb(90, 127, 207)",
-    "pro": "rgb(125, 38, 13)",
-    "uzb": "rgb(206, 21, 0)",
-    "peo": "rgb(54, 23, 198)",
-    "kaz": "rgb(25, 144, 182)",
-    "oss": "rgb(28, 125, 255)",
-    "tat": "rgb(184, 0, 123)",
-    "krl": "rgb(57, 189, 69)",
-    "other": "rgb(150, 150, 150)",
+        "rus": "rgb(255, 111, 36)",
+        "ger": "rgb(255, 130, 255)",
+        "fre": "rgb(54, 224, 0)",
+        "fin": "rgb(223, 170, 0)",
+        "swe": "rgb(152, 204, 243)",
+        "spa": "rgb(255, 163, 139)",
+        "ita": "rgb(139, 216, 144)",
+        "pol": "rgb(255, 91, 190)",
+        "lav": "rgb(167, 165, 255)",
+        "nor": "rgb(95, 80, 137)",
+        "hun": "rgb(255, 172, 226)",
+        "dan": "rgb(0, 211, 151)",
+        "cze": "rgb(66, 117, 5)",
+        "lit": "rgb(168, 50, 83)",
+        "dut": "rgb(0, 109, 76)",
+        "jpn": "rgb(255, 81, 114)",
+        "rum": "rgb(125, 83, 0)",
+        "ukr": "rgb(185, 171, 153)",
+        "gre": "rgb(0, 184, 255)",
+        "ice": "rgb(235, 190, 95)",
+        "heb": "rgb(0, 86, 111)",
+        "por": "rgb(0, 229, 255)",
+        "bul": "rgb(161, 195, 0)",
+        "bel": "rgb(216, 76, 32)",
+        "lat": "rgb(255, 146, 0)",
+        "geo": "rgb(0, 209, 69)",
+        "slo": "rgb(203, 83, 192)",
+        "udm": "rgb(0, 186, 205)",
+        "tur": "rgb(178, 47, 33)",
+        "arm": "rgb(230, 17, 3)",
+        "chi": "rgb(27, 177, 255)",
+        "ara": "rgb(118, 255, 118)",
+        "cat": "rgb(156, 0, 206)",
+        "slv": "rgb(0, 57, 243)",
+        "kom": "rgb(255, 193, 148)",
+        "hin": "rgb(101, 185, 207)",
+        "yid": "rgb(202, 119, 197)",
+        "san": "rgb(83, 255, 151)",
+        "grc": "rgb(250, 253, 154)",
+        "per": "rgb(119, 133, 81)",
+        "srp": "rgb(162, 233, 187)",
+        "fiu": "rgb(181, 4, 54)",
+        "chm": "rgb(60, 0, 133)",
+        "kor": "rgb(74, 190, 158)",
+        "epo": "rgb(129, 0, 39)",
+        "hrv": "rgb(95, 219, 196)",
+        "aze": "rgb(15, 54, 131)",
+        "mac": "rgb(167, 182, 202)",
+        "tgk": "rgb(255, 70, 0)",
+        "smi": "rgb(90, 127, 207)",
+        "pro": "rgb(125, 38, 13)",
+        "uzb": "rgb(206, 21, 0)",
+        "peo": "rgb(54, 23, 198)",
+        "kaz": "rgb(25, 144, 182)",
+        "oss": "rgb(28, 125, 255)",
+        "tat": "rgb(184, 0, 123)",
+        "krl": "rgb(57, 189, 69)",
+        "other": "rgb(150, 150, 150)",
   };
 
-  // Language codes mapping
+  // Language codes mapping to display names
   const languageCodes: { [code: string]: string } = {
     "eng": "inglise",
-    "rus": "vene",
-    "ger": "saksa",
-    "fre": "prantsuse",
-    "fin": "soome",
-    "swe": "rootsi",
-    "spa": "hispaania",
-    "ita": "itaalia",
-    "pol": "poola",
-    "lav": "läti",
-    "nor": "norra",
-    "hun": "ungari",
-    "dan": "taani",
-    "cze": "tšehhi",
-    "lit": "leedu",
-    "dut": "hollandi",
-    "jpn": "jaapani",
-    "rum": "rumeenia",
-    "ukr": "ukraina",
-    "gre": "kreeka",
-    "ice": "islandi",
-    "heb": "heebrea",
-    "por": "portugali",
-    "bul": "bulgaaria",
-    "bel": "valgevene",
-    "lat": "ladina",
-    "geo": "gruusia",
-    "slo": "slovakkia",
-    "udm": "udmurdi",
-    "tur": "türgi",
-    "arm": "armeenia",
-    "chi": "hiina",
-    "ara": "araabia",
-    "cat": "katalaani",
-    "slv": "sloveeni",
-    "kom": "komi",
-    "hin": "hindi",
-    "yid": "jidiš",
-    "san": "sanskriti",
-    "grc": "vanakreeka",
-    "per": "pärsia",
-    "srp": "serbia",
-    "fiu": "soomeugri (muu)",
-    "chm": "mari",
-    "kor": "korea",
-    "epo": "esperanto",
-    "hrv": "horvaadi",
-    "aze": "aserbaidžaani",
-    "mac": "makedoonia",
-    "tgk": "tadžiki",
-    "smi": "saami",
-    "pro": "provansaali",
-    "uzb": "usbeki",
-    "peo": "vanapärsia",
-    "kaz": "kasahhi",
-    "oss": "osseedi",
-    "tat": "tatari",
-    "krl": "karjala",
-    "other": "muu/puuduv",
+        "rus": "vene",
+        "ger": "saksa",
+        "fre": "prantsuse",
+        "fin": "soome",
+        "swe": "rootsi",
+        "spa": "hispaania",
+        "ita": "itaalia",
+        "pol": "poola",
+        "lav": "läti",
+        "nor": "norra",
+        "hun": "ungari",
+        "dan": "taani",
+        "cze": "tšehhi",
+        "lit": "leedu",
+        "dut": "hollandi",
+        "jpn": "jaapani",
+        "rum": "rumeenia",
+        "ukr": "ukraina",
+        "gre": "kreeka",
+        "ice": "islandi",
+        "heb": "heebrea",
+        "por": "portugali",
+        "bul": "bulgaaria",
+        "bel": "belgia",
+        "lat": "ladina",
+        "geo": "gruusia",
+        "slo": "slovakkia",
+        "udm": "udmurdi",
+        "tur": "türgi",
+        "arm": "armeenia",
+        "chi": "hiina",
+        "ara": "araabia",
+        "cat": "katalaani",
+        "slv": "sloveeni",
+        "kom": "komi",
+        "hin": "hindi",
+        "yid": "jidiš",
+        "san": "sanskriti",
+        "grc": "vanakreeka",
+        "per": "pärsia",
+        "srp": "serbia",
+        "fiu": "soomeugri (muu)",
+        "chm": "mari",
+        "kor": "korea",
+        "epo": "esperanto",
+        "hrv": "horvaadi",
+        "aze": "aserbaidžaani",
+        "mac": "makedoonia",
+        "tgk": "tadžiki",
+        "smi": "saami",
+        "pro": "provansaali",
+        "uzb": "usbeki",
+        "peo": "vanapärsia",
+        "kaz": "kasahhi",
+        "oss": "osseedi",
+        "tat": "tatari",
+        "krl": "karjala",
+        "other": "muu/puuduv",
   };
 
-  // Function to load graph data and populate suggestions, languages, and genres
-  async function loadGraphDataAndPopulate() {
-    const response = await fetch("data.json");
-    const graphData = await response.json();
+  // Function to load graph data and initialize UI components
+  async function loadGraphDataAndInitialize() {
+    try {
+      const response = await fetch("data.json");
+      if (!response.ok) {
+        throw new Error(`Failed to load data.json: ${response.statusText}`);
+      }
+      const graphData = await response.json();
+      graph.import(graphData);
 
-    graph.import(graphData);
+      // Populate search suggestions
+      populateSearchSuggestions();
 
-    // Populate the search suggestions
-    searchSuggestions.innerHTML = graph
-      .nodes()
-      .map((node) => {
-        const label = graph.getNodeAttribute(node, "label");
-        return `<option value="${label}"></option>`;
-      })
-      .join("\n");
-
-    // Now, count the languages and generate the checkboxes
-    generateLanguageCheckboxes();
-
-    // Count genres and generate genre checkboxes
-    generateGenreCheckboxes();
+      // Generate checkboxes
+      generateLanguageCheckboxes();
+      generateGenreCheckboxes();
+    } catch (error) {
+      console.error("Error loading graph data:", error);
+    }
   }
 
-  await loadGraphDataAndPopulate();
+  // Function to populate search suggestions
+  function populateSearchSuggestions() {
+    const options = graph.nodes().map((node) => {
+      const label = graph.getNodeAttribute(node, "label") as string;
+      return `<option value="${label}"></option>`;
+    });
+    searchSuggestions.innerHTML = options.join("\n");
+  }
 
-  const renderer = new Sigma(graph, container);
-  // Configure renderer settings
-  renderer.setSetting("labelRenderedSizeThreshold", 5);
-
-  // Function to count languages and generate checkboxes
+  // Generate Language Checkboxes
   function generateLanguageCheckboxes() {
-    // Count the languages from edge attributes
     const languageCounts: { [code: string]: number } = {};
     let totalLanguages = 0;
 
-    // Iterate over all edges to extract languages
     graph.forEachEdge((edge, attributes) => {
-      const languages = attributes.languages as string[];
-      if (Array.isArray(languages) && languages.length > 0) {
+      const languages = attributes.languages as string[] | undefined;
+      if (languages && languages.length > 0) {
         languages.forEach((lang) => {
           languageCounts[lang] = (languageCounts[lang] || 0) + 1;
           totalLanguages++;
         });
       } else {
-        // Handle edges with no languages (optional)
+        // Handle edges with no languages
         languageCounts["other"] = (languageCounts["other"] || 0) + 1;
         totalLanguages++;
       }
     });
 
-    // Sort languages by count in descending order
+    // Sort languages by count descending
     const sortedLanguages = Object.entries(languageCounts).sort(
       (a, b) => b[1] - a[1]
     );
 
-    // Ensure 'other' is added at the end if it exists
+    // Ensure 'other' is at the end
     const checkboxValues = sortedLanguages
       .map(([lang, _]) => lang)
       .filter((lang) => lang !== "other");
@@ -255,9 +252,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       checkboxValues.push("other");
     }
 
-    // Generate the HTML for checkboxes
+    // Generate HTML for checkboxes
     let htmlString = "";
-
     checkboxValues.forEach((lang) => {
       const langCount = languageCounts[lang];
       const langPercentage =
@@ -266,160 +262,151 @@ document.addEventListener("DOMContentLoaded", async () => {
       const color = languageColors[lang] || languageColors["other"];
 
       htmlString += `
-      <label>
-        <input type="checkbox" value="${lang}" checked />
-        <span class="item-name" style="color: ${color};">${langName}</span>
-        <span class="percentage">${langPercentage.toFixed(2)}%</span>
-      </label>
+        <label>
+          <input type="checkbox" value="${lang}" checked />
+          <span class="item-name" style="color: ${color};">${langName}</span>
+          <span class="percentage">${langPercentage.toFixed(2)}%</span>
+        </label>
       `;
     });
 
-    // Insert the HTML into the container
+    // Insert into container
     languageCheckboxesContainer.innerHTML = htmlString;
 
-    // After adding the checkboxes to the DOM, select them for event listeners
+    // Select checkboxes and initialize state
     const languageCheckboxes =
       languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
         'input[type="checkbox"]'
       );
+    state.languageCheckboxes = languageCheckboxes;
 
-    // Initialize selectedLanguages state
     languageCheckboxes.forEach((checkbox) => {
-      const language = checkbox.value;
       if (checkbox.checked) {
-        state.selectedLanguages.add(language);
+        state.selectedLanguages.add(checkbox.value);
       }
-    });
-
-    // Attach event listeners to the checkboxes
-    languageCheckboxes.forEach((checkbox) => {
+      // Attach event listener
       checkbox.addEventListener("change", handleLanguageCheckboxChange);
     });
-
-    // Save the checkboxes for later use
-    state.languageCheckboxes = languageCheckboxes;
   }
 
-  // Function to count genres and generate checkboxes
+  // Generate Genre Checkboxes
   function generateGenreCheckboxes() {
-    // Count the genres
     const genreCounts: { [genre: string]: number } = {};
     let totalGenres = 0;
 
-    // Iterate over all edges to extract genres
     graph.forEachEdge((edge, attributes) => {
-      const genres = attributes.genres as string[];
-      if (Array.isArray(genres) && genres.length > 0) {
+      const genres = attributes.genres as string[] | undefined;
+      if (genres && genres.length > 0) {
         genres.forEach((genre) => {
           genreCounts[genre] = (genreCounts[genre] || 0) + 1;
           totalGenres++;
         });
       } else {
-        // Handle edges with no genres (optional)
+        // Handle edges with no genres
         genreCounts["other"] = (genreCounts["other"] || 0) + 1;
         totalGenres++;
       }
     });
 
-    // Sort genres by count in descending order
+    // Sort genres by count descending
     const sortedGenres = Object.entries(genreCounts).sort(
       (a, b) => b[1] - a[1]
     );
 
-    // Generate the HTML for checkboxes
+    // Generate HTML for checkboxes
     let htmlString = "";
-
     sortedGenres.forEach(([genre, count]) => {
-      const genreCount = count;
       const genrePercentage =
-        totalGenres > 0 ? (genreCount / totalGenres) * 100 : 0;
-
-      // Use genre as the label (you can map to display names if needed)
-      const genreLabel = genre;
+        totalGenres > 0 ? (count / totalGenres) * 100 : 0;
+      const genreLabel = genre; // You can map to display names if needed
 
       htmlString += `
-      <label>
-        <input type="checkbox" value="${genre}" checked />
-        <span class="item-name">${genreLabel}</span>
-        <span class="percentage">${genrePercentage.toFixed(2)}%</span>
-      </label>
+        <label>
+          <input type="checkbox" value="${genre}" checked />
+          <span class="item-name">${genreLabel}</span>
+          <span class="percentage">${genrePercentage.toFixed(2)}%</span>
+        </label>
       `;
     });
 
-    // Insert the HTML into the container
+    // Insert into container
     genreCheckboxesContainer.innerHTML = htmlString;
 
-    // After adding the checkboxes to the DOM, select them for event listeners
+    // Select checkboxes and initialize state
     const genreCheckboxes =
       genreCheckboxesContainer.querySelectorAll<HTMLInputElement>(
         'input[type="checkbox"]'
       );
+    state.genreCheckboxes = genreCheckboxes;
 
-    // Initialize selectedGenres state
     genreCheckboxes.forEach((checkbox) => {
-      const genre = checkbox.value;
       if (checkbox.checked) {
-        state.selectedGenres.add(genre);
+        state.selectedGenres.add(checkbox.value);
       }
-    });
-
-    // Attach event listeners to the checkboxes
-    genreCheckboxes.forEach((checkbox) => {
+      // Attach event listener
       checkbox.addEventListener("change", handleGenreCheckboxChange);
     });
-
-    // Save the checkboxes for later use
-    state.genreCheckboxes = genreCheckboxes;
   }
 
-  // Function to handle language checkbox changes
+  // Handle Language Checkbox Changes
   function handleLanguageCheckboxChange(event: Event) {
     const checkbox = event.target as HTMLInputElement;
     const language = checkbox.value;
 
     if (checkbox.checked) {
-      // Checkbox is checked, add the language to selectedLanguages
       state.selectedLanguages.add(language);
     } else {
-      // Checkbox is unchecked, remove the language from selectedLanguages
       state.selectedLanguages.delete(language);
     }
+
+    // Recompute selectedNeighbors if a node is selected
+    if (state.selectedNode) {
+      state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+    }
+
     renderer.refresh();
   }
 
-  // Function to handle genre checkbox changes
+  // Handle Genre Checkbox Changes
   function handleGenreCheckboxChange(event: Event) {
     const checkbox = event.target as HTMLInputElement;
     const genre = checkbox.value;
 
     if (checkbox.checked) {
-      // Checkbox is checked, add the genre to selectedGenres
       state.selectedGenres.add(genre);
     } else {
-      // Checkbox is unchecked, remove the genre from selectedGenres
       state.selectedGenres.delete(genre);
     }
+
+    // Recompute selectedNeighbors if a node is selected
+    if (state.selectedNode) {
+      state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+    }
+
     renderer.refresh();
   }
 
-  // Function to handle the "Select All" and "Deselect All" buttons for languages
+  // Handle "Select All" / "Deselect All" for Languages
   function handleSelectAllDeselectAllLanguages(selectAll: boolean) {
-    // Loop through language checkboxes and set their checked state
     const languageCheckboxes = state.languageCheckboxes!;
     languageCheckboxes.forEach((checkbox) => {
-      const language = checkbox.value;
       checkbox.checked = selectAll;
-
       if (selectAll) {
-        state.selectedLanguages.add(language);
+        state.selectedLanguages.add(checkbox.value);
       } else {
-        state.selectedLanguages.delete(language);
+        state.selectedLanguages.delete(checkbox.value);
       }
     });
+
+    // Recompute selectedNeighbors if a node is selected
+    if (state.selectedNode) {
+      state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+    }
+
     renderer.refresh();
   }
 
-  // Attach event listeners to "Select All" and "Deselect All" buttons for languages
+  // Attach event listeners to "Select All" and "Deselect All" for Languages
   function attachLanguageSelectDeselectEventListeners() {
     const selectAllButton = document.getElementById(
       "select-all"
@@ -439,24 +426,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   attachLanguageSelectDeselectEventListeners();
 
-  // Function to handle the "Select All" and "Deselect All" buttons for genres
+  // Handle "Select All" / "Deselect All" for Genres
   function handleSelectAllDeselectAllGenres(selectAll: boolean) {
-    // Loop through genre checkboxes and set their checked state
     const genreCheckboxes = state.genreCheckboxes!;
     genreCheckboxes.forEach((checkbox) => {
-      const genre = checkbox.value;
       checkbox.checked = selectAll;
-
       if (selectAll) {
-        state.selectedGenres.add(genre);
+        state.selectedGenres.add(checkbox.value);
       } else {
-        state.selectedGenres.delete(genre);
+        state.selectedGenres.delete(checkbox.value);
       }
     });
+
+    // Recompute selectedNeighbors if a node is selected
+    if (state.selectedNode) {
+      state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+    }
+
     renderer.refresh();
   }
 
-  // Attach event listeners to "Select All" and "Deselect All" buttons for genres
+  // Attach event listeners to "Select All" and "Deselect All" for Genres
   function attachGenreSelectDeselectEventListeners() {
     const selectAllGenresButton = document.getElementById(
       "select-all-genres"
@@ -476,7 +466,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   attachGenreSelectDeselectEventListeners();
 
-  // Tab switching logic
+  // Initialize Sigma renderer
+  const renderer = new Sigma(graph, container);
+  // Configure renderer settings
+  renderer.setSetting("labelRenderedSizeThreshold", 7); // Adjust threshold as needed
+
+  // Tab Switching Logic (if applicable)
   const tabButtons = document.querySelectorAll(".tablinks");
   const tabContents = document.querySelectorAll<HTMLElement>(".tabcontent");
 
@@ -500,31 +495,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     ?.classList.add("active");
   document.getElementById("language-tab")?.classList.add("active");
 
-  // Event listener for the apply button
+  // Event listener for the Apply Time Range button
   timerangeButton.addEventListener("click", function () {
-    // Get the values from the input elements
-    const minYear = parseInt(minYearInput.value);
-    const maxYear = parseInt(maxYearInput.value);
+    const minYear = parseInt(minYearInput.value) || 1800;
+    const maxYear = parseInt(maxYearInput.value) || 2024;
     state.minYear = minYear;
     state.maxYear = maxYear;
 
-    // Refresh rendering:
+    // Recompute selectedNeighbors if a node is selected
+    if (state.selectedNode) {
+      state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+    }
+
     renderer.refresh();
   });
 
-  // Event listener for the reset button
+  // Event listener for the Reset Time Range button
   timerangeResetButton.addEventListener("click", function () {
-    // Reset the time range inputs
     minYearInput.value = "1800";
     maxYearInput.value = "2024";
     state.minYear = 1800;
     state.maxYear = 2024;
 
-    // Refresh rendering:
+    // Recompute selectedNeighbors if a node is selected
+    if (state.selectedNode) {
+      state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+    }
+
     renderer.refresh();
   });
 
-  // Actions:
+  // Function to set search query and handle suggestions
   function setSearchQuery(query: string) {
     state.searchQuery = query;
 
@@ -540,19 +541,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         }))
         .filter(({ label }) => label.toLowerCase().includes(lcQuery));
 
-      // If we have a single perfect match, consider it selected
+      // If single perfect match, select it
       if (suggestions.length === 1 && suggestions[0].label === query) {
         state.selectedNode = suggestions[0].id;
-        state.selectedNeighbors = new Set(
-          graph.neighbors(state.selectedNode)
-        );
+        state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         state.suggestions = undefined;
 
-        // Move the camera to center it on the selected node:
-        const nodePosition = renderer.getNodeDisplayData(
+        // Move camera to selected node
+        const nodeDisplayData = renderer.getNodeDisplayData(
           state.selectedNode
         ) as Coordinates;
-        renderer.getCamera().animate(nodePosition, {
+        renderer.getCamera().animate(nodeDisplayData, {
           duration: 500,
         });
       } else {
@@ -565,87 +564,146 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.selectedNeighbors = undefined;
     }
 
-    // Refresh rendering:
     renderer.refresh();
   }
 
+  // Function to set hovered node
   function setHoveredNode(node?: string) {
     if (node) {
       state.hoveredNode = node;
-      state.hoveredNeighbors = new Set(graph.neighbors(node));
     } else {
       state.hoveredNode = undefined;
-      state.hoveredNeighbors = undefined;
     }
 
-    // Refresh rendering:
     renderer.refresh();
   }
 
-  // Bind search input interactions:
+  // Function to get visible neighbors based on current filters
+  function getVisibleNeighbors(node: string): Set<string> {
+    const neighbors = new Set<string>();
+
+    graph.forEachNeighbor(node, (neighbor, attributes) => {
+      const edge = graph.edge(node, neighbor) || graph.edge(neighbor, node);
+      if (edge) {
+        const edgeAttributes = graph.getEdgeAttributes(edge);
+
+        // Time range filtering based on works
+        const works = edgeAttributes.works as [string, number][] | undefined;
+        const hasWorkInTimeRange = works
+          ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+          : false;
+
+        if (!hasWorkInTimeRange) {
+          return;
+        }
+
+        // Genre filtering
+        if (state.selectedGenres.size > 0) {
+          const edgeGenres = edgeAttributes.genres as string[] | undefined;
+          const hasSelectedGenre = edgeGenres
+            ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+            : false;
+          if (!hasSelectedGenre) {
+            return;
+          }
+        } else {
+          // If no genres selected, do not include edges
+          return;
+        }
+
+        // Language filtering
+        if (state.selectedLanguages.size > 0) {
+          const edgeLanguages = edgeAttributes.languages as string[] | undefined;
+          const hasSelectedLanguage = edgeLanguages
+            ? edgeLanguages.some((lang) => state.selectedLanguages.has(lang))
+            : false;
+          if (!hasSelectedLanguage) {
+            return;
+          }
+        } else {
+          // If no languages selected, do not include edges
+          return;
+        }
+
+        // If edge passes all filters, add neighbor
+        neighbors.add(neighbor);
+      }
+    });
+
+    return neighbors;
+  }
+
+  // Bind search input interactions
   searchInput.addEventListener("input", () => {
-    setSearchQuery(searchInput.value || "");
+    setSearchQuery(searchInput.value.trim());
   });
+
   searchInput.addEventListener("blur", () => {
     setSearchQuery("");
   });
 
-  // Bind graph interactions:
+  // Bind graph interactions
   renderer.on("enterNode", ({ node }) => {
     if (!state.selectedNode && !state.selectedNeighbors) {
       setHoveredNode(node);
     }
   });
+
   renderer.on("leaveNode", () => {
     setHoveredNode(undefined);
   });
+
   renderer.on("clickNode", ({ node }) => {
     state.selectedNode = node;
-    state.selectedNeighbors = new Set(graph.neighbors(state.selectedNode));
+    state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
     setHoveredNode(undefined);
+    renderer.refresh();
   });
+
   renderer.on("clickStage", () => {
     state.selectedNode = undefined;
     state.selectedNeighbors = undefined;
     setHoveredNode(undefined);
+    renderer.refresh();
   });
 
-  // Function to check if node has any visible edges based on current state
+  // Function to check if a node has any visible edges based on current state
   function nodeHasVisibleEdges(node: string): boolean {
     return graph.someEdge(node, (edge, attributes, source, target) => {
-      const edgeAttributes = graph.getEdgeAttributes(edge);
-
       // Time range filtering based on works
-      const works = edgeAttributes.works as [string, number][];
-      const hasWorkInTimeRange = works.some((work) => {
-        const year = work[1];
-        return year >= state.minYear && year <= state.maxYear;
-      });
-
+      const works = attributes.works as [string, number][] | undefined;
+      const hasWorkInTimeRange = works
+        ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+        : false;
       if (!hasWorkInTimeRange) {
         return false;
       }
 
       // Genre filtering
-      if (state.selectedGenres.size === 0) {
-        // No genres selected; hide all edges
-        return false;
-      } else {
-        const edgeGenres = edgeAttributes.genres as string[];
-        const hasSelectedGenre = edgeGenres.some((genre) =>
-          state.selectedGenres.has(genre)
-        );
+      if (state.selectedGenres.size > 0) {
+        const edgeGenres = attributes.genres as string[] | undefined;
+        const hasSelectedGenre = edgeGenres
+          ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+          : false;
         if (!hasSelectedGenre) {
           return false;
         }
+      } else {
+        // If no genres selected, do not include edges
+        return false;
       }
 
       // Language filtering
-      const edgeLanguages = edgeAttributes.languages as string[];
-      const hasSelectedLanguage = edgeLanguages.some((lang) =>
-        state.selectedLanguages.has(lang)
-      );
-      if (!hasSelectedLanguage) {
+      if (state.selectedLanguages.size > 0) {
+        const edgeLanguages = attributes.languages as string[] | undefined;
+        const hasSelectedLanguage = edgeLanguages
+          ? edgeLanguages.some((lang) => state.selectedLanguages.has(lang))
+          : false;
+        if (!hasSelectedLanguage) {
+          return false;
+        }
+      } else {
+        // If no languages selected, do not include edges
         return false;
       }
 
@@ -653,74 +711,80 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Configure Edge Reducer
   renderer.setSetting("edgeReducer", (edge, data) => {
     const res: Partial<EdgeDisplayData> = { ...data };
 
     const edgeAttributes = graph.getEdgeAttributes(edge);
 
     // Time range filtering based on works
-    const works = edgeAttributes.works as [string, number][];
-    const hasWorkInTimeRange = works.some((work) => {
-      const year = work[1];
-      return year >= state.minYear && year <= state.maxYear;
-    });
+    const works = edgeAttributes.works as [string, number][] | undefined;
+    const hasWorkInTimeRange = works
+      ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+      : false;
 
     if (!hasWorkInTimeRange) {
       res.hidden = true;
       return res;
     }
 
-    // Apply genre filtering
-    if (state.selectedGenres.size === 0) {
-      // No genres selected; hide all edges
+    // Genre filtering
+    if (state.selectedGenres.size > 0) {
+      const edgeGenres = edgeAttributes.genres as string[] | undefined;
+      const hasSelectedGenre = edgeGenres
+        ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+        : false;
+      if (!hasSelectedGenre) {
+        res.hidden = true;
+        return res;
+      }
+    } else {
+      // If no genres selected, hide all edges
       res.hidden = true;
       return res;
+    }
+
+    // Language filtering
+    if (state.selectedLanguages.size > 0) {
+      const edgeLanguages = edgeAttributes.languages as string[] | undefined;
+      const hasSelectedLanguage = edgeLanguages
+        ? edgeLanguages.some((lang) => state.selectedLanguages.has(lang))
+        : false;
+      if (!hasSelectedLanguage) {
+        res.hidden = true;
+        return res;
+      }
     } else {
-      const edgeGenres = edgeAttributes.genres as string[];
-      const hasSelectedGenre = edgeGenres.some((genre) =>
-        state.selectedGenres.has(genre)
-      );
-      if (!hasSelectedGenre) {
+      // If no languages selected, hide all edges
+      res.hidden = true;
+      return res;
+    }
+
+    // Selection and Search Suggestions
+    if (state.selectedNode) {
+      if (!graph.hasExtremity(edge, state.selectedNode)) {
         res.hidden = true;
         return res;
       }
     }
 
-    // Apply language filtering based on edge languages
-    const edgeLanguages = edgeAttributes.languages as string[];
-    const hasSelectedLanguage = edgeLanguages.some((lang) =>
-      state.selectedLanguages.has(lang)
-    );
-    if (!hasSelectedLanguage) {
-      res.hidden = true;
-      return res;
+    if (state.suggestions) {
+      const source = graph.source(edge);
+      const target = graph.target(edge);
+      if (!state.suggestions.has(source) || !state.suggestions.has(target)) {
+        res.hidden = true;
+        return res;
+      }
     }
 
-    // Existing logic for hover and selection
-    if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
-      res.hidden = true;
-    } else if (
-      state.selectedNode &&
-      !graph.hasExtremity(edge, state.selectedNode)
-    ) {
-      res.hidden = true;
-    } else if (
-      state.suggestions &&
-      (!state.suggestions.has(graph.source(edge)) ||
-        !state.suggestions.has(graph.target(edge)))
-    ) {
-      res.hidden = true;
-    } else {
-      res.hidden = false;
-    }
-
+    // Do not hide edges on hover
+    res.hidden = false;
     return res;
   });
 
+  // Configure Node Reducer
   renderer.setSetting("nodeReducer", (node, data) => {
     const res: Partial<NodeDisplayData> = { ...data };
-
-    // Remove time range filtering based on nodeAttributes
 
     // Check if node has any visible edges
     if (!nodeHasVisibleEdges(node)) {
@@ -729,27 +793,59 @@ document.addEventListener("DOMContentLoaded", async () => {
       return res;
     }
 
-    // Existing logic for hover and selection
-    if (
-      state.hoveredNeighbors &&
-      !state.hoveredNeighbors.has(node) &&
-      state.hoveredNode !== node
-    ) {
+    // Hovered Node
+    if (state.hoveredNode === node) {
+      res.label = graph.getNodeAttribute(node, "label") as string;
+      res.color = data.color;
+      return res;
+    }
+
+    // Selected Node
+    if (state.selectedNode) {
+      if (state.selectedNode === node) {
+        res.highlighted = true;
+        res.label = graph.getNodeAttribute(node, "label") as string;
+      } else if (state.selectedNeighbors?.has(node)) {
+        // Neighbor of selected node
+        res.label = graph.getNodeAttribute(node, "label") as string;
+        res.color = data.color;
+      } else {
+        // Non-neighbor nodes when a node is selected
+        res.label = "";
+        res.color = "#f6f6f6";
+      }
+      return res;
+    }
+
+    // Search Suggestions
+    if (state.suggestions) {
+      if (!state.suggestions.has(node)) {
+        res.label = "";
+        res.color = "#f6f6f6";
+        return res;
+      }
+    }
+
+    // Default behavior: display labels for larger nodes
+    const nodeSize = data.size || 1;
+    const labelThreshold = 7; // Adjust based on your data
+    if (nodeSize >= labelThreshold) {
+      res.label = graph.getNodeAttribute(node, "label") as string;
+    } else {
       res.label = "";
-      res.color = "#f6f6f6";
-    } else if (state.selectedNode === node) {
-      res.highlighted = true;
-    } else if (
-      state.selectedNeighbors &&
-      !state.selectedNeighbors.has(node)
-    ) {
-      res.label = "";
-      res.color = "#f6f6f6";
-    } else if (state.suggestions && !state.suggestions.has(node)) {
-      res.label = "";
-      res.color = "#f6f6f6";
     }
 
     return res;
   });
+
+  // Load graph data and initialize UI
+  await loadGraphDataAndInitialize();
+
+  /**
+   * Additional Considerations:
+   * - Ensure that each node has a 'size' attribute in your graph data.
+   * - Adjust 'labelRenderedSizeThreshold' and 'labelThreshold' as needed.
+   * - Customize color mappings and language codes as per your requirements.
+   */
+
 });
