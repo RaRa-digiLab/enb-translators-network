@@ -5784,328 +5784,711 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const sigma_1 = __importDefault(__webpack_require__(/*! sigma */ "./node_modules/sigma/index.js"));
 const graphology_1 = __importDefault(__webpack_require__(/*! graphology */ "./node_modules/graphology/dist/graphology.umd.min.js"));
-// Instantiate sigma:
-const graph = new graphology_1.default();
-// Retrieve some useful DOM elements:
-const container = document.getElementById("sigma-container");
-const searchInput = document.getElementById("search-input");
-const searchSuggestions = document.getElementById("suggestions");
-const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-const minYearInput = document.getElementById("min-year");
-const maxYearInput = document.getElementById("max-year");
-const minYear = parseFloat(minYearInput.value);
-const maxYear = parseFloat(maxYearInput.value);
-const timerangeButton = document.getElementById("timerange-button");
-const timerangeResetButton = document.getElementById("timerange-reset-button");
-function loadGraphDataAndPopulateSuggestions() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const response = yield fetch('data.json');
-        const graphData = yield response.json();
-        // Assume graph is an instance of your graph library initialized elsewhere
-        graph.import(graphData); // Load your graph data into the graph instance
-        // Now that the data is loaded, populate the datalist
-        searchSuggestions.innerHTML = graph.nodes().map(node => {
+document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    // Instantiate Graphology graph
+    const graph = new graphology_1.default();
+    // Retrieve DOM elements
+    const container = document.getElementById("sigma-container");
+    const searchInput = document.getElementById("search-input");
+    const searchSuggestions = document.getElementById("suggestions");
+    // Language and Genre checkboxes containers
+    const languageCheckboxesContainer = document.getElementById("checkboxes");
+    const genreCheckboxesContainer = document.getElementById("genre-checkboxes");
+    // Time range input elements and buttons
+    const minYearInput = document.getElementById("min-year");
+    const maxYearInput = document.getElementById("max-year");
+    const timerangeButton = document.getElementById("timerange-button");
+    const timerangeResetButton = document.getElementById("timerange-reset-button");
+    // Initialize minYear and maxYear from inputs
+    const initialMinYear = parseInt(minYearInput.value) || 1800;
+    const initialMaxYear = parseInt(maxYearInput.value) || 2024;
+    // Initialize state
+    const state = {
+        searchQuery: "",
+        selectedLanguages: new Set(),
+        selectedGenres: new Set(),
+        minYear: initialMinYear,
+        maxYear: initialMaxYear,
+    };
+    // Language colors mapping
+    const languageColors = {
+        "eng": "rgb(0, 221, 235)",
+        "rus": "rgb(255, 111, 36)",
+        "ger": "rgb(255, 130, 255)",
+        "fre": "rgb(54, 224, 0)",
+        "fin": "rgb(223, 170, 0)",
+        "swe": "rgb(152, 204, 243)",
+        "spa": "rgb(255, 163, 139)",
+        "ita": "rgb(139, 216, 144)",
+        "pol": "rgb(255, 91, 190)",
+        "lav": "rgb(167, 165, 255)",
+        "nor": "rgb(95, 80, 137)",
+        "hun": "rgb(255, 172, 226)",
+        "dan": "rgb(0, 211, 151)",
+        "cze": "rgb(66, 117, 5)",
+        "lit": "rgb(168, 50, 83)",
+        "dut": "rgb(0, 109, 76)",
+        "jpn": "rgb(255, 81, 114)",
+        "rum": "rgb(125, 83, 0)",
+        "ukr": "rgb(185, 171, 153)",
+        "gre": "rgb(0, 184, 255)",
+        "ice": "rgb(235, 190, 95)",
+        "heb": "rgb(0, 86, 111)",
+        "por": "rgb(0, 229, 255)",
+        "bul": "rgb(161, 195, 0)",
+        "bel": "rgb(216, 76, 32)",
+        "lat": "rgb(255, 146, 0)",
+        "geo": "rgb(0, 209, 69)",
+        "slo": "rgb(203, 83, 192)",
+        "udm": "rgb(0, 186, 205)",
+        "tur": "rgb(178, 47, 33)",
+        "arm": "rgb(230, 17, 3)",
+        "chi": "rgb(27, 177, 255)",
+        "ara": "rgb(118, 255, 118)",
+        "cat": "rgb(156, 0, 206)",
+        "slv": "rgb(0, 57, 243)",
+        "kom": "rgb(255, 193, 148)",
+        "hin": "rgb(101, 185, 207)",
+        "yid": "rgb(202, 119, 197)",
+        "san": "rgb(83, 255, 151)",
+        "grc": "rgb(250, 253, 154)",
+        "per": "rgb(119, 133, 81)",
+        "srp": "rgb(162, 233, 187)",
+        "fiu": "rgb(181, 4, 54)",
+        "chm": "rgb(60, 0, 133)",
+        "kor": "rgb(74, 190, 158)",
+        "epo": "rgb(129, 0, 39)",
+        "hrv": "rgb(95, 219, 196)",
+        "aze": "rgb(15, 54, 131)",
+        "mac": "rgb(167, 182, 202)",
+        "tgk": "rgb(255, 70, 0)",
+        "smi": "rgb(90, 127, 207)",
+        "pro": "rgb(125, 38, 13)",
+        "uzb": "rgb(206, 21, 0)",
+        "peo": "rgb(54, 23, 198)",
+        "kaz": "rgb(25, 144, 182)",
+        "oss": "rgb(28, 125, 255)",
+        "tat": "rgb(184, 0, 123)",
+        "krl": "rgb(57, 189, 69)",
+        "other": "rgb(150, 150, 150)",
+    };
+    // Language codes mapping to display names
+    const languageCodes = {
+        "eng": "inglise",
+        "rus": "vene",
+        "ger": "saksa",
+        "fre": "prantsuse",
+        "fin": "soome",
+        "swe": "rootsi",
+        "spa": "hispaania",
+        "ita": "itaalia",
+        "pol": "poola",
+        "lav": "läti",
+        "nor": "norra",
+        "hun": "ungari",
+        "dan": "taani",
+        "cze": "tšehhi",
+        "lit": "leedu",
+        "dut": "hollandi",
+        "jpn": "jaapani",
+        "rum": "rumeenia",
+        "ukr": "ukraina",
+        "gre": "kreeka",
+        "ice": "islandi",
+        "heb": "heebrea",
+        "por": "portugali",
+        "bul": "bulgaaria",
+        "bel": "belgia",
+        "lat": "ladina",
+        "geo": "gruusia",
+        "slo": "slovakkia",
+        "udm": "udmurdi",
+        "tur": "türgi",
+        "arm": "armeenia",
+        "chi": "hiina",
+        "ara": "araabia",
+        "cat": "katalaani",
+        "slv": "sloveeni",
+        "kom": "komi",
+        "hin": "hindi",
+        "yid": "jidiš",
+        "san": "sanskriti",
+        "grc": "vanakreeka",
+        "per": "pärsia",
+        "srp": "serbia",
+        "fiu": "soomeugri (muu)",
+        "chm": "mari",
+        "kor": "korea",
+        "epo": "esperanto",
+        "hrv": "horvaadi",
+        "aze": "aserbaidžaani",
+        "mac": "makedoonia",
+        "tgk": "tadžiki",
+        "smi": "saami",
+        "pro": "provansaali",
+        "uzb": "usbeki",
+        "peo": "vanapärsia",
+        "kaz": "kasahhi",
+        "oss": "osseedi",
+        "tat": "tatari",
+        "krl": "karjala",
+        "other": "muu/puuduv",
+    };
+    // Function to load graph data and initialize UI components
+    function loadGraphDataAndInitialize() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield fetch("data.json");
+                if (!response.ok) {
+                    throw new Error(`Failed to load data.json: ${response.statusText}`);
+                }
+                const graphData = yield response.json();
+                graph.import(graphData);
+                // Populate search suggestions
+                populateSearchSuggestions();
+                // Generate checkboxes
+                generateLanguageCheckboxes();
+                generateGenreCheckboxes();
+            }
+            catch (error) {
+                console.error("Error loading graph data:", error);
+            }
+        });
+    }
+    // Function to populate search suggestions
+    function populateSearchSuggestions() {
+        const options = graph.nodes().map((node) => {
             const label = graph.getNodeAttribute(node, "label");
             return `<option value="${label}"></option>`;
-        }).join("\n");
-    });
-}
-// Call the function to load data and populate suggestions
-loadGraphDataAndPopulateSuggestions();
-const renderer = new sigma_1.default(graph, container);
-// configure renderer settings
-renderer.setSetting("labelRenderedSizeThreshold", 5);
-const languageOptions = new Set();
-checkboxes.forEach((checkbox) => {
-    if (checkbox.checked) {
-        languageOptions.add(checkbox.value);
+        });
+        searchSuggestions.innerHTML = options.join("\n");
     }
-});
-// Declare application state
-const state = { searchQuery: "",
-    selectedLanguages: languageOptions,
-    minYear: minYear,
-    maxYear: maxYear };
-// Actions:
-function setSearchQuery(query) {
-    state.searchQuery = query;
-    if (searchInput.value !== query)
-        searchInput.value = query;
-    if (query) {
-        const lcQuery = query.toLowerCase();
-        const suggestions = graph
-            .nodes()
-            .map((n) => ({ id: n, label: graph.getNodeAttribute(n, "label") }))
-            .filter(({ label }) => label.toLowerCase().includes(lcQuery));
-        // If we have a single perfect match, them we remove the suggestions, and
-        // we consider the user has selected a node through the datalist
-        // autocomplete:
-        if (suggestions.length === 1 && suggestions[0].label === query) {
-            state.selectedNode = suggestions[0].id;
-            state.selectedNeighbors = new Set(graph.neighbors(state.selectedNode));
-            state.suggestions = undefined;
-            // Move the camera to center it on the selected node:
-            const nodePosition = renderer.getNodeDisplayData(state.selectedNode);
-            renderer.getCamera().animate(nodePosition, {
-                duration: 500,
-            });
-        }
-        // Else, we display the suggestions list:
-        else {
-            state.selectedNode = undefined;
-            state.suggestions = new Set(suggestions.map(({ id }) => id));
-        }
+    // Generate Language Checkboxes
+    function generateLanguageCheckboxes() {
+        const languageCounts = {};
+        let totalLanguages = 0;
+        graph.forEachEdge((edge, attributes) => {
+            const languages = attributes.languages;
+            if (languages && languages.length > 0) {
+                languages.forEach((lang) => {
+                    // Map unmapped languages to 'other'
+                    const mappedLang = languageCodes.hasOwnProperty(lang) ? lang : 'other';
+                    languageCounts[mappedLang] = (languageCounts[mappedLang] || 0) + 1;
+                    totalLanguages++;
+                });
+            }
+            else {
+                // Edges with no languages are considered 'other'
+                languageCounts['other'] = (languageCounts['other'] || 0) + 1;
+                totalLanguages++;
+            }
+        });
+        // Sort languages, placing 'other' at the end
+        const sortedLanguages = Object.entries(languageCounts).sort((a, b) => {
+            if (a[0] === 'other')
+                return 1;
+            if (b[0] === 'other')
+                return -1;
+            return b[1] - a[1];
+        });
+        // Generate HTML for checkboxes
+        let htmlString = "";
+        sortedLanguages.forEach(([lang, count]) => {
+            const langPercentage = totalLanguages > 0 ? (count / totalLanguages) * 100 : 0;
+            const langName = languageCodes[lang] || "Muu/Puuduv";
+            const color = languageColors[lang] || languageColors["other"];
+            htmlString += `
+        <label>
+          <input type="checkbox" value="${lang}" checked />
+          <span class="item-name" style="color: ${color};">${langName}</span>
+          <span class="percentage">${langPercentage.toFixed(2)}%</span>
+        </label>
+      `;
+        });
+        // Insert into container
+        languageCheckboxesContainer.innerHTML = htmlString;
+        // Select checkboxes and initialize state
+        const languageCheckboxes = languageCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
+        state.languageCheckboxes = languageCheckboxes;
+        languageCheckboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+                state.selectedLanguages.add(checkbox.value);
+            }
+            // Attach event listener
+            checkbox.addEventListener("change", handleLanguageCheckboxChange);
+        });
     }
-    // If the query is empty, then we reset the selectedNode / suggestions state:
-    else {
-        state.selectedNode = undefined;
-        state.suggestions = undefined;
-        state.selectedNeighbors = undefined;
+    // Generate Genre Checkboxes
+    function generateGenreCheckboxes() {
+        const genreCounts = {};
+        let totalGenres = 0;
+        graph.forEachEdge((edge, attributes) => {
+            const genres = attributes.genres;
+            if (genres && genres.length > 0) {
+                genres.forEach((genre) => {
+                    genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+                    totalGenres++;
+                });
+            }
+            else {
+                // Handle edges with no genres
+                genreCounts["other"] = (genreCounts["other"] || 0) + 1;
+                totalGenres++;
+            }
+        });
+        // Sort genres by count descending
+        const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+        // Generate HTML for checkboxes
+        let htmlString = "";
+        sortedGenres.forEach(([genre, count]) => {
+            const genrePercentage = totalGenres > 0 ? (count / totalGenres) * 100 : 0;
+            const genreLabel = genre; // You can map to display names if needed
+            htmlString += `
+        <label>
+          <input type="checkbox" value="${genre}" checked />
+          <span class="item-name">${genreLabel}</span>
+          <span class="percentage">${genrePercentage.toFixed(2)}%</span>
+        </label>
+      `;
+        });
+        // Insert into container
+        genreCheckboxesContainer.innerHTML = htmlString;
+        // Select checkboxes and initialize state
+        const genreCheckboxes = genreCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
+        state.genreCheckboxes = genreCheckboxes;
+        genreCheckboxes.forEach((checkbox) => {
+            if (checkbox.checked) {
+                state.selectedGenres.add(checkbox.value);
+            }
+            // Attach event listener
+            checkbox.addEventListener("change", handleGenreCheckboxChange);
+        });
     }
-    // Refresh rendering:
-    renderer.refresh();
-}
-function setHoveredNode(node) {
-    if (node) {
-        state.hoveredNode = node;
-        state.hoveredNeighbors = new Set(graph.neighbors(node));
-    }
-    else {
-        state.hoveredNode = undefined;
-        state.hoveredNeighbors = undefined;
-    }
-    // Refresh rendering:
-    renderer.refresh();
-}
-// Event listener for the apply button
-timerangeButton.addEventListener("click", function () {
-    // Get the values from the input elements
-    const minYear = parseInt(minYearInput.value);
-    const maxYear = parseInt(maxYearInput.value);
-    state.minYear = minYear;
-    state.maxYear = maxYear;
-    // Refresh rendering:
-    renderer.refresh();
-});
-// Event listener for the reset button
-timerangeResetButton.addEventListener("click", function () {
-    // Get the values from the input elements
-    minYearInput.value = '1800';
-    maxYearInput.value = '2024';
-    const minYear = parseInt(minYearInput.value);
-    const maxYear = parseInt(maxYearInput.value);
-    state.minYear = minYear;
-    state.maxYear = maxYear;
-    // Refresh rendering:
-    renderer.refresh();
-});
-// Function to handle checkbox changes
-function handleCheckboxChange(event) {
-    const checkbox = event.target;
-    const language = checkbox.value;
-    if (checkbox.checked) {
-        // Checkbox is checked, add the language to selectedLanguages
-        state.selectedLanguages.add(language);
-    }
-    else {
-        // Checkbox is unchecked, remove the language from selectedLanguages
-        state.selectedLanguages.delete(language);
-    }
-    renderer.refresh();
-}
-checkboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", handleCheckboxChange);
-});
-// Function to handle the "Select All" and "Deselect All" buttons
-function handleSelectAllDeselectAllClick(selectAll) {
-    // Loop through checkboxes and set their checked state
-    checkboxes.forEach((checkbox) => {
+    // Handle Language Checkbox Changes
+    function handleLanguageCheckboxChange(event) {
+        const checkbox = event.target;
         const language = checkbox.value;
-        checkbox.checked = selectAll;
-        if (selectAll) {
-            // If "Select All" is clicked, add all languages to selectedLanguages
+        if (checkbox.checked) {
             state.selectedLanguages.add(language);
         }
         else {
-            // If "Deselect All" is clicked, remove all languages from selectedLanguages
             state.selectedLanguages.delete(language);
         }
-    });
-    renderer.refresh();
-}
-// Function to check if any neighbor of a node has a language attribute present in the given set
-function hasNeighborWithLanguages(graph, nodeKey, languages = state.selectedLanguages) {
-    return graph.someNeighbor(nodeKey, (neighbor, attributes) => {
-        return languages.has(attributes.author_lang);
-    });
-}
-// Attach event listeners to handle input changes for both min and max year inputs
-//minYearInput.addEventListener("input", handleYearInputChange);
-//maxYearInput.addEventListener("input", handleYearInputChange);
-// Attach event listeners to checkboxes
-// const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-checkboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", handleCheckboxChange);
-});
-// Attach event listeners to "Select All" and "Deselect All" buttons
-const selectAllButton = document.getElementById("select-all");
-const deselectAllButton = document.getElementById("deselect-all");
-selectAllButton === null || selectAllButton === void 0 ? void 0 : selectAllButton.addEventListener("click", () => {
-    handleSelectAllDeselectAllClick(true);
-});
-deselectAllButton === null || deselectAllButton === void 0 ? void 0 : deselectAllButton.addEventListener("click", () => {
-    handleSelectAllDeselectAllClick(false);
-});
-// Bind search input interactions:
-searchInput.addEventListener("input", () => {
-    setSearchQuery(searchInput.value || "");
-});
-searchInput.addEventListener("blur", () => {
-    setSearchQuery("");
-});
-// Bind graph interactions:
-renderer.on("enterNode", ({ node }) => {
-    if (!state.selectedNode && !state.selectedNeighbors) {
-        setHoveredNode(node);
+        // Recompute selectedNeighbors if a node is selected
+        if (state.selectedNode) {
+            state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+        }
+        renderer.refresh();
     }
-});
-renderer.on("leaveNode", () => {
-    setHoveredNode(undefined);
-});
-renderer.on("clickNode", ({ node }) => {
-    state.selectedNode = node;
-    state.selectedNeighbors = new Set(graph.neighbors(node));
-    setHoveredNode(undefined);
-});
-renderer.on("clickStage", () => {
-    state.selectedNode = undefined;
-    state.selectedNeighbors = undefined;
-    setHoveredNode(undefined);
-});
-renderer.setSetting("nodeReducer", (node, data) => {
-    const res = Object.assign({}, data);
-    // grey if the node's activity is outside the selected timerange
-    if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
-        res.label = "";
-        res.color = "#f6f6f6";
+    // Handle Genre Checkbox Changes
+    function handleGenreCheckboxChange(event) {
+        const checkbox = event.target;
+        const genre = checkbox.value;
+        if (checkbox.checked) {
+            state.selectedGenres.add(genre);
+        }
+        else {
+            state.selectedGenres.delete(genre);
+        }
+        // Recompute selectedNeighbors if a node is selected
+        if (state.selectedNode) {
+            state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+        }
+        renderer.refresh();
     }
-    else {
-        const hasEdgeActivityInRange = graph.edges(node).some(edge => {
-            const edgeData = graph.getEdgeAttributes(edge);
-            return edgeData.activity_start <= state.maxYear && edgeData.activity_end >= state.minYear;
+    // Handle "Select All" / "Deselect All" for Languages
+    function handleSelectAllDeselectAllLanguages(selectAll) {
+        const languageCheckboxes = state.languageCheckboxes;
+        languageCheckboxes.forEach((checkbox) => {
+            checkbox.checked = selectAll;
+            if (selectAll) {
+                state.selectedLanguages.add(checkbox.value);
+            }
+            else {
+                state.selectedLanguages.delete(checkbox.value);
+            }
         });
-        // Grey out the node if none of its edges have activity within the timerange
-        if (!hasEdgeActivityInRange) {
-            res.label = "";
-            res.color = "#f6f6f6";
+        // Recompute selectedNeighbors if a node is selected
+        if (state.selectedNode) {
+            state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         }
+        renderer.refresh();
     }
-    // is the node hovered or neighbors a hovered node
-    if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
-        res.label = "";
-        res.color = "#f6f6f6";
-        // highlight is the node selected (by clicking or search)
-    }
-    else if (state.selectedNode === node) {
-        res.highlighted = true;
-        // grey if the node is in the selectedNeighbors set    
-    }
-    else if (state.selectedNeighbors && !state.selectedNeighbors.has(node)) {
-        res.label = "";
-        res.color = "#f6f6f6";
-        // grey if the node's activity is outside the selected timerange
-    }
-    else if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
-        res.label = "";
-        res.color = "#f6f6f6";
-        // grey if the suggestion box is open and the node is not suggested
-    }
-    else if (state.suggestions && !state.suggestions.has(node)) {
-        res.label = "";
-        res.color = "#f6f6f6";
-        // grey if the node is filtered out with language selection box
-    }
-    else if (data.author_lang !== 'tlk' && !state.selectedLanguages.has(data.author_lang)) {
-        res.label = "";
-        res.color = "#f6f6f6";
-        // grey out translators who are not connected to authors of filtered languages
-    }
-    else if (data.author_lang === 'tlk' && !hasNeighborWithLanguages(graph, node, state.selectedLanguages)) {
-        res.label = "";
-        res.color = "#f6f6f6";
-    }
-    return res;
-});
-renderer.setSetting("edgeReducer", (edge, data) => {
-    const res = Object.assign({}, data);
-    // grey if the node's activity is outside the selected timerange
-    if (data.activity_end < state.minYear || data.activity_start > state.maxYear) {
-        res.hidden = true;
-    }
-    // hide edge if nodes are not hovered
-    if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
-        res.hidden = true;
-    }
-    // hide edge if nodes are not selected
-    else if (state.selectedNode && !graph.hasExtremity(edge, state.selectedNode)) {
-        res.hidden = true;
-    }
-    // hide edge if nodes are not suggested
-    else if (state.suggestions && (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))) {
-        res.hidden = true;
-    }
-    // hide edge if nodes are not in selected languages
-    else {
-        const sourceNodeLanguage = graph.getNodeAttribute(graph.source(edge), "author_lang");
-        const targetNodeLanguage = graph.getNodeAttribute(graph.target(edge), "author_lang");
-        // Check if either the source or target node's language is in selectedLanguages
-        if (!state.selectedLanguages.has(sourceNodeLanguage) &&
-            !state.selectedLanguages.has(targetNodeLanguage)) {
-            res.hidden = true;
-        }
-    }
-    return res;
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const menuButton = document.querySelector('.menu-button');
-    if (menuButton) {
-        menuButton.addEventListener('click', () => {
-            console.log("clicked button");
-            const panels = document.querySelectorAll('.small-panel');
-            panels.forEach((panel) => {
-                // Toggle a class that controls visibility
-                panel.classList.toggle('is-visible');
-            });
+    // Attach event listeners to "Select All" and "Deselect All" for Languages
+    function attachLanguageSelectDeselectEventListeners() {
+        const selectAllButton = document.getElementById("select-all");
+        const deselectAllButton = document.getElementById("deselect-all");
+        selectAllButton === null || selectAllButton === void 0 ? void 0 : selectAllButton.addEventListener("click", () => {
+            handleSelectAllDeselectAllLanguages(true);
+        });
+        deselectAllButton === null || deselectAllButton === void 0 ? void 0 : deselectAllButton.addEventListener("click", () => {
+            handleSelectAllDeselectAllLanguages(false);
         });
     }
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const descriptionToggle = document.getElementById('description-toggle');
-    const descriptionContent = document.getElementById('description-content');
-    // Get all elements with class 'small-panel' and select the last one
-    const allSmallPanels = Array.from(document.querySelectorAll('.small-panel'));
-    const lastSmallPanel = allSmallPanels[allSmallPanels.length - 1];
-    descriptionToggle === null || descriptionToggle === void 0 ? void 0 : descriptionToggle.addEventListener('click', () => {
-        if (descriptionContent && descriptionContent instanceof HTMLElement) {
-            if (descriptionContent.style.display === 'none') {
-                descriptionContent.style.display = 'block';
-                descriptionToggle.innerHTML = '<u><i>peida kirjeldus</i></u>';
-                // Adjust the height of the last small panel here
-                if (lastSmallPanel && lastSmallPanel instanceof HTMLElement) {
-                    lastSmallPanel.style.maxHeight = 'calc(100vh - 20px - 650px)'; // Or any other value
+    attachLanguageSelectDeselectEventListeners();
+    // Handle "Select All" / "Deselect All" for Genres
+    function handleSelectAllDeselectAllGenres(selectAll) {
+        const genreCheckboxes = state.genreCheckboxes;
+        genreCheckboxes.forEach((checkbox) => {
+            checkbox.checked = selectAll;
+            if (selectAll) {
+                state.selectedGenres.add(checkbox.value);
+            }
+            else {
+                state.selectedGenres.delete(checkbox.value);
+            }
+        });
+        // Recompute selectedNeighbors if a node is selected
+        if (state.selectedNode) {
+            state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+        }
+        renderer.refresh();
+    }
+    // Attach event listeners to "Select All" and "Deselect All" for Genres
+    function attachGenreSelectDeselectEventListeners() {
+        const selectAllGenresButton = document.getElementById("select-all-genres");
+        const deselectAllGenresButton = document.getElementById("deselect-all-genres");
+        selectAllGenresButton === null || selectAllGenresButton === void 0 ? void 0 : selectAllGenresButton.addEventListener("click", () => {
+            handleSelectAllDeselectAllGenres(true);
+        });
+        deselectAllGenresButton === null || deselectAllGenresButton === void 0 ? void 0 : deselectAllGenresButton.addEventListener("click", () => {
+            handleSelectAllDeselectAllGenres(false);
+        });
+    }
+    attachGenreSelectDeselectEventListeners();
+    // Initialize Sigma renderer
+    const renderer = new sigma_1.default(graph, container);
+    // Configure renderer settings
+    renderer.setSetting("labelRenderedSizeThreshold", 5.5); // Adjust threshold as needed
+    // Tab Switching Logic (if applicable)
+    const tabButtons = document.querySelectorAll(".tablinks");
+    const tabContents = document.querySelectorAll(".tabcontent");
+    tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            var _a;
+            const tabId = button.getAttribute("data-tab");
+            // Remove 'active' class from all buttons and contents
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            tabContents.forEach((content) => content.classList.remove("active"));
+            // Add 'active' class to the selected tab and content
+            button.classList.add("active");
+            (_a = document.getElementById(tabId)) === null || _a === void 0 ? void 0 : _a.classList.add("active");
+        });
+    });
+    // Initialize to show the language tab by default
+    (_a = document
+        .querySelector('.tablinks[data-tab="language-tab"]')) === null || _a === void 0 ? void 0 : _a.classList.add("active");
+    (_b = document.getElementById("language-tab")) === null || _b === void 0 ? void 0 : _b.classList.add("active");
+    // Event listener for the Apply Time Range button
+    timerangeButton.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission
+        const minYear = parseInt(minYearInput.value) || 1800;
+        const maxYear = parseInt(maxYearInput.value) || 2024;
+        state.minYear = minYear;
+        state.maxYear = maxYear;
+        // Recompute selectedNeighbors if a node is selected
+        if (state.selectedNode) {
+            state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+        }
+        renderer.refresh();
+    });
+    // Event listener for the Reset Time Range button
+    timerangeResetButton.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission
+        minYearInput.value = "1800";
+        maxYearInput.value = "2024";
+        state.minYear = 1800;
+        state.maxYear = 2024;
+        // Recompute selectedNeighbors if a node is selected
+        if (state.selectedNode) {
+            state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+        }
+        renderer.refresh();
+    });
+    // Function to set search query and handle suggestions
+    function setSearchQuery(query) {
+        state.searchQuery = query;
+        if (searchInput.value !== query)
+            searchInput.value = query;
+        if (query) {
+            const lcQuery = query.toLowerCase();
+            const suggestions = graph
+                .nodes()
+                .map((n) => ({
+                id: n,
+                label: graph.getNodeAttribute(n, "label"),
+            }))
+                .filter(({ label }) => label.toLowerCase().includes(lcQuery));
+            // If single perfect match, select it
+            if (suggestions.length === 1 && suggestions[0].label === query) {
+                state.selectedNode = suggestions[0].id;
+                state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+                state.suggestions = undefined;
+                // Move camera to selected node
+                const nodeDisplayData = renderer.getNodeDisplayData(state.selectedNode);
+                renderer.getCamera().animate(nodeDisplayData, {
+                    duration: 500,
+                });
+            }
+            else {
+                state.selectedNode = undefined;
+                state.suggestions = new Set(suggestions.map(({ id }) => id));
+            }
+        }
+        else {
+            state.selectedNode = undefined;
+            state.suggestions = undefined;
+            state.selectedNeighbors = undefined;
+        }
+        renderer.refresh();
+    }
+    // Function to set hovered node
+    function setHoveredNode(node) {
+        if (node) {
+            state.hoveredNode = node;
+        }
+        else {
+            state.hoveredNode = undefined;
+        }
+        renderer.refresh();
+    }
+    // Function to get visible neighbors based on current filters
+    function getVisibleNeighbors(node) {
+        const neighbors = new Set();
+        graph.forEachNeighbor(node, (neighbor, attributes) => {
+            const edge = graph.edge(node, neighbor) || graph.edge(neighbor, node);
+            if (edge) {
+                const edgeAttributes = graph.getEdgeAttributes(edge);
+                // Time range filtering based on works
+                const works = edgeAttributes.works;
+                const hasWorkInTimeRange = works
+                    ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+                    : false;
+                if (!hasWorkInTimeRange) {
+                    return;
+                }
+                // Genre filtering
+                if (state.selectedGenres.size > 0) {
+                    const edgeGenres = edgeAttributes.genres;
+                    const hasSelectedGenre = edgeGenres
+                        ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+                        : false;
+                    if (!hasSelectedGenre) {
+                        return;
+                    }
+                }
+                else {
+                    // If no genres selected, do not include edges
+                    return;
+                }
+                // Language filtering
+                if (state.selectedLanguages.size > 0) {
+                    const edgeLanguages = edgeAttributes.languages;
+                    const hasSelectedLanguage = edgeLanguages
+                        ? edgeLanguages.some((lang) => state.selectedLanguages.has(lang))
+                        : false;
+                    if (!hasSelectedLanguage) {
+                        return;
+                    }
+                }
+                else {
+                    // If no languages selected, do not include edges
+                    return;
+                }
+                // If edge passes all filters, add neighbor
+                neighbors.add(neighbor);
+            }
+        });
+        return neighbors;
+    }
+    // Bind search input interactions
+    searchInput.addEventListener("input", () => {
+        setSearchQuery(searchInput.value.trim());
+    });
+    searchInput.addEventListener("blur", () => {
+        setSearchQuery("");
+    });
+    // Bind graph interactions
+    renderer.on("enterNode", ({ node }) => {
+        if (!state.selectedNode && !state.selectedNeighbors) {
+            setHoveredNode(node);
+        }
+    });
+    renderer.on("leaveNode", () => {
+        setHoveredNode(undefined);
+    });
+    renderer.on("clickNode", ({ node }) => {
+        state.selectedNode = node;
+        state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+        setHoveredNode(undefined);
+        renderer.refresh();
+    });
+    renderer.on("clickStage", () => {
+        state.selectedNode = undefined;
+        state.selectedNeighbors = undefined;
+        setHoveredNode(undefined);
+        renderer.refresh();
+    });
+    // Function to check if a node has any visible edges based on current state
+    function nodeHasVisibleEdges(node) {
+        return graph.someEdge(node, (edge, attributes, source, target) => {
+            // Time range filtering based on works
+            const works = attributes.works;
+            const hasWorkInTimeRange = works
+                ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+                : false;
+            if (!hasWorkInTimeRange) {
+                return false;
+            }
+            // Genre filtering
+            if (state.selectedGenres.size > 0) {
+                const edgeGenres = attributes.genres;
+                const hasSelectedGenre = edgeGenres
+                    ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+                    : false;
+                if (!hasSelectedGenre) {
+                    return false;
                 }
             }
             else {
-                descriptionContent.style.display = 'none';
-                descriptionToggle.innerHTML = '<u><i>näita kirjeldust</i></u>';
-                // Reset the height of the last small panel here
-                if (lastSmallPanel && lastSmallPanel instanceof HTMLElement) {
-                    lastSmallPanel.style.maxHeight = 'calc(100vh - 20px - 350px)'; // Or any other initial value
+                // If no genres selected, do not include edges
+                return false;
+            }
+            // Language filtering
+            if (state.selectedLanguages.size > 0) {
+                const edgeLanguages = attributes.languages;
+                const hasSelectedLanguage = edgeLanguages
+                    ? edgeLanguages.some((lang) => state.selectedLanguages.has(lang))
+                    : false;
+                if (!hasSelectedLanguage) {
+                    return false;
                 }
             }
+            else {
+                // If no languages selected, do not include edges
+                return false;
+            }
+            return true;
+        });
+    }
+    // Configure Edge Reducer
+    renderer.setSetting("edgeReducer", (edge, data) => {
+        const res = Object.assign({}, data);
+        const edgeAttributes = graph.getEdgeAttributes(edge);
+        // Time range filtering based on works
+        const works = edgeAttributes.works;
+        const hasWorkInTimeRange = works
+            ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+            : false;
+        if (!hasWorkInTimeRange) {
+            res.hidden = true;
+            return res;
         }
+        // Genre filtering
+        if (state.selectedGenres.size > 0) {
+            const edgeGenres = edgeAttributes.genres;
+            const hasSelectedGenre = edgeGenres
+                ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+                : false;
+            if (!hasSelectedGenre) {
+                res.hidden = true;
+                return res;
+            }
+        }
+        else {
+            // If no genres selected, hide all edges
+            res.hidden = true;
+            return res;
+        }
+        // Language filtering
+        if (state.selectedLanguages.size > 0) {
+            const edgeLanguages = edgeAttributes.languages;
+            const hasSelectedLanguage = edgeLanguages
+                ? edgeLanguages.some((lang) => state.selectedLanguages.has(lang))
+                : false;
+            if (!hasSelectedLanguage) {
+                res.hidden = true;
+                return res;
+            }
+        }
+        else {
+            // If no languages selected, hide all edges
+            res.hidden = true;
+            return res;
+        }
+        // Selection and Search Suggestions
+        if (state.selectedNode) {
+            if (!graph.hasExtremity(edge, state.selectedNode)) {
+                res.hidden = true;
+                return res;
+            }
+        }
+        if (state.suggestions) {
+            const source = graph.source(edge);
+            const target = graph.target(edge);
+            if (!state.suggestions.has(source) || !state.suggestions.has(target)) {
+                res.hidden = true;
+                return res;
+            }
+        }
+        // Do not hide edges on hover
+        res.hidden = false;
+        return res;
     });
-});
+    // Configure Node Reducer
+    renderer.setSetting("nodeReducer", (node, data) => {
+        var _a;
+        const res = Object.assign({}, data);
+        // Check if node has any visible edges
+        if (!nodeHasVisibleEdges(node)) {
+            res.label = "";
+            res.color = "#f6f6f6";
+            return res;
+        }
+        // Hovered Node
+        if (state.hoveredNode === node) {
+            res.label = graph.getNodeAttribute(node, "label");
+            res.color = data.color;
+            return res;
+        }
+        // Selected Node
+        if (state.selectedNode) {
+            if (state.selectedNode === node) {
+                res.highlighted = true;
+                res.label = graph.getNodeAttribute(node, "label");
+            }
+            else if ((_a = state.selectedNeighbors) === null || _a === void 0 ? void 0 : _a.has(node)) {
+                // Neighbor of selected node
+                res.label = graph.getNodeAttribute(node, "label");
+                res.color = data.color;
+            }
+            else {
+                // Non-neighbor nodes when a node is selected
+                res.label = "";
+                res.color = "#f6f6f6";
+            }
+            return res;
+        }
+        // Search Suggestions
+        if (state.suggestions) {
+            if (!state.suggestions.has(node)) {
+                res.label = "";
+                res.color = "#f6f6f6";
+                return res;
+            }
+        }
+        return res;
+    });
+    // Load graph data and initialize UI
+    yield loadGraphDataAndInitialize();
+    /**
+     * Additional Considerations:
+     * - Ensure that each node has a 'size' attribute in your graph data.
+     * - Adjust 'labelRenderedSizeThreshold' and 'labelThreshold' as needed.
+     * - Customize color mappings and language codes as per your requirements.
+     */
+}));
 
 
 /***/ })
