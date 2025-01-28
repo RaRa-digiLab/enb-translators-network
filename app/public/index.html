@@ -91,6 +91,7 @@
 
     /* Styles for each small panel */
     .small-panel {
+      display: block;
       font-size: small;
       padding: 12px;
       background-color: rgba(255, 255, 255, 0.8);
@@ -191,21 +192,22 @@
       margin-top: 3px;
     }
 
-    /* Mobile-specific styles */
+    /* For screens up to 768px: hide by default, show only if .is-visible is present */
     @media screen and (max-width: 768px) {
-
-      .menu-button {
-        display: block;
-      }
-
+      
       .small-panel {
         display: none;
-        /* Hide by default on small screens */
       }
 
       .small-panel.is-visible {
         display: block;
-        /* Or 'flex', depending on your layout */
+      }
+    }
+
+    /* For screens above 768px: hide them IF toggled (i.e. .is-visible) */
+    @media screen and (min-width: 769px) {
+      .small-panel.is-visible {
+        display: none;
       }
     }
   </style>

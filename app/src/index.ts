@@ -18,6 +18,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     "suggestions"
   ) as HTMLDataListElement;
 
+  // Hamburger menu toggle
+  const menuButton = document.querySelector(".menu-button");
+  menuButton?.addEventListener("click", () => {
+    const panels = document.querySelectorAll(".small-panel");
+    panels.forEach(panel => {
+      panel.classList.toggle("is-visible");
+    });
+  });
+
+  // "näita kirjeldust" toggle
+  const descriptionToggle = document.getElementById("description-toggle");
+  const descriptionContent = document.getElementById("description-content");
+  descriptionToggle?.addEventListener("click", function () {
+    ;
+    if (!descriptionContent) return; // Guard clause to satisfy TypeScript
+
+    if (descriptionContent.style.display === "none") {
+      descriptionContent.style.display = "block";
+      this.textContent = "peida kirjeldus";
+    } else {
+      descriptionContent.style.display = "none";
+      this.textContent = "näita kirjeldust";
+    }
+  });
+
+
   // Language and Genre checkboxes containers
   const languageCheckboxesContainer = document.getElementById(
     "checkboxes"
@@ -67,127 +93,127 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Language colors mapping
   const languageColors: { [code: string]: string } = {
     "eng": "rgb(0, 221, 235)",
-        "rus": "rgb(255, 111, 36)",
-        "ger": "rgb(255, 130, 255)",
-        "fre": "rgb(54, 224, 0)",
-        "fin": "rgb(223, 170, 0)",
-        "swe": "rgb(152, 204, 243)",
-        "spa": "rgb(255, 163, 139)",
-        "ita": "rgb(139, 216, 144)",
-        "pol": "rgb(255, 91, 190)",
-        "lav": "rgb(167, 165, 255)",
-        "nor": "rgb(95, 80, 137)",
-        "hun": "rgb(255, 172, 226)",
-        "dan": "rgb(0, 211, 151)",
-        "cze": "rgb(66, 117, 5)",
-        "lit": "rgb(168, 50, 83)",
-        "dut": "rgb(0, 109, 76)",
-        "jpn": "rgb(255, 81, 114)",
-        "rum": "rgb(125, 83, 0)",
-        "ukr": "rgb(185, 171, 153)",
-        "gre": "rgb(0, 184, 255)",
-        "ice": "rgb(235, 190, 95)",
-        "heb": "rgb(0, 86, 111)",
-        "por": "rgb(0, 229, 255)",
-        "bul": "rgb(161, 195, 0)",
-        "bel": "rgb(216, 76, 32)",
-        "lat": "rgb(255, 146, 0)",
-        "geo": "rgb(0, 209, 69)",
-        "slo": "rgb(203, 83, 192)",
-        "udm": "rgb(0, 186, 205)",
-        "tur": "rgb(178, 47, 33)",
-        "arm": "rgb(230, 17, 3)",
-        "chi": "rgb(27, 177, 255)",
-        "ara": "rgb(118, 255, 118)",
-        "cat": "rgb(156, 0, 206)",
-        "slv": "rgb(0, 57, 243)",
-        "kom": "rgb(255, 193, 148)",
-        "hin": "rgb(101, 185, 207)",
-        "yid": "rgb(202, 119, 197)",
-        "san": "rgb(83, 255, 151)",
-        "grc": "rgb(250, 253, 154)",
-        "per": "rgb(119, 133, 81)",
-        "srp": "rgb(162, 233, 187)",
-        "fiu": "rgb(181, 4, 54)",
-        "chm": "rgb(60, 0, 133)",
-        "kor": "rgb(74, 190, 158)",
-        "epo": "rgb(129, 0, 39)",
-        "hrv": "rgb(95, 219, 196)",
-        "aze": "rgb(15, 54, 131)",
-        "mac": "rgb(167, 182, 202)",
-        "tgk": "rgb(255, 70, 0)",
-        "smi": "rgb(90, 127, 207)",
-        "pro": "rgb(125, 38, 13)",
-        "uzb": "rgb(206, 21, 0)",
-        "peo": "rgb(54, 23, 198)",
-        "kaz": "rgb(25, 144, 182)",
-        "oss": "rgb(28, 125, 255)",
-        "tat": "rgb(184, 0, 123)",
-        "krl": "rgb(57, 189, 69)",
-        "other": "rgb(150, 150, 150)",
+    "rus": "rgb(255, 111, 36)",
+    "ger": "rgb(255, 130, 255)",
+    "fre": "rgb(54, 224, 0)",
+    "fin": "rgb(223, 170, 0)",
+    "swe": "rgb(152, 204, 243)",
+    "spa": "rgb(255, 163, 139)",
+    "ita": "rgb(139, 216, 144)",
+    "pol": "rgb(255, 91, 190)",
+    "lav": "rgb(167, 165, 255)",
+    "nor": "rgb(95, 80, 137)",
+    "hun": "rgb(255, 172, 226)",
+    "dan": "rgb(0, 211, 151)",
+    "cze": "rgb(66, 117, 5)",
+    "lit": "rgb(168, 50, 83)",
+    "dut": "rgb(0, 109, 76)",
+    "jpn": "rgb(255, 81, 114)",
+    "rum": "rgb(125, 83, 0)",
+    "ukr": "rgb(185, 171, 153)",
+    "gre": "rgb(0, 184, 255)",
+    "ice": "rgb(235, 190, 95)",
+    "heb": "rgb(0, 86, 111)",
+    "por": "rgb(0, 229, 255)",
+    "bul": "rgb(161, 195, 0)",
+    "bel": "rgb(216, 76, 32)",
+    "lat": "rgb(255, 146, 0)",
+    "geo": "rgb(0, 209, 69)",
+    "slo": "rgb(203, 83, 192)",
+    "udm": "rgb(0, 186, 205)",
+    "tur": "rgb(178, 47, 33)",
+    "arm": "rgb(230, 17, 3)",
+    "chi": "rgb(27, 177, 255)",
+    "ara": "rgb(118, 255, 118)",
+    "cat": "rgb(156, 0, 206)",
+    "slv": "rgb(0, 57, 243)",
+    "kom": "rgb(255, 193, 148)",
+    "hin": "rgb(101, 185, 207)",
+    "yid": "rgb(202, 119, 197)",
+    "san": "rgb(83, 255, 151)",
+    "grc": "rgb(250, 253, 154)",
+    "per": "rgb(119, 133, 81)",
+    "srp": "rgb(162, 233, 187)",
+    "fiu": "rgb(181, 4, 54)",
+    "chm": "rgb(60, 0, 133)",
+    "kor": "rgb(74, 190, 158)",
+    "epo": "rgb(129, 0, 39)",
+    "hrv": "rgb(95, 219, 196)",
+    "aze": "rgb(15, 54, 131)",
+    "mac": "rgb(167, 182, 202)",
+    "tgk": "rgb(255, 70, 0)",
+    "smi": "rgb(90, 127, 207)",
+    "pro": "rgb(125, 38, 13)",
+    "uzb": "rgb(206, 21, 0)",
+    "peo": "rgb(54, 23, 198)",
+    "kaz": "rgb(25, 144, 182)",
+    "oss": "rgb(28, 125, 255)",
+    "tat": "rgb(184, 0, 123)",
+    "krl": "rgb(57, 189, 69)",
+    "other": "rgb(150, 150, 150)",
   };
 
   // Language codes mapping to display names
   const languageCodes: { [code: string]: string } = {
     "eng": "inglise",
-        "rus": "vene",
-        "ger": "saksa",
-        "fre": "prantsuse",
-        "fin": "soome",
-        "swe": "rootsi",
-        "spa": "hispaania",
-        "ita": "itaalia",
-        "pol": "poola",
-        "lav": "läti",
-        "nor": "norra",
-        "hun": "ungari",
-        "dan": "taani",
-        "cze": "tšehhi",
-        "lit": "leedu",
-        "dut": "hollandi",
-        "jpn": "jaapani",
-        "rum": "rumeenia",
-        "ukr": "ukraina",
-        "gre": "kreeka",
-        "ice": "islandi",
-        "heb": "heebrea",
-        "por": "portugali",
-        "bul": "bulgaaria",
-        "bel": "belgia",
-        "lat": "ladina",
-        "geo": "gruusia",
-        "slo": "slovakkia",
-        "udm": "udmurdi",
-        "tur": "türgi",
-        "arm": "armeenia",
-        "chi": "hiina",
-        "ara": "araabia",
-        "cat": "katalaani",
-        "slv": "sloveeni",
-        "kom": "komi",
-        "hin": "hindi",
-        "yid": "jidiš",
-        "san": "sanskriti",
-        "grc": "vanakreeka",
-        "per": "pärsia",
-        "srp": "serbia",
-        "fiu": "soomeugri (muu)",
-        "chm": "mari",
-        "kor": "korea",
-        "epo": "esperanto",
-        "hrv": "horvaadi",
-        "aze": "aserbaidžaani",
-        "mac": "makedoonia",
-        "tgk": "tadžiki",
-        "smi": "saami",
-        "pro": "provansaali",
-        "uzb": "usbeki",
-        "peo": "vanapärsia",
-        "kaz": "kasahhi",
-        "oss": "osseedi",
-        "tat": "tatari",
-        "krl": "karjala",
-        "other": "muu/puuduv",
+    "rus": "vene",
+    "ger": "saksa",
+    "fre": "prantsuse",
+    "fin": "soome",
+    "swe": "rootsi",
+    "spa": "hispaania",
+    "ita": "itaalia",
+    "pol": "poola",
+    "lav": "läti",
+    "nor": "norra",
+    "hun": "ungari",
+    "dan": "taani",
+    "cze": "tšehhi",
+    "lit": "leedu",
+    "dut": "hollandi",
+    "jpn": "jaapani",
+    "rum": "rumeenia",
+    "ukr": "ukraina",
+    "gre": "kreeka",
+    "ice": "islandi",
+    "heb": "heebrea",
+    "por": "portugali",
+    "bul": "bulgaaria",
+    "bel": "belgia",
+    "lat": "ladina",
+    "geo": "gruusia",
+    "slo": "slovakkia",
+    "udm": "udmurdi",
+    "tur": "türgi",
+    "arm": "armeenia",
+    "chi": "hiina",
+    "ara": "araabia",
+    "cat": "katalaani",
+    "slv": "sloveeni",
+    "kom": "komi",
+    "hin": "hindi",
+    "yid": "jidiš",
+    "san": "sanskriti",
+    "grc": "vanakreeka",
+    "per": "pärsia",
+    "srp": "serbia",
+    "fiu": "soomeugri (muu)",
+    "chm": "mari",
+    "kor": "korea",
+    "epo": "esperanto",
+    "hrv": "horvaadi",
+    "aze": "aserbaidžaani",
+    "mac": "makedoonia",
+    "tgk": "tadžiki",
+    "smi": "saami",
+    "pro": "provansaali",
+    "uzb": "usbeki",
+    "peo": "vanapärsia",
+    "kaz": "kasahhi",
+    "oss": "osseedi",
+    "tat": "tatari",
+    "krl": "karjala",
+    "other": "muu/puuduv",
   };
 
   // Function to load graph data and initialize UI components
@@ -224,7 +250,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function generateLanguageCheckboxes() {
     const languageCounts: { [code: string]: number } = {};
     let totalLanguages = 0;
-  
+
     graph.forEachEdge((edge, attributes) => {
       const languages = attributes.languages as string[] | undefined;
       if (languages && languages.length > 0) {
@@ -240,14 +266,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         totalLanguages++;
       }
     });
-  
+
     // Sort languages, placing 'other' at the end
     const sortedLanguages = Object.entries(languageCounts).sort((a, b) => {
       if (a[0] === 'other') return 1;
       if (b[0] === 'other') return -1;
       return b[1] - a[1];
     });
-  
+
     // Generate HTML for checkboxes
     let htmlString = "";
     sortedLanguages.forEach(([lang, count]) => {
@@ -255,7 +281,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         totalLanguages > 0 ? (count / totalLanguages) * 100 : 0;
       const langName = languageCodes[lang] || "Muu/Puuduv";
       const color = languageColors[lang] || languageColors["other"];
-  
+
       htmlString += `
         <label>
           <input type="checkbox" value="${lang}" checked />
@@ -264,17 +290,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         </label>
       `;
     });
-  
+
     // Insert into container
     languageCheckboxesContainer.innerHTML = htmlString;
-  
+
     // Select checkboxes and initialize state
     const languageCheckboxes =
       languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
         'input[type="checkbox"]'
       );
     state.languageCheckboxes = languageCheckboxes;
-  
+
     languageCheckboxes.forEach((checkbox) => {
       if (checkbox.checked) {
         state.selectedLanguages.add(checkbox.value);
@@ -283,7 +309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       checkbox.addEventListener("change", handleLanguageCheckboxChange);
     });
   }
-  
+
 
   // Generate Genre Checkboxes
   function generateGenreCheckboxes() {
