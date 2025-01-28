@@ -194,7 +194,7 @@
 
     /* For screens up to 768px: hide by default, show only if .is-visible is present */
     @media screen and (max-width: 768px) {
-      
+
       .small-panel {
         display: none;
       }
@@ -223,10 +223,19 @@
         <h2>
           Eesti tõlkekirjanduse võrgustik
         </h2>
-        <div class="description-toggle" id="description-toggle">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="description-toggle" id="description-toggle">
             <u>
               näita kirjeldust
             </u>
+          </div>
+          <!-- Language toggle dropdown to the right -->
+          <div>
+            <select id="language-select">
+              <option value="est">EST</option>
+              <option value="eng">ENG</option>
+            </select>
+          </div>
         </div>
       </div>
       <div id="description-content" style="display: none;">
@@ -240,8 +249,7 @@
         <p>
           Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste
           sõlmedega. Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud
-          keeli või
-          kitsamat ajavahemikku.
+          keeli, žanre või kitsamat ajavahemikku.
         </p>
         <p>
           Rakendus põhineb

@@ -31,15 +31,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const descriptionToggle = document.getElementById("description-toggle");
   const descriptionContent = document.getElementById("description-content");
   descriptionToggle?.addEventListener("click", function () {
-    ;
-    if (!descriptionContent) return; // Guard clause to satisfy TypeScript
+    if (!descriptionContent) return;
 
+    // Toggle the descriptionContent's visibility
     if (descriptionContent.style.display === "none") {
       descriptionContent.style.display = "block";
-      this.innerHTML = "<u>peida kirjeldus</u>";
     } else {
       descriptionContent.style.display = "none";
-      this.innerHTML = "<u>näita kirjeldust</u>";
+    }
+
+    // Now set the correct text, but use currentLanguage plus hidden vs shown:
+    if (descriptionContent.style.display === "none") {
+      descriptionToggle.innerHTML = `<u>${translations[currentLanguage].showDescription}</u>`;
+    } else {
+      descriptionToggle.innerHTML = `<u>${translations[currentLanguage].hideDescription}</u>`;
     }
   });
 
@@ -60,6 +65,216 @@ document.addEventListener("DOMContentLoaded", async () => {
   const timerangeResetButton = document.getElementById(
     "timerange-reset-button"
   ) as HTMLButtonElement;
+
+  // "Select All" and "Deselect All" buttons
+  const selectAllButton = document.getElementById("select-all") as HTMLButtonElement;
+  const deselectAllButton = document.getElementById("deselect-all") as HTMLButtonElement;
+
+  // 1. Create a dictionary of UI strings in both languages
+  const translations = {
+    est: {
+      showDescription: "näita kirjeldust",
+      hideDescription: "peida kirjeldus",
+      headingTitle: "Eesti tõlkekirjanduse võrgustik",
+      periodLabel: "Periood:",
+      timerangeApply: "vali",
+      timerangeReset: "lähtesta",
+      searchHeading: "Otsi isikut",
+      searchPlaceholder: "Sisesta nimi...",
+      filterHeading: "Filtreeri",
+      tabLanguage: "Keele järgi",
+      tabGenre: "Žanri järgi",
+      selectAllLangs: "vali kõik",
+      clearAllLangs: "tühjenda kõik",
+      descriptionContent: `
+      <p>
+          See rakendus visualiseerib võrgustiku kujul eesti tõlkekirjandust 19. sajandi algusest tänapäevani.
+          Võrgustik koosneb 9807 võõrkeelsest autorist ja 4027 tõlkijast, kes nende ilukirjanduslikku loomingut on eestindanud.
+          Tõlkijaid ja autoreid ühendavad kaared kujutavad tõlgitud teoseid, värvid sümboliseerivad erinevaid keeli.
+        </p>
+        <p>
+          Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste sõlmedega.
+          Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud
+          keeli, žanre või kitsamat ajavahemikku.
+        </p>
+        <p>
+          Rakendus põhineb
+          <a href="https://doi.org/10.5281/zenodo.14708287">
+            Eesti Rahvusbibliograafia
+          </a>
+          andmetel, lähtekood on leitav
+          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
+            GitHubis
+          </a>
+        </p>
+        <p>
+          <i>
+            Krister Kruusmaa,
+            <a href="https://digilab.rara.ee/">
+              RaRa digilabor
+            </a>
+            2024
+          </i>
+        </p>
+        <p>
+        </p>
+      `
+    },
+    eng: {
+      showDescription: "show description",
+      hideDescription: "hide description",
+      headingTitle: "Network of Translated Estonian Literature",
+      periodLabel: "Time range:",
+      timerangeApply: "apply",
+      timerangeReset: "reset",
+      searchHeading: "Search",
+      searchPlaceholder: "Enter a name...",
+      filterHeading: "Filter",
+      tabLanguage: "Languages",
+      tabGenre: "Genres",
+      selectAllLangs: "select all",
+      clearAllLangs: "clear all",
+      descriptionContent: `
+      <p>
+        This application visualizes Estonian translated literature in the form of a network, spanning from the early 19th century to the present day.
+        The network consists of 9,807 foreign authors and 4,027 translators who have translated their literary works into Estonian.
+        The connections between translators and authors represent translated works, while the colors symbolize different languages.
+      </p>
+      <p>
+        To explore the network, you can zoom in and out. Clicking on a node reveals its connections to other nodes.
+        You can search for a specific author or translator, and it's also possible to filter by desired languages and genres, or narrow the time range.
+      </p>
+        <p>
+          The app is based on data from
+          <a href="https://doi.org/10.5281/zenodo.14708287">
+            The Estonian National Bibliography
+          </a>
+          source code can be found on
+          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
+            GitHub
+          </a>
+        </p>
+        <p>
+          <i>
+            Krister Kruusmaa,
+            <a href="https://digilab.rara.ee/">
+              RaRa Digilab
+            </a>
+            2024
+          </i>
+        </p>
+        <p>
+        </p>
+      `
+    },
+  };
+
+  let currentLanguage: "est" | "eng" = "est";
+
+  function setLanguage(lang: "est" | "eng") {
+    currentLanguage = lang;
+    // Update the title
+    const mainTitle = document.querySelector("#title-container h2");
+    if (mainTitle) {
+      mainTitle.textContent = translations[lang].headingTitle;
+    }
+
+    // Update the description toggle text based on visibility
+    if (descriptionToggle && descriptionContent) {
+      if (descriptionContent.style.display === "none") {
+        descriptionToggle.innerHTML = `<u>${translations[lang].showDescription}</u>`;
+      } else {
+        descriptionToggle.innerHTML = `<u>${translations[lang].hideDescription}</u>`;
+      }
+    }
+
+    // Update the description contents
+    if (descriptionContent) {
+      descriptionContent.innerHTML = translations[lang].descriptionContent;
+    }
+
+    // Update the period label
+    const sliderContainer = document.getElementById("slider-container");
+    if (sliderContainer) {
+      const labelSpan = sliderContainer.querySelector("span");
+      if (labelSpan) {
+        labelSpan.textContent = translations[lang].periodLabel;
+      }
+    }
+
+    // Update the timerange buttons
+    if (timerangeButton) {
+      timerangeButton.textContent = translations[lang].timerangeApply;
+    }
+    if (timerangeResetButton) {
+      timerangeResetButton.textContent = translations[lang].timerangeReset;
+    }
+
+    // Update the search panel heading
+    const searchHeading = document.querySelector("#search-box h3");
+    if (searchHeading) {
+      searchHeading.textContent = translations[lang].searchHeading;
+    }
+
+    // Update the search input placeholder
+    if (searchInput) {
+      searchInput.placeholder = translations[lang].searchPlaceholder;
+    }
+
+    // Update the filter panel heading
+    const filterHeading = document.querySelector("#filter-panel h3");
+    if (filterHeading) {
+      filterHeading.textContent = translations[lang].filterHeading;
+    }
+
+    // Update tab labels (language and genre)
+    const langTabButton = document.querySelector('.tablinks[data-tab="language-tab"]') as HTMLButtonElement;
+    if (langTabButton) {
+      langTabButton.textContent = translations[lang].tabLanguage;
+    }
+    const genreTabButton = document.querySelector('.tablinks[data-tab="genre-tab"]') as HTMLButtonElement;
+    if (genreTabButton) {
+      genreTabButton.textContent = translations[lang].tabGenre;
+    }
+
+    // Update "Select All" / "Clear All" buttons for languages
+    if (selectAllButton) {
+      selectAllButton.textContent = translations[lang].selectAllLangs;
+    }
+    if (deselectAllButton) {
+      deselectAllButton.textContent = translations[lang].clearAllLangs;
+    }
+
+    // Update "Select All" / "Clear All" buttons for genres
+    const selectAllGenresButton = document.getElementById("select-all-genres") as HTMLButtonElement;
+    const deselectAllGenresButton = document.getElementById("deselect-all-genres") as HTMLButtonElement;
+    if (selectAllGenresButton) {
+      selectAllGenresButton.textContent = translations[lang].selectAllLangs;
+    }
+    if (deselectAllGenresButton) {
+      deselectAllGenresButton.textContent = translations[lang].clearAllLangs;
+    }
+
+    // Update description toggle
+    if (descriptionToggle && descriptionContent) {
+      if (descriptionContent.style.display === "none") {
+        descriptionToggle.innerHTML = `<u>${translations[currentLanguage].showDescription}</u>`;
+      } else {
+        descriptionToggle.innerHTML = `<u>${translations[currentLanguage].hideDescription}</u>`;
+      }
+    }
+  }
+
+  // Optionally, set a default language
+  setLanguage("est");
+
+  const languageSelect = document.getElementById("language-select") as HTMLSelectElement;
+
+  // Attach an event listener
+  languageSelect?.addEventListener("change", () => {
+    const choice = languageSelect.value as "est" | "eng"; // "est" or "eng"
+    setLanguage(choice);
+  });
 
   // Application state interface
   interface State {
@@ -854,12 +1069,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Load graph data and initialize UI
   await loadGraphDataAndInitialize();
-
-  /**
-   * Additional Considerations:
-   * - Ensure that each node has a 'size' attribute in your graph data.
-   * - Adjust 'labelRenderedSizeThreshold' and 'labelThreshold' as needed.
-   * - Customize color mappings and language codes as per your requirements.
-   */
 
 });
