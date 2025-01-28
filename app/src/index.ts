@@ -36,13 +36,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (descriptionContent.style.display === "none") {
       descriptionContent.style.display = "block";
-      this.textContent = "peida kirjeldus";
+      this.innerHTML = "<u>peida kirjeldus</u>";
     } else {
       descriptionContent.style.display = "none";
-      this.textContent = "näita kirjeldust";
+      this.innerHTML = "<u>näita kirjeldust</u>";
     }
   });
-
 
   // Language and Genre checkboxes containers
   const languageCheckboxesContainer = document.getElementById(
