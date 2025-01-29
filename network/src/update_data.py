@@ -130,7 +130,11 @@ def update_languages_and_colors(graphology_data, language_codes, language_colors
 
 if __name__ == "__main__":
 
-    key = sys.argv[1]
+    if len(sys.argv) == 2:
+        key = sys.argv[1]
+    else:
+        key = "data"
+        print("Using default key 'data'. Use 'python update_data.py <key>' to change the default value")
 
     # Load the Graphology JSON file
     with open(f"../data/{key}.json", "r", encoding="utf8") as f:

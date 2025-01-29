@@ -213,9 +213,9 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
     # Remove self-loops (if any)
     G.remove_edges_from(nx.selfloop_edges(G))
     
-    print("Updating node and edge attributes")
+    print("Updating node attributes")
     # Calculate and store the total_count and main_role for each node
-    for node_id, attributes in G.nodes(data=True):
+    for node_id, attributes in tqdm(G.nodes(data=True)):
         # Calculate total role counts and determine the main role
         autor_count = attributes.get("autor_count", 0)
         tõlkija_count = attributes.get("tõlkija_count", 0)
@@ -233,8 +233,9 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
         elif G.nodes[node_id]["main_role"] == "tõlkija":
             G.nodes[node_id]["author_lang"] = "tõlkija"
     
+    print("Updating node attributes")
     # Update edge attributes
-    for edge in G.edges:
+    for edge in tqdm(G.edges):
         edge_data = G.edges[edge]
         language_counter = Counter(edge_data["languages"])
         edge_data["language"] = language_counter.most_common(1)[0][0]
@@ -372,9 +373,15 @@ def simplify_graph_for_gexf(G):
 
 
 if __name__ == "__main__":
-    key = sys.argv[1]
-    min_year = int(sys.argv[2])
-    max_year = int(sys.argv[3])
+    if len(sys.argv) == 4:
+        key = sys.argv[1]
+        min_year = int(sys.argv[2])
+        max_year = int(sys.argv[3])
+    else:
+        key = "data"
+        min_year = 1800
+        max_year = 2025
+        print("Creating graph from timerange 1800 to 2025. Use 'python create_graph.py <key> <min_year> <max_year>' to change the default values")
 
     print("Loading data")
     erb_main = pd.read_parquet("../data/raw/erb_all_books.parquet")
