@@ -18,7 +18,7 @@ Related publications:
 
 ![Project flowchart](network/notebooks/plots/flowchart.png)
 
-The project contains a back-end and a front-end module. The [`network/`](network/) directory contains scripts to generate a graph object from curated metadata of the [Estonian National Bibliography](https://zenodo.org/records/14083327), as well as analysis notebooks and plots. The [`app`](app/) directory contains code for an Typescript-based interactive web app using Graphology and Sigma modules. To build the network locally, follow these steps:
+The project consists of a back-end and a front-end module. The [`network/`](network/) directory contains scripts to generate a graph object from curated metadata of the [Estonian National Bibliography](https://zenodo.org/records/14083327), as well as analysis notebooks and plots. The [`app`](app/) directory contains code for an Typescript-based interactive web app using Graphology and Sigma modules. To build the network locally, follow these steps:
 
 1. Install the required Python modules via `pip` using the [`reqiurements.txt`](requirements.txt) file.
 2. Download the [Curated ENB](https://zenodo.org/records/14083327) dataset and place it into the [`network/data/raw/`](network/data/raw/) directory.
