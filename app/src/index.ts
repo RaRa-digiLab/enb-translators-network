@@ -69,6 +69,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // "Select All" and "Deselect All" buttons
   const selectAllButton = document.getElementById("select-all") as HTMLButtonElement;
   const deselectAllButton = document.getElementById("deselect-all") as HTMLButtonElement;
+  
+  let currentLanguage: "est" | "eng" = "est";
+  const languageSelect = document.getElementById("language-select") as HTMLSelectElement;
 
   // 1. Create a dictionary of UI strings in both languages
   const translations = {
@@ -162,7 +165,242 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
   };
 
-  let currentLanguage: "est" | "eng" = "est";
+  // Application state interface
+  interface State {
+    hoveredNode?: string;
+    searchQuery: string;
+    selectedNode?: string;
+    selectedNeighbors?: Set<string>;
+    suggestions?: Set<string>;
+    selectedLanguages: Set<string>;
+    selectedGenres: Set<string>;
+    minYear: number;
+    maxYear: number;
+    languageCheckboxes?: NodeListOf<HTMLInputElement>;
+    genreCheckboxes?: NodeListOf<HTMLInputElement>;
+  }
+
+  // Initialize minYear and maxYear from inputs
+  const initialMinYear = parseInt(minYearInput.value) || 1800;
+  const initialMaxYear = parseInt(maxYearInput.value) || 2024;
+
+  // Initialize state
+  const state: State = {
+    searchQuery: "",
+    selectedLanguages: new Set<string>(),
+    selectedGenres: new Set<string>(),
+    minYear: initialMinYear,
+    maxYear: initialMaxYear,
+  };
+
+  // Language colors mapping
+  const languageColors: { [code: string]: string } = {
+    "eng": "rgb(0, 221, 235)",
+    "rus": "rgb(255, 111, 36)",
+    "ger": "rgb(255, 130, 255)",
+    "fre": "rgb(54, 224, 0)",
+    "fin": "rgb(223, 170, 0)",
+    "swe": "rgb(152, 204, 243)",
+    "spa": "rgb(255, 163, 139)",
+    "ita": "rgb(139, 216, 144)",
+    "pol": "rgb(255, 91, 190)",
+    "lav": "rgb(167, 165, 255)",
+    "nor": "rgb(95, 80, 137)",
+    "hun": "rgb(255, 172, 226)",
+    "dan": "rgb(0, 211, 151)",
+    "cze": "rgb(66, 117, 5)",
+    "lit": "rgb(168, 50, 83)",
+    "dut": "rgb(0, 109, 76)",
+    "jpn": "rgb(255, 81, 114)",
+    "rum": "rgb(125, 83, 0)",
+    "ukr": "rgb(185, 171, 153)",
+    "gre": "rgb(0, 184, 255)",
+    "ice": "rgb(235, 190, 95)",
+    "heb": "rgb(0, 86, 111)",
+    "por": "rgb(0, 229, 255)",
+    "bul": "rgb(161, 195, 0)",
+    "bel": "rgb(216, 76, 32)",
+    "lat": "rgb(255, 146, 0)",
+    "geo": "rgb(0, 209, 69)",
+    "slo": "rgb(203, 83, 192)",
+    "udm": "rgb(0, 186, 205)",
+    "tur": "rgb(178, 47, 33)",
+    "arm": "rgb(230, 17, 3)",
+    "chi": "rgb(27, 177, 255)",
+    "ara": "rgb(118, 255, 118)",
+    "cat": "rgb(156, 0, 206)",
+    "slv": "rgb(0, 57, 243)",
+    "kom": "rgb(255, 193, 148)",
+    "hin": "rgb(101, 185, 207)",
+    "yid": "rgb(202, 119, 197)",
+    "san": "rgb(83, 255, 151)",
+    "grc": "rgb(250, 253, 154)",
+    "per": "rgb(119, 133, 81)",
+    "srp": "rgb(162, 233, 187)",
+    "fiu": "rgb(181, 4, 54)",
+    "chm": "rgb(60, 0, 133)",
+    "kor": "rgb(74, 190, 158)",
+    "epo": "rgb(129, 0, 39)",
+    "hrv": "rgb(95, 219, 196)",
+    "aze": "rgb(15, 54, 131)",
+    "mac": "rgb(167, 182, 202)",
+    "tgk": "rgb(255, 70, 0)",
+    "smi": "rgb(90, 127, 207)",
+    "pro": "rgb(125, 38, 13)",
+    "uzb": "rgb(206, 21, 0)",
+    "peo": "rgb(54, 23, 198)",
+    "kaz": "rgb(25, 144, 182)",
+    "oss": "rgb(28, 125, 255)",
+    "tat": "rgb(184, 0, 123)",
+    "krl": "rgb(57, 189, 69)",
+    "other": "rgb(150, 150, 150)",
+  };
+
+  // Language codes mapping to display names
+  const languageCodesEst: { [code: string]: string } = {
+    "eng": "inglise",
+    "rus": "vene",
+    "ger": "saksa",
+    "fre": "prantsuse",
+    "fin": "soome",
+    "swe": "rootsi",
+    "spa": "hispaania",
+    "ita": "itaalia",
+    "pol": "poola",
+    "lav": "läti",
+    "nor": "norra",
+    "hun": "ungari",
+    "dan": "taani",
+    "cze": "tšehhi",
+    "lit": "leedu",
+    "dut": "hollandi",
+    "jpn": "jaapani",
+    "rum": "rumeenia",
+    "ukr": "ukraina",
+    "gre": "kreeka",
+    "ice": "islandi",
+    "heb": "heebrea",
+    "por": "portugali",
+    "bul": "bulgaaria",
+    "bel": "belgia",
+    "lat": "ladina",
+    "geo": "gruusia",
+    "slo": "slovakkia",
+    "udm": "udmurdi",
+    "tur": "türgi",
+    "arm": "armeenia",
+    "chi": "hiina",
+    "ara": "araabia",
+    "cat": "katalaani",
+    "slv": "sloveeni",
+    "kom": "komi",
+    "hin": "hindi",
+    "yid": "jidiš",
+    "san": "sanskriti",
+    "grc": "vanakreeka",
+    "per": "pärsia",
+    "srp": "serbia",
+    "fiu": "soomeugri (muu)",
+    "chm": "mari",
+    "kor": "korea",
+    "epo": "esperanto",
+    "hrv": "horvaadi",
+    "aze": "aserbaidžaani",
+    "mac": "makedoonia",
+    "tgk": "tadžiki",
+    "smi": "saami",
+    "pro": "provansaali",
+    "uzb": "usbeki",
+    "peo": "vanapärsia",
+    "kaz": "kasahhi",
+    "oss": "osseedi",
+    "tat": "tatari",
+    "krl": "karjala",
+    "other": "muu/puuduv",
+  };
+
+  const languageCodesEng: { [code: string]: string } = {
+    "eng": "English",
+    "rus": "Russian",
+    "ger": "German",
+    "fre": "French",
+    "fin": "Finnish",
+    "swe": "Swedish",
+    "spa": "Spanish",
+    "ita": "Italian",
+    "pol": "Polish",
+    "lav": "Latvian",
+    "nor": "Norwegian",
+    "hun": "Hungarian",
+    "dan": "Danish",
+    "cze": "Czech",
+    "lit": "Lithuanian",
+    "dut": "Dutch",
+    "jpn": "Japanese",
+    "rum": "Romanian",
+    "ukr": "Ukrainian",
+    "gre": "Greek",
+    "ice": "Icelandic",
+    "heb": "Hebrew",
+    "por": "Portuguese",
+    "bul": "Bulgarian",
+    "bel": "Belarusian",
+    "lat": "Latin",
+    "geo": "Georgian",
+    "slo": "Slovak",
+    "udm": "Udmurt",
+    "tur": "Turkish",
+    "arm": "Armenian",
+    "chi": "Chinese",
+    "ara": "Arabic",
+    "cat": "Catalan",
+    "slv": "Slovenian",
+    "kom": "Komi",
+    "hin": "Hindi",
+    "yid": "Yiddish",
+    "san": "Sanskrit",
+    "grc": "Ancient Greek",
+    "per": "Persian",
+    "srp": "Serbian",
+    "fiu": "Finno-Ugric (other)",
+    "chm": "Mari",
+    "kor": "Korean",
+    "epo": "Esperanto",
+    "hrv": "Croatian",
+    "aze": "Azerbaijani",
+    "mac": "Macedonian",
+    "tgk": "Tajik",
+    "smi": "Sami",
+    "pro": "Provençal",
+    "uzb": "Uzbek",
+    "peo": "Old Persian",
+    "kaz": "Kazakh",
+    "oss": "Ossetian",
+    "tat": "Tatar",
+    "krl": "Karelian",
+    "other": "Other / Missing",
+  };
+
+  // Function to load graph data and initialize UI components
+  async function loadGraphDataAndInitialize() {
+    try {
+      const response = await fetch("data.json");
+      if (!response.ok) {
+        throw new Error(`Failed to load data.json: ${response.statusText}`);
+      }
+      const graphData = await response.json();
+      graph.import(graphData);
+
+      // Populate search suggestions
+      populateSearchSuggestions();
+
+      // Generate checkboxes
+      generateLanguageCheckboxes();
+      generateGenreCheckboxes();
+    } catch (error) {
+      console.error("Error loading graph data:", error);
+    }
+  }
 
   function setLanguage(lang: "est" | "eng") {
     currentLanguage = lang;
@@ -256,193 +494,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         descriptionToggle.innerHTML = `<u>${translations[currentLanguage].hideDescription}</u>`;
       }
     }
+
+    // update the existing language checkbox labels:
+    updateLanguageCheckboxLabels();
   }
-
-  // Optionally, set a default language
-  setLanguage("est");
-
-  const languageSelect = document.getElementById("language-select") as HTMLSelectElement;
 
   // Attach an event listener
   languageSelect?.addEventListener("change", () => {
     const choice = languageSelect.value as "est" | "eng"; // "est" or "eng"
     setLanguage(choice);
   });
-
-  // Application state interface
-  interface State {
-    hoveredNode?: string;
-    searchQuery: string;
-    selectedNode?: string;
-    selectedNeighbors?: Set<string>;
-    suggestions?: Set<string>;
-    selectedLanguages: Set<string>;
-    selectedGenres: Set<string>;
-    minYear: number;
-    maxYear: number;
-    languageCheckboxes?: NodeListOf<HTMLInputElement>;
-    genreCheckboxes?: NodeListOf<HTMLInputElement>;
-  }
-
-  // Initialize minYear and maxYear from inputs
-  const initialMinYear = parseInt(minYearInput.value) || 1800;
-  const initialMaxYear = parseInt(maxYearInput.value) || 2024;
-
-  // Initialize state
-  const state: State = {
-    searchQuery: "",
-    selectedLanguages: new Set<string>(),
-    selectedGenres: new Set<string>(),
-    minYear: initialMinYear,
-    maxYear: initialMaxYear,
-  };
-
-  // Language colors mapping
-  const languageColors: { [code: string]: string } = {
-    "eng": "rgb(0, 221, 235)",
-    "rus": "rgb(255, 111, 36)",
-    "ger": "rgb(255, 130, 255)",
-    "fre": "rgb(54, 224, 0)",
-    "fin": "rgb(223, 170, 0)",
-    "swe": "rgb(152, 204, 243)",
-    "spa": "rgb(255, 163, 139)",
-    "ita": "rgb(139, 216, 144)",
-    "pol": "rgb(255, 91, 190)",
-    "lav": "rgb(167, 165, 255)",
-    "nor": "rgb(95, 80, 137)",
-    "hun": "rgb(255, 172, 226)",
-    "dan": "rgb(0, 211, 151)",
-    "cze": "rgb(66, 117, 5)",
-    "lit": "rgb(168, 50, 83)",
-    "dut": "rgb(0, 109, 76)",
-    "jpn": "rgb(255, 81, 114)",
-    "rum": "rgb(125, 83, 0)",
-    "ukr": "rgb(185, 171, 153)",
-    "gre": "rgb(0, 184, 255)",
-    "ice": "rgb(235, 190, 95)",
-    "heb": "rgb(0, 86, 111)",
-    "por": "rgb(0, 229, 255)",
-    "bul": "rgb(161, 195, 0)",
-    "bel": "rgb(216, 76, 32)",
-    "lat": "rgb(255, 146, 0)",
-    "geo": "rgb(0, 209, 69)",
-    "slo": "rgb(203, 83, 192)",
-    "udm": "rgb(0, 186, 205)",
-    "tur": "rgb(178, 47, 33)",
-    "arm": "rgb(230, 17, 3)",
-    "chi": "rgb(27, 177, 255)",
-    "ara": "rgb(118, 255, 118)",
-    "cat": "rgb(156, 0, 206)",
-    "slv": "rgb(0, 57, 243)",
-    "kom": "rgb(255, 193, 148)",
-    "hin": "rgb(101, 185, 207)",
-    "yid": "rgb(202, 119, 197)",
-    "san": "rgb(83, 255, 151)",
-    "grc": "rgb(250, 253, 154)",
-    "per": "rgb(119, 133, 81)",
-    "srp": "rgb(162, 233, 187)",
-    "fiu": "rgb(181, 4, 54)",
-    "chm": "rgb(60, 0, 133)",
-    "kor": "rgb(74, 190, 158)",
-    "epo": "rgb(129, 0, 39)",
-    "hrv": "rgb(95, 219, 196)",
-    "aze": "rgb(15, 54, 131)",
-    "mac": "rgb(167, 182, 202)",
-    "tgk": "rgb(255, 70, 0)",
-    "smi": "rgb(90, 127, 207)",
-    "pro": "rgb(125, 38, 13)",
-    "uzb": "rgb(206, 21, 0)",
-    "peo": "rgb(54, 23, 198)",
-    "kaz": "rgb(25, 144, 182)",
-    "oss": "rgb(28, 125, 255)",
-    "tat": "rgb(184, 0, 123)",
-    "krl": "rgb(57, 189, 69)",
-    "other": "rgb(150, 150, 150)",
-  };
-
-  // Language codes mapping to display names
-  const languageCodes: { [code: string]: string } = {
-    "eng": "inglise",
-    "rus": "vene",
-    "ger": "saksa",
-    "fre": "prantsuse",
-    "fin": "soome",
-    "swe": "rootsi",
-    "spa": "hispaania",
-    "ita": "itaalia",
-    "pol": "poola",
-    "lav": "läti",
-    "nor": "norra",
-    "hun": "ungari",
-    "dan": "taani",
-    "cze": "tšehhi",
-    "lit": "leedu",
-    "dut": "hollandi",
-    "jpn": "jaapani",
-    "rum": "rumeenia",
-    "ukr": "ukraina",
-    "gre": "kreeka",
-    "ice": "islandi",
-    "heb": "heebrea",
-    "por": "portugali",
-    "bul": "bulgaaria",
-    "bel": "belgia",
-    "lat": "ladina",
-    "geo": "gruusia",
-    "slo": "slovakkia",
-    "udm": "udmurdi",
-    "tur": "türgi",
-    "arm": "armeenia",
-    "chi": "hiina",
-    "ara": "araabia",
-    "cat": "katalaani",
-    "slv": "sloveeni",
-    "kom": "komi",
-    "hin": "hindi",
-    "yid": "jidiš",
-    "san": "sanskriti",
-    "grc": "vanakreeka",
-    "per": "pärsia",
-    "srp": "serbia",
-    "fiu": "soomeugri (muu)",
-    "chm": "mari",
-    "kor": "korea",
-    "epo": "esperanto",
-    "hrv": "horvaadi",
-    "aze": "aserbaidžaani",
-    "mac": "makedoonia",
-    "tgk": "tadžiki",
-    "smi": "saami",
-    "pro": "provansaali",
-    "uzb": "usbeki",
-    "peo": "vanapärsia",
-    "kaz": "kasahhi",
-    "oss": "osseedi",
-    "tat": "tatari",
-    "krl": "karjala",
-    "other": "muu/puuduv",
-  };
-
-  // Function to load graph data and initialize UI components
-  async function loadGraphDataAndInitialize() {
-    try {
-      const response = await fetch("data.json");
-      if (!response.ok) {
-        throw new Error(`Failed to load data.json: ${response.statusText}`);
-      }
-      const graphData = await response.json();
-      graph.import(graphData);
-
-      // Populate search suggestions
-      populateSearchSuggestions();
-
-      // Generate checkboxes
-      generateLanguageCheckboxes();
-      generateGenreCheckboxes();
-    } catch (error) {
-      console.error("Error loading graph data:", error);
-    }
-  }
 
   // Function to populate search suggestions
   function populateSearchSuggestions() {
@@ -459,40 +520,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     let totalLanguages = 0;
 
     graph.forEachEdge((edge, attributes) => {
-      const languages = attributes.languages as string[] | undefined;
-      if (languages && languages.length > 0) {
-        languages.forEach((lang) => {
-          // Map unmapped languages to 'other'
-          const mappedLang = languageCodes.hasOwnProperty(lang) ? lang : 'other';
-          languageCounts[mappedLang] = (languageCounts[mappedLang] || 0) + 1;
+      const langs = attributes.languages as string[] | undefined;
+      if (langs && langs.length) {
+        langs.forEach((lang) => {
+          const mapped = languageCodesEst.hasOwnProperty(lang) ? lang : "other";
+          languageCounts[mapped] = (languageCounts[mapped] || 0) + 1;
           totalLanguages++;
         });
       } else {
-        // Edges with no languages are considered 'other'
-        languageCounts['other'] = (languageCounts['other'] || 0) + 1;
+        languageCounts["other"] = (languageCounts["other"] || 0) + 1;
         totalLanguages++;
       }
     });
 
-    // Sort languages, placing 'other' at the end
+    // Sort languages
     const sortedLanguages = Object.entries(languageCounts).sort((a, b) => {
-      if (a[0] === 'other') return 1;
-      if (b[0] === 'other') return -1;
+      if (a[0] === "other") return 1;
+      if (b[0] === "other") return -1;
       return b[1] - a[1];
     });
 
-    // Generate HTML for checkboxes
+    // Build the checkboxes (Estonian labels by default)
     let htmlString = "";
-    sortedLanguages.forEach(([lang, count]) => {
-      const langPercentage =
-        totalLanguages > 0 ? (count / totalLanguages) * 100 : 0;
-      const langName = languageCodes[lang] || "Muu/Puuduv";
-      const color = languageColors[lang] || languageColors["other"];
+    sortedLanguages.forEach(([code, count]) => {
+      const langPercentage = totalLanguages ? (count / totalLanguages) * 100 : 0;
+      const langNameEst = languageCodesEst[code] || languageCodesEst["other"];
+      const color = languageColors[code] || languageColors["other"];
 
       htmlString += `
         <label>
-          <input type="checkbox" value="${lang}" checked />
-          <span class="item-name" style="color: ${color};">${langName}</span>
+          <input type="checkbox" value="${code}" checked />
+          <span class="item-name" style="color: ${color};">${langNameEst}</span>
           <span class="percentage">${langPercentage.toFixed(2)}%</span>
         </label>
       `;
@@ -501,22 +559,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Insert into container
     languageCheckboxesContainer.innerHTML = htmlString;
 
-    // Select checkboxes and initialize state
-    const languageCheckboxes =
-      languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
-        'input[type="checkbox"]'
-      );
+    // Attach to state
+    const languageCheckboxes = languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"]'
+    );
     state.languageCheckboxes = languageCheckboxes;
 
-    languageCheckboxes.forEach((checkbox) => {
-      if (checkbox.checked) {
-        state.selectedLanguages.add(checkbox.value);
-      }
-      // Attach event listener
-      checkbox.addEventListener("change", handleLanguageCheckboxChange);
+    // Initialize the selectedLanguages set
+    languageCheckboxes.forEach((cb) => {
+      if (cb.checked) state.selectedLanguages.add(cb.value);
+      cb.addEventListener("change", handleLanguageCheckboxChange);
     });
   }
 
+  function updateLanguageCheckboxLabels() {
+    const currentLangMap =
+      currentLanguage === "eng" ? languageCodesEng : languageCodesEst;
+
+    // Go through all existing checkboxes
+    const checkboxes = languageCheckboxesContainer.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"]'
+    );
+
+    checkboxes.forEach((cb) => {
+      // The language code (like "eng", "rus", etc.) is in cb.value
+      const code = cb.value;
+
+      // The next sibling .item-name is the text span
+      const labelSpan = cb.parentElement?.querySelector(".item-name") as HTMLElement;
+      if (labelSpan) {
+        labelSpan.textContent = currentLangMap[code] || currentLangMap["other"];
+      }
+    });
+  }
 
   // Generate Genre Checkboxes
   function generateGenreCheckboxes() {
