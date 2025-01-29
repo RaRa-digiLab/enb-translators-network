@@ -1164,6 +1164,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderer.refresh();
   });
 
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      searchInput.value = "";
+      state.searchQuery = "";
+      state.selectedNode = undefined;
+      state.selectedNeighbors = undefined;
+      renderer.refresh();
+    }
+  });
+
   // Function to check if a node has any visible edges based on current state
   function nodeHasVisibleEdges(node: string): boolean {
     return graph.someEdge(node, (edge, attributes, source, target) => {
