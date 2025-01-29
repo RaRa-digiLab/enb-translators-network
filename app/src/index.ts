@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     eng: {
       showDescription: "show description",
       hideDescription: "hide description",
-      headingTitle: "Network of Translated Estonian Literature",
+      headingTitle: "Network of Translated<br> Estonian Literature",
       periodLabel: "Time range:",
       timerangeApply: "apply",
       timerangeReset: "reset",
@@ -534,7 +534,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Update the title
     const mainTitle = document.querySelector("#title-container h2");
     if (mainTitle) {
-      mainTitle.textContent = translations[lang].headingTitle;
+      mainTitle.innerHTML = translations[lang].headingTitle;
     }
 
     // Update the description toggle text based on visibility
