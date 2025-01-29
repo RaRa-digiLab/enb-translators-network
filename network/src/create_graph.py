@@ -212,7 +212,11 @@ def create_graph(erb, min_year, max_year, id_to_int=False):
                     
     # Remove self-loops (if any)
     G.remove_edges_from(nx.selfloop_edges(G))
-    
+
+    # Remove isolated nodes (those with no edges):
+    isolated_nodes = [n for n, deg in G.degree() if deg == 0]
+    G.remove_nodes_from(isolated_nodes)
+
     print("Updating node attributes")
     # Calculate and store the total_count and main_role for each node
     for node_id, attributes in tqdm(G.nodes(data=True)):
@@ -399,6 +403,6 @@ if __name__ == "__main__":
 
     print("Simplifying graph for Gephi")
     G_gephi = simplify_graph_for_gexf(G)
-    nx.write_gexf(G_gephi, f"../data/gephi/{key}.gexf")
+    nx.write_gexf(G_gephi, f"../data/gephi/{key}_for_gephi.gexf")
 
-    print(f"Done! Check ../data/{key}.json and ../data/gephi/{key}.gexf")
+    print(f"Done! Check ../data/{key}.json and ../data/gephi/{key}_for_gephi.gexf")
