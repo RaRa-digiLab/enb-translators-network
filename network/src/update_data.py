@@ -4,7 +4,7 @@ import os
 
 # Constants for size coefficients and alpha transparency
 node_size_coefficient = 1.0
-edge_size_coefficient = 0.5
+edge_size_coefficient = 0.2
 node_alpha = 0.8
 edge_alpha = 0.9  # Corrected from 'edge_alpa'
 
