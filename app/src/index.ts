@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // "Select All" and "Deselect All" buttons
   const selectAllButton = document.getElementById("select-all") as HTMLButtonElement;
   const deselectAllButton = document.getElementById("deselect-all") as HTMLButtonElement;
-  
+
   let currentLanguage: "est" | "eng" = "est";
   const languageSelect = document.getElementById("language-select") as HTMLSelectElement;
 
@@ -381,6 +381,133 @@ document.addEventListener("DOMContentLoaded", async () => {
     "other": "Other / Missing",
   };
 
+  // English mapping object for known genres.
+  // Everything else falls back to the original Estonian label (italicized).
+  const genreLabelsEng: { [genre: string]: string } = {
+      "romaanid": "Novels",
+      "lastekirjandus": "Children's Literature",
+      "jutustused": "Narratives",
+      "armastusromaanid": "Romance Novels",
+      "põnevusromaanid": "Thriller Novels",
+      "kriminaalromaanid": "Crime Novels",
+      "jutud": "Stories",
+      "noorsookirjandus": "Young Adult Literature",
+      "luuletused": "Poems",
+      "ajaloolised romaanid": "Historical Novels",
+      "näidendid": "Plays",
+      "novellid": "Short Stories",
+      "pildiraamatud": "Picture Books",
+      "muinasjutud": "Fairy Tales",
+      "fantaasiaromaanid": "Fantasy Novels",
+      "ulmeromaanid": "Science Fiction Novels",
+      "biograafilised romaanid": "Biographical Novels",
+      "komöödiad": "Comedies",
+      "mugandused": "Adaptations",
+      "rööptekstid": "Parallel Texts",
+      "loomajutud": "Animal Stories",
+      "mälestused": "Memoirs",
+      "suurtähtraamatud": "Large Print Books",
+      "psühholoogilised romaanid": "Psychological Novels",
+      "seiklusromaanid": "Adventure Novels",
+      "sõjaromaanid": "War Novels",
+      "lühiromaanid": "Short Novels",
+      "perekonnaromaanid": "Family Novels",
+      "huumor": "Humor",
+      "dokumentaalkirjandus": "Documentary Literature",
+      "vigurraamatud": "Trick Books",
+      "biograafiad": "Biographies",
+      "poeemid": "Poems (Epics)",
+      "õudusromaanid": "Horror Novels",
+      "ulmejutud": "Science Fiction Stories",
+      "autobiograafilised romaanid": "Autobiographical Novels",
+      "vaimulik ilukirjandus": "Religious Fiction",
+      "esseed": "Essays",
+      "autobiograafiad": "Autobiographies",
+      "satiirilised romaanid": "Satirical Novels",
+      "spiooniromaanid": "Spy Novels",
+      "reisikirjad": "Travel Writings",
+      "antoloogiad": "Anthologies",
+      "õudusjutud": "Horror Stories",
+      "värssjutud": "Verse Stories",
+      "päevikud": "Diaries",
+      "kriminaaljutud": "Crime Stories",
+      "tõlked": "Translations",
+      "päevikromaanid": "Diary Novels",
+      "tragöödiad": "Tragedies",
+      "unejutud": "Bedtime Stories",
+      "aforismid": "Aphorisms",
+      "värssdraamad": "Verse Dramas",
+      "koomiksid": "Comics",
+      "olukirjeldused": "Situational Descriptions",
+      "legendid": "Legends",
+      "tsitaadid": "Quotations",
+      "kommentaarid": "Commentaries",
+      "kogutud teosed": "Collected Works",
+      "graafilised romaanid": "Graphic Novels",
+      "poliitilised romaanid": "Political Novels",
+      "toiduretseptid": "Recipes",
+      "mereromaanid": "Maritime Novels",
+      "haikud": "Haikus",
+      "koolijutud": "School Stories",
+      "düstoopiad": "Dystopias",
+      "valmid": "Fables",
+      "satiir": "Satire",
+      "aimekirjandus": "Popular Science Literature",
+      "miniatuurid": "Miniatures",
+      "lood": "Tales",
+      "libretod": "Librettos",
+      "lühinäidendid": "Short Plays",
+      "kiriromaanid": "Epistolary Novels",
+      "katkendid": "Excerpts",
+      "loomamuinasjutud": "Animal Fairy Tales",
+      "illustratsioonid": "Illustrations",
+      "proosaluuletused": "Prose Poems",
+      "filmistsenaariumid": "Screenplays",
+      "autobiograafilised jutustused": "Autobiographical Narratives",
+      "följetonid": "Feuilletons",
+      "kirjad": "Letters",
+      "armastusluule": "Love Poetry",
+      "eeposed": "Epics",
+      "paroodiad": "Parodies",
+      "ballaadid": "Ballads",
+      "nõuanded": "Advice",
+      "haiglaromaanid": "Hospital Novels",
+      "pusled": "Puzzles",
+      "autograafid": "Autographs",
+      "nuputamisülesanded": "Brain Teasers",
+      "müüdid": "Myths",
+      "ajaloolised näidendid": "Historical Plays",
+      "humoreskid": "Humorous Sketches",
+      "anekdoodid": "Anecdotes",
+      "lastenäidendid": "Children's Plays",
+      "valitud teosed": "Selected Works",
+      "üliõpilastööd": "Student Papers",
+      "arenguromaanid": "Bildungsromans (Coming-of-Age Novels)",
+      "muistendid": "Folktales",
+      "käsiraamatud": "Handbooks",
+      "kõned": "Speeches",
+      "dialoogid": "Dialogues",
+      "laulumängud": "Singing Games",
+      "loodusjutud": "Nature Stories",
+      "laastud": "Sketches",
+      "laulutekstid": "Song Lyrics",
+      "diplomitööd": "Theses",
+      "värvimisraamatud": "Coloring Books",
+      "rüütliromaanid": "Chivalric Novels",
+      "õppematerjalid": "Study Materials",
+      "publitsistika": "Journalistic Literature",
+      "fantaasiakirjandus": "Fantasy Literature",
+      "harduskirjandus": "Devotional Literature",
+      "sketšid": "Sketches",
+      "mõtisklused": "Reflections",
+      "intervjuud": "Interviews",
+      "operetid": "Operettas",
+      "mõistujutud": "Allegories",
+      "muu": "Other",
+      "teadmata žanr": "Unknown Genre",
+  }
+  
+
   // Function to load graph data and initialize UI components
   async function loadGraphDataAndInitialize() {
     try {
@@ -497,6 +624,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // update the existing language checkbox labels:
     updateLanguageCheckboxLabels();
+
+    // update the existing genre checkbox labels:
+    updateGenreCheckboxLabels();
   }
 
   // Attach an event listener
@@ -593,62 +723,113 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Generate Genre Checkboxes
   function generateGenreCheckboxes() {
     const genreCounts: { [genre: string]: number } = {};
     let totalGenres = 0;
-
+  
     graph.forEachEdge((edge, attributes) => {
       const genres = attributes.genres as string[] | undefined;
-      if (genres && genres.length > 0) {
-        genres.forEach((genre) => {
-          genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+      if (genres && genres.length) {
+        genres.forEach((g) => {
+          // If null/undefined/empty or "null", rename to "teadmata žanr"
+          if (!g || g.toLowerCase() === "null") {
+            g = "teadmata žanr";
+          }
+          genreCounts[g] = (genreCounts[g] || 0) + 1;
           totalGenres++;
         });
       } else {
-        // Handle edges with no genres
-        genreCounts["other"] = (genreCounts["other"] || 0) + 1;
+        // No genres array => lump into "teadmata žanr"
+        const key = "teadmata žanr";
+        genreCounts[key] = (genreCounts[key] || 0) + 1;
         totalGenres++;
       }
     });
-
-    // Sort genres by count descending
-    const sortedGenres = Object.entries(genreCounts).sort(
-      (a, b) => b[1] - a[1]
-    );
-
-    // Generate HTML for checkboxes
-    let htmlString = "";
+  
+    // Sort genres by descending frequency
+    const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+  
+    // Lump anything below 0.15% into "muu"
+    const threshold = 0.15; // 0.2%
+    let leftoverCount = 0;
+    const finalGenres: [string, number][] = [];
+  
     sortedGenres.forEach(([genre, count]) => {
-      const genrePercentage =
-        totalGenres > 0 ? (count / totalGenres) * 100 : 0;
-      const genreLabel = genre; // You can map to display names if needed
-
+      const percentage = (count / totalGenres) * 100;
+      if (percentage < threshold) {
+        leftoverCount += count;
+      } else {
+        finalGenres.push([genre, count]);
+      }
+    });
+  
+    // Add a single "muu" if leftoverCount > 0
+    if (leftoverCount > 0) {
+      finalGenres.push(["muu", leftoverCount]);
+    }
+  
+    // Build the HTML for each final genre
+    let htmlString = "";
+    finalGenres.forEach(([genre, count]) => {
+      const percent = (count / totalGenres) * 100;
+      // Display the raw genre text for now (or a default language)
+      // You can store it in data attributes for dynamic on-the-fly translations
       htmlString += `
         <label>
           <input type="checkbox" value="${genre}" checked />
-          <span class="item-name">${genreLabel}</span>
-          <span class="percentage">${genrePercentage.toFixed(2)}%</span>
+          <span class="item-name">${genre}</span>
+          <span class="percentage">${percent.toFixed(2)}%</span>
         </label>
       `;
     });
-
+  
     // Insert into container
     genreCheckboxesContainer.innerHTML = htmlString;
-
-    // Select checkboxes and initialize state
-    const genreCheckboxes =
-      genreCheckboxesContainer.querySelectorAll<HTMLInputElement>(
-        'input[type="checkbox"]'
-      );
+  
+    // Attach to state and set up event listeners
+    const genreCheckboxes = genreCheckboxesContainer.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"]'
+    );
     state.genreCheckboxes = genreCheckboxes;
-
+  
     genreCheckboxes.forEach((checkbox) => {
       if (checkbox.checked) {
         state.selectedGenres.add(checkbox.value);
       }
-      // Attach event listener
       checkbox.addEventListener("change", handleGenreCheckboxChange);
+    });
+  }  
+
+  function updateGenreCheckboxLabels() {
+    // Only run if the checkboxes are present
+    if (!state.genreCheckboxes) return;
+  
+    // Decide which dictionary to use
+    const useEnglish = (currentLanguage === "eng");
+  
+    // Loop through existing checkboxes
+    state.genreCheckboxes.forEach((cb) => {
+      // The "value" is something like "luule", "muu", or "other"
+      const genreCode = cb.value;
+      // The Estonian label is stored in data-est-label (the original text from generation)
+      const estLabel = cb.getAttribute("data-est-label") || genreCode;
+  
+      // Find the text span
+      const labelSpan = cb.parentElement?.querySelector(".item-name") as HTMLElement;
+      if (!labelSpan) return;
+  
+      if (useEnglish) {
+        // If we have an English translation, use it
+        if (genreLabelsEng[genreCode]) {
+          labelSpan.textContent = genreLabelsEng[genreCode];
+        } else {
+          // fallback: italicize the Estonian label
+          labelSpan.innerHTML = `<i>${estLabel}</i>`;
+        }
+      } else {
+        // Switch back to Estonian label
+        labelSpan.textContent = estLabel;
+      }
     });
   }
 
