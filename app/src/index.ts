@@ -109,11 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </p>
         <p>
           <i>
-            Krister Kruusmaa,
-            <a href="https://digilab.rara.ee/">
-              RaRa digilabor
-            </a>
-            2024
+            Krister Kruusmaa, <a href="https://digilab.rara.ee/">RaRa digilabor</a> 2024
           </i>
         </p>
         <p>
@@ -157,10 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p>
           <i>
             Krister Kruusmaa,
-            <a href="https://digilab.rara.ee/">
-              RaRa Digilab
-            </a>
-            2024
+            <a href="https://digilab.rara.ee/en">RaRa Digilab</a> 2024
           </i>
         </p>
         <p>
