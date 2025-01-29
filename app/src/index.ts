@@ -1126,7 +1126,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   searchInput.addEventListener("blur", () => {
-    setSearchQuery("");
+    // Instead of clearing the entire query & deselecting the node, 
+    // just hide suggestions (or set state.suggestions = undefined).
+    state.suggestions = undefined;
+    renderer.refresh();
+  });
+
+  searchInput.addEventListener("focus", () => {
+    // Automatically select all text, so one keystroke replaces it
+    searchInput.select();
   });
 
   // Bind graph interactions
@@ -1148,6 +1156,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   renderer.on("clickStage", () => {
+    searchInput.value = "";          // Clear the search field
+    state.searchQuery = "";          // Clear internal state
     state.selectedNode = undefined;
     state.selectedNeighbors = undefined;
     setHoveredNode(undefined);
