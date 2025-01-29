@@ -39,7 +39,7 @@
       position: absolute;
       top: 10px;
       left: 10px;
-      width: 340px;
+      width: 350px;
       padding: 10px;
       box-sizing: border-box;
       /* No need to set a fixed width */
@@ -91,6 +91,7 @@
 
     /* Styles for each small panel */
     .small-panel {
+      display: block;
       font-size: small;
       padding: 12px;
       background-color: rgba(255, 255, 255, 0.8);
@@ -191,21 +192,22 @@
       margin-top: 3px;
     }
 
-    /* Mobile-specific styles */
+    /* For screens up to 768px: hide by default, show only if .is-visible is present */
     @media screen and (max-width: 768px) {
-
-      .menu-button {
-        display: block;
-      }
 
       .small-panel {
         display: none;
-        /* Hide by default on small screens */
       }
 
       .small-panel.is-visible {
         display: block;
-        /* Or 'flex', depending on your layout */
+      }
+    }
+
+    /* For screens above 768px: hide them IF toggled (i.e. .is-visible) */
+    @media screen and (min-width: 769px) {
+      .small-panel.is-visible {
+        display: none;
       }
     }
   </style>
@@ -221,12 +223,19 @@
         <h2>
           Eesti tõlkekirjanduse võrgustik
         </h2>
-        <div class="description-toggle" id="description-toggle">
-          <i>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="description-toggle" id="description-toggle">
             <u>
               näita kirjeldust
             </u>
-          </i>
+          </div>
+          <!-- Language toggle dropdown to the right -->
+          <div>
+            <select id="language-select">
+              <option value="est">EST</option>
+              <option value="eng">ENG</option>
+            </select>
+          </div>
         </div>
       </div>
       <div id="description-content" style="display: none;">
@@ -240,8 +249,7 @@
         <p>
           Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste
           sõlmedega. Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud
-          keeli või
-          kitsamat ajavahemikku.
+          keeli, žanre või kitsamat ajavahemikku.
         </p>
         <p>
           Rakendus põhineb
@@ -255,11 +263,7 @@
         </p>
         <p>
           <i>
-            Krister Kruusmaa,
-            <a href="https://digilab.rara.ee/">
-              RaRa digilabor
-            </a>
-            2024
+            Krister Kruusmaa, <a href="https://digilab.rara.ee/">RaRa digilabor</a> 2024
           </i>
         </p>
         <p>

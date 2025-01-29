@@ -5792,6 +5792,35 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
     const container = document.getElementById("sigma-container");
     const searchInput = document.getElementById("search-input");
     const searchSuggestions = document.getElementById("suggestions");
+    // Hamburger menu toggle
+    const menuButton = document.querySelector(".menu-button");
+    menuButton === null || menuButton === void 0 ? void 0 : menuButton.addEventListener("click", () => {
+        const panels = document.querySelectorAll(".small-panel");
+        panels.forEach(panel => {
+            panel.classList.toggle("is-visible");
+        });
+    });
+    // "näita kirjeldust" toggle
+    const descriptionToggle = document.getElementById("description-toggle");
+    const descriptionContent = document.getElementById("description-content");
+    descriptionToggle === null || descriptionToggle === void 0 ? void 0 : descriptionToggle.addEventListener("click", function () {
+        if (!descriptionContent)
+            return;
+        // Toggle the descriptionContent's visibility
+        if (descriptionContent.style.display === "none") {
+            descriptionContent.style.display = "block";
+        }
+        else {
+            descriptionContent.style.display = "none";
+        }
+        // Now set the correct text, but use currentLanguage plus hidden vs shown:
+        if (descriptionContent.style.display === "none") {
+            descriptionToggle.innerHTML = `<u>${translations[currentLanguage].showDescription}</u>`;
+        }
+        else {
+            descriptionToggle.innerHTML = `<u>${translations[currentLanguage].hideDescription}</u>`;
+        }
+    });
     // Language and Genre checkboxes containers
     const languageCheckboxesContainer = document.getElementById("checkboxes");
     const genreCheckboxesContainer = document.getElementById("genre-checkboxes");
@@ -5800,6 +5829,102 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
     const maxYearInput = document.getElementById("max-year");
     const timerangeButton = document.getElementById("timerange-button");
     const timerangeResetButton = document.getElementById("timerange-reset-button");
+    // "Select All" and "Deselect All" buttons
+    const selectAllButton = document.getElementById("select-all");
+    const deselectAllButton = document.getElementById("deselect-all");
+    let currentLanguage = "est";
+    const languageSelect = document.getElementById("language-select");
+    // 1. Create a dictionary of UI strings in both languages
+    const translations = {
+        est: {
+            showDescription: "näita kirjeldust",
+            hideDescription: "peida kirjeldus",
+            headingTitle: "Eesti tõlkekirjanduse võrgustik",
+            periodLabel: "Periood:",
+            timerangeApply: "vali",
+            timerangeReset: "lähtesta",
+            searchHeading: "Otsi isikut",
+            searchPlaceholder: "Sisesta nimi...",
+            filterHeading: "Filtreeri",
+            tabLanguage: "Keele järgi",
+            tabGenre: "Žanri järgi",
+            selectAllLangs: "vali kõik",
+            clearAllLangs: "tühjenda kõik",
+            descriptionContent: `
+      <p>
+          See rakendus visualiseerib võrgustiku kujul eesti tõlkekirjandust 19. sajandi algusest tänapäevani.
+          Võrgustik koosneb 9807 võõrkeelsest autorist ja 4027 tõlkijast, kes nende ilukirjanduslikku loomingut on eestindanud.
+          Tõlkijaid ja autoreid ühendavad kaared kujutavad tõlgitud teoseid, värvid sümboliseerivad erinevaid keeli.
+        </p>
+        <p>
+          Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste sõlmedega.
+          Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud
+          keeli, žanre või kitsamat ajavahemikku.
+        </p>
+        <p>
+          Rakendus põhineb
+          <a href="https://doi.org/10.5281/zenodo.14708287">
+            Eesti Rahvusbibliograafia
+          </a>
+          andmetel, lähtekood on leitav
+          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
+            GitHubis
+          </a>
+        </p>
+        <p>
+          <i>
+            Krister Kruusmaa, <a href="https://digilab.rara.ee/">RaRa digilabor</a> 2024
+          </i>
+        </p>
+        <p>
+        </p>
+      `
+        },
+        eng: {
+            showDescription: "show description",
+            hideDescription: "hide description",
+            headingTitle: "Network of Translated<br> Estonian Literature",
+            periodLabel: "Time range:",
+            timerangeApply: "apply",
+            timerangeReset: "reset",
+            searchHeading: "Search",
+            searchPlaceholder: "Enter a name...",
+            filterHeading: "Filter",
+            tabLanguage: "Languages",
+            tabGenre: "Genres",
+            selectAllLangs: "select all",
+            clearAllLangs: "clear all",
+            descriptionContent: `
+      <p>
+        This application visualizes Estonian translated literature in the form of a network, spanning from the early 19th century to the present day.
+        The network consists of 9,807 foreign authors and 4,027 translators who have translated their literary works into Estonian.
+        The connections between translators and authors represent translated works, while the colors symbolize different languages.
+      </p>
+      <p>
+        To explore the network, you can zoom in and out. Clicking on a node reveals its connections to other nodes.
+        You can search for a specific author or translator, and it's also possible to filter by desired languages and genres, or narrow the time range.
+      </p>
+        <p>
+          The app is based on data from
+          <a href="https://doi.org/10.5281/zenodo.14708287">
+            The Estonian National Bibliography
+          </a>
+          source code can be found on
+          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
+            GitHub
+          </a>
+        </p>
+        <p>
+          <i>
+            Krister Kruusmaa,
+            <a href="https://digilab.rara.ee/en">RaRa Digilab</a> 2024
+          </i>
+        </p>
+        <p>
+        </p>
+      `
+        },
+    };
     // Initialize minYear and maxYear from inputs
     const initialMinYear = parseInt(minYearInput.value) || 1800;
     const initialMaxYear = parseInt(maxYearInput.value) || 2024;
@@ -5874,7 +5999,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         "other": "rgb(150, 150, 150)",
     };
     // Language codes mapping to display names
-    const languageCodes = {
+    const languageCodesEst = {
         "eng": "inglise",
         "rus": "vene",
         "ger": "saksa",
@@ -5935,6 +6060,192 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         "krl": "karjala",
         "other": "muu/puuduv",
     };
+    const languageCodesEng = {
+        "eng": "English",
+        "rus": "Russian",
+        "ger": "German",
+        "fre": "French",
+        "fin": "Finnish",
+        "swe": "Swedish",
+        "spa": "Spanish",
+        "ita": "Italian",
+        "pol": "Polish",
+        "lav": "Latvian",
+        "nor": "Norwegian",
+        "hun": "Hungarian",
+        "dan": "Danish",
+        "cze": "Czech",
+        "lit": "Lithuanian",
+        "dut": "Dutch",
+        "jpn": "Japanese",
+        "rum": "Romanian",
+        "ukr": "Ukrainian",
+        "gre": "Greek",
+        "ice": "Icelandic",
+        "heb": "Hebrew",
+        "por": "Portuguese",
+        "bul": "Bulgarian",
+        "bel": "Belarusian",
+        "lat": "Latin",
+        "geo": "Georgian",
+        "slo": "Slovak",
+        "udm": "Udmurt",
+        "tur": "Turkish",
+        "arm": "Armenian",
+        "chi": "Chinese",
+        "ara": "Arabic",
+        "cat": "Catalan",
+        "slv": "Slovenian",
+        "kom": "Komi",
+        "hin": "Hindi",
+        "yid": "Yiddish",
+        "san": "Sanskrit",
+        "grc": "Ancient Greek",
+        "per": "Persian",
+        "srp": "Serbian",
+        "fiu": "Finno-Ugric (other)",
+        "chm": "Mari",
+        "kor": "Korean",
+        "epo": "Esperanto",
+        "hrv": "Croatian",
+        "aze": "Azerbaijani",
+        "mac": "Macedonian",
+        "tgk": "Tajik",
+        "smi": "Sami",
+        "pro": "Provençal",
+        "uzb": "Uzbek",
+        "peo": "Old Persian",
+        "kaz": "Kazakh",
+        "oss": "Ossetian",
+        "tat": "Tatar",
+        "krl": "Karelian",
+        "other": "Other / Missing",
+    };
+    // English mapping object for known genres.
+    // Everything else falls back to the original Estonian label (italicized).
+    const genreLabelsEng = {
+        "romaanid": "Novels",
+        "lastekirjandus": "Children's Literature",
+        "jutustused": "Narratives",
+        "armastusromaanid": "Romance Novels",
+        "põnevusromaanid": "Thriller Novels",
+        "kriminaalromaanid": "Crime Novels",
+        "jutud": "Stories",
+        "noorsookirjandus": "Young Adult Literature",
+        "luuletused": "Poems",
+        "ajaloolised romaanid": "Historical Novels",
+        "näidendid": "Plays",
+        "novellid": "Short Stories",
+        "pildiraamatud": "Picture Books",
+        "muinasjutud": "Fairy Tales",
+        "fantaasiaromaanid": "Fantasy Novels",
+        "ulmeromaanid": "Science Fiction Novels",
+        "biograafilised romaanid": "Biographical Novels",
+        "komöödiad": "Comedies",
+        "mugandused": "Adaptations",
+        "rööptekstid": "Parallel Texts",
+        "loomajutud": "Animal Stories",
+        "mälestused": "Memoirs",
+        "suurtähtraamatud": "Large Print Books",
+        "psühholoogilised romaanid": "Psychological Novels",
+        "seiklusromaanid": "Adventure Novels",
+        "sõjaromaanid": "War Novels",
+        "lühiromaanid": "Short Novels",
+        "perekonnaromaanid": "Family Novels",
+        "huumor": "Humor",
+        "dokumentaalkirjandus": "Documentary Literature",
+        "vigurraamatud": "Trick Books",
+        "biograafiad": "Biographies",
+        "poeemid": "Poems (Epics)",
+        "õudusromaanid": "Horror Novels",
+        "ulmejutud": "Science Fiction Stories",
+        "autobiograafilised romaanid": "Autobiographical Novels",
+        "vaimulik ilukirjandus": "Religious Fiction",
+        "esseed": "Essays",
+        "autobiograafiad": "Autobiographies",
+        "satiirilised romaanid": "Satirical Novels",
+        "spiooniromaanid": "Spy Novels",
+        "reisikirjad": "Travel Writings",
+        "antoloogiad": "Anthologies",
+        "õudusjutud": "Horror Stories",
+        "värssjutud": "Verse Stories",
+        "päevikud": "Diaries",
+        "kriminaaljutud": "Crime Stories",
+        "tõlked": "Translations",
+        "päevikromaanid": "Diary Novels",
+        "tragöödiad": "Tragedies",
+        "unejutud": "Bedtime Stories",
+        "aforismid": "Aphorisms",
+        "värssdraamad": "Verse Dramas",
+        "koomiksid": "Comics",
+        "olukirjeldused": "Situational Descriptions",
+        "legendid": "Legends",
+        "tsitaadid": "Quotations",
+        "kommentaarid": "Commentaries",
+        "kogutud teosed": "Collected Works",
+        "graafilised romaanid": "Graphic Novels",
+        "poliitilised romaanid": "Political Novels",
+        "toiduretseptid": "Recipes",
+        "mereromaanid": "Maritime Novels",
+        "haikud": "Haikus",
+        "koolijutud": "School Stories",
+        "düstoopiad": "Dystopias",
+        "valmid": "Fables",
+        "satiir": "Satire",
+        "aimekirjandus": "Popular Science Literature",
+        "miniatuurid": "Miniatures",
+        "lood": "Tales",
+        "libretod": "Librettos",
+        "lühinäidendid": "Short Plays",
+        "kiriromaanid": "Epistolary Novels",
+        "katkendid": "Excerpts",
+        "loomamuinasjutud": "Animal Fairy Tales",
+        "illustratsioonid": "Illustrations",
+        "proosaluuletused": "Prose Poems",
+        "filmistsenaariumid": "Screenplays",
+        "autobiograafilised jutustused": "Autobiographical Narratives",
+        "följetonid": "Feuilletons",
+        "kirjad": "Letters",
+        "armastusluule": "Love Poetry",
+        "eeposed": "Epics",
+        "paroodiad": "Parodies",
+        "ballaadid": "Ballads",
+        "nõuanded": "Advice",
+        "haiglaromaanid": "Hospital Novels",
+        "pusled": "Puzzles",
+        "autograafid": "Autographs",
+        "nuputamisülesanded": "Brain Teasers",
+        "müüdid": "Myths",
+        "ajaloolised näidendid": "Historical Plays",
+        "humoreskid": "Humorous Sketches",
+        "anekdoodid": "Anecdotes",
+        "lastenäidendid": "Children's Plays",
+        "valitud teosed": "Selected Works",
+        "üliõpilastööd": "Student Papers",
+        "arenguromaanid": "Bildungsromans (Coming-of-Age Novels)",
+        "muistendid": "Folktales",
+        "käsiraamatud": "Handbooks",
+        "kõned": "Speeches",
+        "dialoogid": "Dialogues",
+        "laulumängud": "Singing Games",
+        "loodusjutud": "Nature Stories",
+        "laastud": "Sketches",
+        "laulutekstid": "Song Lyrics",
+        "diplomitööd": "Theses",
+        "värvimisraamatud": "Coloring Books",
+        "rüütliromaanid": "Chivalric Novels",
+        "õppematerjalid": "Study Materials",
+        "publitsistika": "Journalistic Literature",
+        "fantaasiakirjandus": "Fantasy Literature",
+        "harduskirjandus": "Devotional Literature",
+        "sketšid": "Sketches",
+        "mõtisklused": "Reflections",
+        "intervjuud": "Interviews",
+        "operetid": "Operettas",
+        "mõistujutud": "Allegories",
+        "muu": "Other",
+        "teadmata žanr": "Unknown Genre",
+    };
     // Function to load graph data and initialize UI components
     function loadGraphDataAndInitialize() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -5956,6 +6267,99 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             }
         });
     }
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        // Update the title
+        const mainTitle = document.querySelector("#title-container h2");
+        if (mainTitle) {
+            mainTitle.innerHTML = translations[lang].headingTitle;
+        }
+        // Update the description toggle text based on visibility
+        if (descriptionToggle && descriptionContent) {
+            if (descriptionContent.style.display === "none") {
+                descriptionToggle.innerHTML = `<u>${translations[lang].showDescription}</u>`;
+            }
+            else {
+                descriptionToggle.innerHTML = `<u>${translations[lang].hideDescription}</u>`;
+            }
+        }
+        // Update the description contents
+        if (descriptionContent) {
+            descriptionContent.innerHTML = translations[lang].descriptionContent;
+        }
+        // Update the period label
+        const sliderContainer = document.getElementById("slider-container");
+        if (sliderContainer) {
+            const labelSpan = sliderContainer.querySelector("span");
+            if (labelSpan) {
+                labelSpan.textContent = translations[lang].periodLabel;
+            }
+        }
+        // Update the timerange buttons
+        if (timerangeButton) {
+            timerangeButton.textContent = translations[lang].timerangeApply;
+        }
+        if (timerangeResetButton) {
+            timerangeResetButton.textContent = translations[lang].timerangeReset;
+        }
+        // Update the search panel heading
+        const searchHeading = document.querySelector("#search-box h3");
+        if (searchHeading) {
+            searchHeading.textContent = translations[lang].searchHeading;
+        }
+        // Update the search input placeholder
+        if (searchInput) {
+            searchInput.placeholder = translations[lang].searchPlaceholder;
+        }
+        // Update the filter panel heading
+        const filterHeading = document.querySelector("#filter-panel h3");
+        if (filterHeading) {
+            filterHeading.textContent = translations[lang].filterHeading;
+        }
+        // Update tab labels (language and genre)
+        const langTabButton = document.querySelector('.tablinks[data-tab="language-tab"]');
+        if (langTabButton) {
+            langTabButton.textContent = translations[lang].tabLanguage;
+        }
+        const genreTabButton = document.querySelector('.tablinks[data-tab="genre-tab"]');
+        if (genreTabButton) {
+            genreTabButton.textContent = translations[lang].tabGenre;
+        }
+        // Update "Select All" / "Clear All" buttons for languages
+        if (selectAllButton) {
+            selectAllButton.textContent = translations[lang].selectAllLangs;
+        }
+        if (deselectAllButton) {
+            deselectAllButton.textContent = translations[lang].clearAllLangs;
+        }
+        // Update "Select All" / "Clear All" buttons for genres
+        const selectAllGenresButton = document.getElementById("select-all-genres");
+        const deselectAllGenresButton = document.getElementById("deselect-all-genres");
+        if (selectAllGenresButton) {
+            selectAllGenresButton.textContent = translations[lang].selectAllLangs;
+        }
+        if (deselectAllGenresButton) {
+            deselectAllGenresButton.textContent = translations[lang].clearAllLangs;
+        }
+        // Update description toggle
+        if (descriptionToggle && descriptionContent) {
+            if (descriptionContent.style.display === "none") {
+                descriptionToggle.innerHTML = `<u>${translations[currentLanguage].showDescription}</u>`;
+            }
+            else {
+                descriptionToggle.innerHTML = `<u>${translations[currentLanguage].hideDescription}</u>`;
+            }
+        }
+        // update the existing language checkbox labels:
+        updateLanguageCheckboxLabels();
+        // update the existing genre checkbox labels:
+        updateGenreCheckboxLabels();
+    }
+    // Attach an event listener
+    languageSelect === null || languageSelect === void 0 ? void 0 : languageSelect.addEventListener("change", () => {
+        const choice = languageSelect.value; // "est" or "eng"
+        setLanguage(choice);
+    });
     // Function to populate search suggestions
     function populateSearchSuggestions() {
         const options = graph.nodes().map((node) => {
@@ -5969,100 +6373,166 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         const languageCounts = {};
         let totalLanguages = 0;
         graph.forEachEdge((edge, attributes) => {
-            const languages = attributes.languages;
-            if (languages && languages.length > 0) {
-                languages.forEach((lang) => {
-                    // Map unmapped languages to 'other'
-                    const mappedLang = languageCodes.hasOwnProperty(lang) ? lang : 'other';
-                    languageCounts[mappedLang] = (languageCounts[mappedLang] || 0) + 1;
+            const langs = attributes.languages;
+            if (langs && langs.length) {
+                langs.forEach((lang) => {
+                    const mapped = languageCodesEst.hasOwnProperty(lang) ? lang : "other";
+                    languageCounts[mapped] = (languageCounts[mapped] || 0) + 1;
                     totalLanguages++;
                 });
             }
             else {
-                // Edges with no languages are considered 'other'
-                languageCounts['other'] = (languageCounts['other'] || 0) + 1;
+                languageCounts["other"] = (languageCounts["other"] || 0) + 1;
                 totalLanguages++;
             }
         });
-        // Sort languages, placing 'other' at the end
+        // Sort languages
         const sortedLanguages = Object.entries(languageCounts).sort((a, b) => {
-            if (a[0] === 'other')
+            if (a[0] === "other")
                 return 1;
-            if (b[0] === 'other')
+            if (b[0] === "other")
                 return -1;
             return b[1] - a[1];
         });
-        // Generate HTML for checkboxes
+        // Build the checkboxes (Estonian labels by default)
         let htmlString = "";
-        sortedLanguages.forEach(([lang, count]) => {
-            const langPercentage = totalLanguages > 0 ? (count / totalLanguages) * 100 : 0;
-            const langName = languageCodes[lang] || "Muu/Puuduv";
-            const color = languageColors[lang] || languageColors["other"];
+        sortedLanguages.forEach(([code, count]) => {
+            const langPercentage = totalLanguages ? (count / totalLanguages) * 100 : 0;
+            const langNameEst = languageCodesEst[code] || languageCodesEst["other"];
+            const color = languageColors[code] || languageColors["other"];
             htmlString += `
         <label>
-          <input type="checkbox" value="${lang}" checked />
-          <span class="item-name" style="color: ${color};">${langName}</span>
+          <input type="checkbox" value="${code}" checked />
+          <span class="item-name" style="color: ${color};">${langNameEst}</span>
           <span class="percentage">${langPercentage.toFixed(2)}%</span>
         </label>
       `;
         });
         // Insert into container
         languageCheckboxesContainer.innerHTML = htmlString;
-        // Select checkboxes and initialize state
+        // Attach to state
         const languageCheckboxes = languageCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
         state.languageCheckboxes = languageCheckboxes;
-        languageCheckboxes.forEach((checkbox) => {
-            if (checkbox.checked) {
-                state.selectedLanguages.add(checkbox.value);
-            }
-            // Attach event listener
-            checkbox.addEventListener("change", handleLanguageCheckboxChange);
+        // Initialize the selectedLanguages set
+        languageCheckboxes.forEach((cb) => {
+            if (cb.checked)
+                state.selectedLanguages.add(cb.value);
+            cb.addEventListener("change", handleLanguageCheckboxChange);
         });
     }
-    // Generate Genre Checkboxes
+    function updateLanguageCheckboxLabels() {
+        const currentLangMap = currentLanguage === "eng" ? languageCodesEng : languageCodesEst;
+        // Go through all existing checkboxes
+        const checkboxes = languageCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach((cb) => {
+            var _a;
+            // The language code (like "eng", "rus", etc.) is in cb.value
+            const code = cb.value;
+            // The next sibling .item-name is the text span
+            const labelSpan = (_a = cb.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector(".item-name");
+            if (labelSpan) {
+                labelSpan.textContent = currentLangMap[code] || currentLangMap["other"];
+            }
+        });
+    }
     function generateGenreCheckboxes() {
         const genreCounts = {};
         let totalGenres = 0;
         graph.forEachEdge((edge, attributes) => {
             const genres = attributes.genres;
-            if (genres && genres.length > 0) {
-                genres.forEach((genre) => {
-                    genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+            if (genres && genres.length) {
+                genres.forEach((g) => {
+                    // If null/undefined/empty or "null", rename to "teadmata žanr"
+                    if (!g || g.toLowerCase() === "null") {
+                        g = "teadmata žanr";
+                    }
+                    genreCounts[g] = (genreCounts[g] || 0) + 1;
                     totalGenres++;
                 });
             }
             else {
-                // Handle edges with no genres
-                genreCounts["other"] = (genreCounts["other"] || 0) + 1;
+                // No genres array => lump into "teadmata žanr"
+                const key = "teadmata žanr";
+                genreCounts[key] = (genreCounts[key] || 0) + 1;
                 totalGenres++;
             }
         });
-        // Sort genres by count descending
+        // Sort genres by descending frequency
         const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
-        // Generate HTML for checkboxes
-        let htmlString = "";
+        // Lump anything below 0.15% into "muu"
+        const threshold = 0.15; // 0.2%
+        let leftoverCount = 0;
+        const finalGenres = [];
         sortedGenres.forEach(([genre, count]) => {
-            const genrePercentage = totalGenres > 0 ? (count / totalGenres) * 100 : 0;
-            const genreLabel = genre; // You can map to display names if needed
+            const percentage = (count / totalGenres) * 100;
+            if (percentage < threshold) {
+                leftoverCount += count;
+            }
+            else {
+                finalGenres.push([genre, count]);
+            }
+        });
+        // Add a single "muu" if leftoverCount > 0
+        if (leftoverCount > 0) {
+            finalGenres.push(["muu", leftoverCount]);
+        }
+        // Build the HTML for each final genre
+        let htmlString = "";
+        finalGenres.forEach(([genre, count]) => {
+            const percent = (count / totalGenres) * 100;
+            // Display the raw genre text for now (or a default language)
+            // You can store it in data attributes for dynamic on-the-fly translations
             htmlString += `
         <label>
           <input type="checkbox" value="${genre}" checked />
-          <span class="item-name">${genreLabel}</span>
-          <span class="percentage">${genrePercentage.toFixed(2)}%</span>
+          <span class="item-name">${genre}</span>
+          <span class="percentage">${percent.toFixed(2)}%</span>
         </label>
       `;
         });
         // Insert into container
         genreCheckboxesContainer.innerHTML = htmlString;
-        // Select checkboxes and initialize state
+        // Attach to state and set up event listeners
         const genreCheckboxes = genreCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
         state.genreCheckboxes = genreCheckboxes;
         genreCheckboxes.forEach((checkbox) => {
             if (checkbox.checked) {
                 state.selectedGenres.add(checkbox.value);
             }
-            // Attach event listener
             checkbox.addEventListener("change", handleGenreCheckboxChange);
+        });
+    }
+    function updateGenreCheckboxLabels() {
+        // Only run if the checkboxes are present
+        if (!state.genreCheckboxes)
+            return;
+        // Decide which dictionary to use
+        const useEnglish = (currentLanguage === "eng");
+        // Loop through existing checkboxes
+        state.genreCheckboxes.forEach((cb) => {
+            var _a;
+            // The "value" is something like "luule", "muu", or "other"
+            const genreCode = cb.value;
+            // The Estonian label is stored in data-est-label (the original text from generation)
+            const estLabel = cb.getAttribute("data-est-label") || genreCode;
+            // Find the text span
+            const labelSpan = (_a = cb.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector(".item-name");
+            if (!labelSpan)
+                return;
+            if (useEnglish) {
+                // If we have an English translation, use it
+                if (genreLabelsEng[genreCode]) {
+                    labelSpan.textContent = genreLabelsEng[genreCode];
+                }
+                else {
+                    // fallback: italicize the Estonian label
+                    labelSpan.innerHTML = `<i>${estLabel}</i>`;
+                }
+            }
+            else {
+                // Switch back to Estonian label
+                labelSpan.textContent = estLabel;
+            }
         });
     }
     // Handle Language Checkbox Changes
@@ -6307,7 +6777,14 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         setSearchQuery(searchInput.value.trim());
     });
     searchInput.addEventListener("blur", () => {
-        setSearchQuery("");
+        // Instead of clearing the entire query & deselecting the node, 
+        // just hide suggestions (or set state.suggestions = undefined).
+        state.suggestions = undefined;
+        renderer.refresh();
+    });
+    searchInput.addEventListener("focus", () => {
+        // Automatically select all text, so one keystroke replaces it
+        searchInput.select();
     });
     // Bind graph interactions
     renderer.on("enterNode", ({ node }) => {
@@ -6325,10 +6802,21 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         renderer.refresh();
     });
     renderer.on("clickStage", () => {
+        searchInput.value = ""; // Clear the search field
+        state.searchQuery = ""; // Clear internal state
         state.selectedNode = undefined;
         state.selectedNeighbors = undefined;
         setHoveredNode(undefined);
         renderer.refresh();
+    });
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            searchInput.value = "";
+            state.searchQuery = "";
+            state.selectedNode = undefined;
+            state.selectedNeighbors = undefined;
+            renderer.refresh();
+        }
     });
     // Function to check if a node has any visible edges based on current state
     function nodeHasVisibleEdges(node) {
@@ -6482,12 +6970,6 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
     });
     // Load graph data and initialize UI
     yield loadGraphDataAndInitialize();
-    /**
-     * Additional Considerations:
-     * - Ensure that each node has a 'size' attribute in your graph data.
-     * - Adjust 'labelRenderedSizeThreshold' and 'labelThreshold' as needed.
-     * - Customize color mappings and language codes as per your requirements.
-     */
 }));
 
 
