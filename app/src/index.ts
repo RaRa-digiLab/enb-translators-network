@@ -95,28 +95,21 @@ document.addEventListener("DOMContentLoaded", async () => {
           Võrgustik koosneb 9807 võõrkeelsest autorist ja 4027 tõlkijast, kes nende ilukirjanduslikku loomingut on eestindanud.
           Tõlkijaid ja autoreid ühendavad kaared kujutavad tõlgitud teoseid, värvid sümboliseerivad erinevaid keeli.
         </p>
+        <p>Võrgustiku avastamiseks:</p>
+        <ul>
+          <li>Kliki ja lohista liikumiseks</li>
+          <li>Keri hiirega suumimiseks</li>
+          <li>Kliki isikul, et esile tuua tema seosed</li>
+          <li>Mitme isiku valimiseks hoia all Ctrl ja kliki</li>
+          <li>Kasuta otsingut konkreetse isiku leidmiseks</li>
+          <li>Filtreeri ajavahemiku, keele ja žanri järgi</li>
+        </ul>
         <p>
-          Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste sõlmedega.
-          Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud
-          keeli, žanre või kitsamat ajavahemikku.
+          Rakendus põhineb <a href="https://doi.org/10.5281/zenodo.14708287">Eesti Rahvusbibliograafia</a><br>andmetel,
+          lähtekood on leitav <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">GitHubis</a>.
         </p>
-        <p>
-          Rakendus põhineb
-          <a href="https://doi.org/10.5281/zenodo.14708287">
-            Eesti Rahvusbibliograafia
-          </a>
-          andmetel, lähtekood on leitav
-          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
-            GitHubis
-          </a>
-        </p>
-        <p>
-          <i>
-            Krister Kruusmaa, <a href="https://digilab.rara.ee/">RaRa digilabor</a> 2024
-          </i>
-        </p>
-        <p>
-        </p>
+        <p><i>Krister Kruusmaa, <a href="https://digilab.rara.ee/">RaRa digilabor</a> 2024</i></p>
+        <p></p>
       `
     },
     eng: {
@@ -139,28 +132,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         The network consists of 9,807 foreign authors and 4,027 translators who have translated their literary works into Estonian.
         The connections between translators and authors represent translated works, while the colors symbolize different languages.
       </p>
-      <p>
-        To explore the network, you can zoom in and out. Clicking on a node reveals its connections to other nodes.
-        You can search for a specific author or translator, and it's also possible to filter by desired languages and genres, or narrow the time range.
+      <p>Explore the network:</p>
+      <ul>
+        <li>Click and drag to move</li>
+        <li>Scroll to zoom</li>
+        <li>Click on a person to highlight connections</li>
+        <li>Hold Ctrl and click to select multiple people</li>
+        <li>Use search to find a specific person</li>
+        <li>Filter by time period, language, and genre</li>
+      </ul>
+      <p>The app is based on data from<a href="https://doi.org/10.5281/zenodo.14708287">The Estonian National Bibliography</a>,
+        source code can be found on <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">GitHub</a>.
       </p>
-        <p>
-          The app is based on data from
-          <a href="https://doi.org/10.5281/zenodo.14708287">
-            The Estonian National Bibliography
-          </a>
-          source code can be found on
-          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
-            GitHub
-          </a>
-        </p>
-        <p>
-          <i>
-            Krister Kruusmaa,
-            <a href="https://digilab.rara.ee/en">RaRa Digilab</a> 2024
-          </i>
-        </p>
-        <p>
-        </p>
+      <p><i>Krister Kruusmaa, <a href="https://digilab.rara.ee/en">RaRa Digilab</a> 2024</i></p>
+      <p></p>
       `
     },
   };
