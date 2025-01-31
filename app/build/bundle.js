@@ -5856,28 +5856,21 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
           Võrgustik koosneb 9807 võõrkeelsest autorist ja 4027 tõlkijast, kes nende ilukirjanduslikku loomingut on eestindanud.
           Tõlkijaid ja autoreid ühendavad kaared kujutavad tõlgitud teoseid, värvid sümboliseerivad erinevaid keeli.
         </p>
+        <p>Võrgustiku avastamiseks:</p>
+        <ul>
+          <li>Kliki ja lohista liikumiseks</li>
+          <li>Keri hiirega suumimiseks</li>
+          <li>Kliki isikul, et esile tuua tema seosed</li>
+          <li>Mitme isiku valimiseks hoia all Ctrl ja kliki</li>
+          <li>Kasuta otsingut konkreetse isiku leidmiseks</li>
+          <li>Filtreeri ajavahemiku, keele ja žanri järgi</li>
+        </ul>
         <p>
-          Võrgustiku avastamiseks saab suumida sisse ja välja. Sõlmel klikkimine toob esile tema seosed teiste sõlmedega.
-          Otsingu abil saab leida konkreetse autori või tõlkija. Samuti on võimalik vaadelda vaid soovitud
-          keeli, žanre või kitsamat ajavahemikku.
+          Rakendus põhineb <a href="https://doi.org/10.5281/zenodo.14708287">Eesti Rahvusbibliograafia</a><br>andmetel,
+          lähtekood on leitav <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">GitHubis</a>.
         </p>
-        <p>
-          Rakendus põhineb
-          <a href="https://doi.org/10.5281/zenodo.14708287">
-            Eesti Rahvusbibliograafia
-          </a>
-          andmetel, lähtekood on leitav
-          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
-            GitHubis
-          </a>
-        </p>
-        <p>
-          <i>
-            Krister Kruusmaa, <a href="https://digilab.rara.ee/">RaRa digilabor</a> 2024
-          </i>
-        </p>
-        <p>
-        </p>
+        <p><i>Krister Kruusmaa, <a href="https://digilab.rara.ee/">RaRa digilabor</a> 2024</i></p>
+        <p></p>
       `
         },
         eng: {
@@ -5900,28 +5893,20 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         The network consists of 9,807 foreign authors and 4,027 translators who have translated their literary works into Estonian.
         The connections between translators and authors represent translated works, while the colors symbolize different languages.
       </p>
-      <p>
-        To explore the network, you can zoom in and out. Clicking on a node reveals its connections to other nodes.
-        You can search for a specific author or translator, and it's also possible to filter by desired languages and genres, or narrow the time range.
+      <p>Explore the network:</p>
+      <ul>
+        <li>Click and drag to move</li>
+        <li>Scroll to zoom</li>
+        <li>Click on a person to highlight connections</li>
+        <li>Hold Ctrl and click to select multiple people</li>
+        <li>Use search to find a specific person</li>
+        <li>Filter by time period, language, and genre</li>
+      </ul>
+      <p>The app is based on data from<a href="https://doi.org/10.5281/zenodo.14708287">The Estonian National Bibliography</a>,
+        source code can be found on <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">GitHub</a>.
       </p>
-        <p>
-          The app is based on data from
-          <a href="https://doi.org/10.5281/zenodo.14708287">
-            The Estonian National Bibliography
-          </a>
-          source code can be found on
-          <a href="https://github.com/RaRa-digiLab/erb-translators-network/tree/main">
-            GitHub
-          </a>
-        </p>
-        <p>
-          <i>
-            Krister Kruusmaa,
-            <a href="https://digilab.rara.ee/en">RaRa Digilab</a> 2024
-          </i>
-        </p>
-        <p>
-        </p>
+      <p><i>Krister Kruusmaa, <a href="https://digilab.rara.ee/en">RaRa Digilab</a> 2024</i></p>
+      <p></p>
       `
         },
     };
@@ -5935,6 +5920,8 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         selectedGenres: new Set(),
         minYear: initialMinYear,
         maxYear: initialMaxYear,
+        multiSelectedNodes: new Set(),
+        multiSelectedNeighbors: new Set(),
     };
     // Language colors mapping
     const languageColors = {
@@ -6265,6 +6252,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             catch (error) {
                 console.error("Error loading graph data:", error);
             }
+            renderer.refresh();
         });
     }
     function setLanguage(lang) {
@@ -6549,6 +6537,8 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         if (state.selectedNode) {
             state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         }
+        // Recompute selections so out-of-range nodes are dropped
+        recomputeSelections();
         renderer.refresh();
     }
     // Handle Genre Checkbox Changes
@@ -6565,6 +6555,8 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         if (state.selectedNode) {
             state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         }
+        // Recompute selections so out-of-range nodes are dropped
+        recomputeSelections();
         renderer.refresh();
     }
     // Handle "Select All" / "Deselect All" for Languages
@@ -6583,6 +6575,8 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         if (state.selectedNode) {
             state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         }
+        // Recompute selections so out-of-range nodes are dropped
+        recomputeSelections();
         renderer.refresh();
     }
     // Attach event listeners to "Select All" and "Deselect All" for Languages
@@ -6613,6 +6607,8 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         if (state.selectedNode) {
             state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         }
+        // Recompute selections so out-of-range nodes are dropped
+        recomputeSelections();
         renderer.refresh();
     }
     // Attach event listeners to "Select All" and "Deselect All" for Genres
@@ -6661,6 +6657,8 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         if (state.selectedNode) {
             state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         }
+        // Recompute selections so out-of-range nodes are dropped
+        recomputeSelections();
         renderer.refresh();
     });
     // Event listener for the Reset Time Range button
@@ -6674,6 +6672,8 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         if (state.selectedNode) {
             state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
         }
+        // Recompute selections so out-of-range nodes are dropped
+        recomputeSelections();
         renderer.refresh();
     });
     // Function to set search query and handle suggestions
@@ -6772,6 +6772,26 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
         });
         return neighbors;
     }
+    // Function to recompute node/edge selections after applying filters
+    function recomputeSelections() {
+        // 1) If we have a single selected node, recompute its neighbors
+        if (state.selectedNode) {
+            state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+        }
+        // 2) If we have multiple selected nodes, union their neighbors again
+        if (state.multiSelectedNodes && state.multiSelectedNodes.size > 0) {
+            const newSet = new Set();
+            for (const node of state.multiSelectedNodes) {
+                for (const neigh of getVisibleNeighbors(node)) {
+                    newSet.add(neigh);
+                }
+            }
+            state.multiSelectedNeighbors = newSet;
+        }
+        else {
+            state.multiSelectedNeighbors = undefined;
+        }
+    }
     // Bind search input interactions
     searchInput.addEventListener("input", () => {
         setSearchQuery(searchInput.value.trim());
@@ -6788,33 +6808,69 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
     });
     // Bind graph interactions
     renderer.on("enterNode", ({ node }) => {
-        if (!state.selectedNode && !state.selectedNeighbors) {
-            setHoveredNode(node);
-        }
+        // if (!state.selectedNode && !state.selectedNeighbors) {
+        setHoveredNode(node);
+        // }
     });
     renderer.on("leaveNode", () => {
         setHoveredNode(undefined);
     });
-    renderer.on("clickNode", ({ node }) => {
-        state.selectedNode = node;
-        state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
-        setHoveredNode(undefined);
+    renderer.on("clickNode", (e) => {
+        // Check if Ctrl or Meta is pressed
+        const domEvent = e.event.original;
+        const isCtrlClick = domEvent.ctrlKey || domEvent.metaKey;
+        const node = e.node;
+        if (isCtrlClick) {
+            // 1) Toggle the node in state.multiSelectedNodes
+            if (state.multiSelectedNodes.has(node)) {
+                state.multiSelectedNodes.delete(node);
+            }
+            else {
+                state.multiSelectedNodes.add(node);
+            }
+            // 2) Recompute neighbors for multiSelectedNodes
+            //    The simplest approach: union of neighbors for each multi-selected node
+            //    We'll store them in a new property, e.g., multiSelectedNeighbors
+            state.multiSelectedNeighbors = new Set();
+            for (const n of state.multiSelectedNodes) {
+                for (const neighbor of getVisibleNeighbors(n)) {
+                    state.multiSelectedNeighbors.add(neighbor);
+                }
+            }
+            // Do NOT modify state.selectedNode or state.selectedNeighbors
+            // so single-click logic remains intact.
+        }
+        else {
+            // Original single-node logic
+            state.selectedNode = node;
+            state.selectedNeighbors = getVisibleNeighbors(node);
+            setHoveredNode(undefined);
+            // Clear any old multi-selections
+            state.multiSelectedNodes.clear();
+            state.multiSelectedNeighbors = undefined;
+        }
         renderer.refresh();
     });
     renderer.on("clickStage", () => {
+        var _a;
         searchInput.value = ""; // Clear the search field
         state.searchQuery = ""; // Clear internal state
         state.selectedNode = undefined;
         state.selectedNeighbors = undefined;
+        state.multiSelectedNodes.clear();
+        (_a = state.multiSelectedNeighbors) === null || _a === void 0 ? void 0 : _a.clear();
         setHoveredNode(undefined);
         renderer.refresh();
     });
     window.addEventListener("keydown", (e) => {
+        var _a;
         if (e.key === "Escape") {
             searchInput.value = "";
             state.searchQuery = "";
             state.selectedNode = undefined;
             state.selectedNeighbors = undefined;
+            state.multiSelectedNodes.clear();
+            (_a = state.multiSelectedNeighbors) === null || _a === void 0 ? void 0 : _a.clear();
             renderer.refresh();
         }
     });
@@ -6864,20 +6920,20 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
     renderer.setSetting("edgeReducer", (edge, data) => {
         const res = Object.assign({}, data);
         const edgeAttributes = graph.getEdgeAttributes(edge);
-        // Time range filtering based on works
+        // 1. Time range filtering
         const works = edgeAttributes.works;
         const hasWorkInTimeRange = works
-            ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+            ? works.some(([_, year]) => year >= state.minYear && year <= state.maxYear)
             : false;
         if (!hasWorkInTimeRange) {
             res.hidden = true;
             return res;
         }
-        // Genre filtering
+        // 2. Genre filtering
         if (state.selectedGenres.size > 0) {
             const edgeGenres = edgeAttributes.genres;
             const hasSelectedGenre = edgeGenres
-                ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+                ? edgeGenres.some((g) => state.selectedGenres.has(g))
                 : false;
             if (!hasSelectedGenre) {
                 res.hidden = true;
@@ -6889,7 +6945,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             res.hidden = true;
             return res;
         }
-        // Language filtering
+        // 3. Language filtering
         if (state.selectedLanguages.size > 0) {
             const edgeLanguages = edgeAttributes.languages;
             const hasSelectedLanguage = edgeLanguages
@@ -6905,60 +6961,97 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             res.hidden = true;
             return res;
         }
-        // Selection and Search Suggestions
+        // 4. Combine single and multi-selected nodes
+        const selectedSet = new Set();
         if (state.selectedNode) {
-            if (!graph.hasExtremity(edge, state.selectedNode)) {
+            selectedSet.add(state.selectedNode);
+        }
+        if (state.multiSelectedNodes && state.multiSelectedNodes.size > 0) {
+            for (const nd of state.multiSelectedNodes) {
+                selectedSet.add(nd);
+            }
+        }
+        const source = graph.source(edge);
+        const target = graph.target(edge);
+        // 5. If there's at least one selected node...
+        if (selectedSet.size > 0) {
+            // Show edge only if it connects to at least one selected node
+            const connectsToSelection = selectedSet.has(source) || selectedSet.has(target);
+            if (!connectsToSelection) {
                 res.hidden = true;
                 return res;
             }
         }
-        if (state.suggestions) {
-            const source = graph.source(edge);
-            const target = graph.target(edge);
+        // 6. Otherwise, if we have suggestions...
+        else if (state.suggestions) {
+            // Show edge only if both endpoints are in suggestions
             if (!state.suggestions.has(source) || !state.suggestions.has(target)) {
                 res.hidden = true;
                 return res;
             }
         }
-        // Do not hide edges on hover
+        // If none of the above hid the edge, show it
         res.hidden = false;
         return res;
     });
     // Configure Node Reducer
     renderer.setSetting("nodeReducer", (node, data) => {
-        var _a;
         const res = Object.assign({}, data);
-        // Check if node has any visible edges
+        // 1) If this node has no visible edges under current filters,
+        //    hide it right away.
         if (!nodeHasVisibleEdges(node)) {
             res.label = "";
             res.color = "#f6f6f6";
             return res;
         }
-        // Hovered Node
+        // 2) Handle "hoveredNode" (unchanged logic).
         if (state.hoveredNode === node) {
             res.label = graph.getNodeAttribute(node, "label");
             res.color = data.color;
             return res;
         }
-        // Selected Node
+        // 3) Combine single- and multi-selected sets
+        const selectedSet = new Set();
         if (state.selectedNode) {
-            if (state.selectedNode === node) {
+            selectedSet.add(state.selectedNode);
+        }
+        if (state.multiSelectedNodes && state.multiSelectedNodes.size > 0) {
+            for (const m of state.multiSelectedNodes) {
+                selectedSet.add(m);
+            }
+        }
+        // 4) Also combine their neighbors
+        const neighborSet = new Set();
+        if (state.selectedNeighbors) {
+            for (const n of state.selectedNeighbors) {
+                neighborSet.add(n);
+            }
+        }
+        if (state.multiSelectedNeighbors) {
+            for (const n of state.multiSelectedNeighbors) {
+                neighborSet.add(n);
+            }
+        }
+        // 5) If any nodes are selected:
+        if (selectedSet.size > 0) {
+            if (selectedSet.has(node)) {
+                // Highlight the selected node
                 res.highlighted = true;
                 res.label = graph.getNodeAttribute(node, "label");
             }
-            else if ((_a = state.selectedNeighbors) === null || _a === void 0 ? void 0 : _a.has(node)) {
-                // Neighbor of selected node
+            else if (neighborSet.has(node)) {
+                // A neighbor of one or more selected nodes
                 res.label = graph.getNodeAttribute(node, "label");
                 res.color = data.color;
             }
             else {
-                // Non-neighbor nodes when a node is selected
+                // Not selected, nor a neighbor of selected
                 res.label = "";
                 res.color = "#f6f6f6";
             }
             return res;
         }
-        // Search Suggestions
+        // 6) If there are search suggestions, apply that
         if (state.suggestions) {
             if (!state.suggestions.has(node)) {
                 res.label = "";
@@ -6966,6 +7059,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
                 return res;
             }
         }
+        // If no filters are excluding it, return as-is
         return res;
     });
     // Load graph data and initialize UI
