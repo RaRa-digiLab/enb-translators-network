@@ -171,6 +171,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     searchQuery: string;
     selectedNode?: string;
     selectedNeighbors?: Set<string>;
+    multiSelectedNodes: Set<string>;
+    multiSelectedNeighbors?: Set<string>;
     suggestions?: Set<string>;
     selectedLanguages: Set<string>;
     selectedGenres: Set<string>;
@@ -191,6 +193,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedGenres: new Set<string>(),
     minYear: initialMinYear,
     maxYear: initialMaxYear,
+    multiSelectedNodes: new Set<string>(),
+    multiSelectedNeighbors: new Set<string>(),
   };
 
   // Language colors mapping
@@ -384,129 +388,129 @@ document.addEventListener("DOMContentLoaded", async () => {
   // English mapping object for known genres.
   // Everything else falls back to the original Estonian label (italicized).
   const genreLabelsEng: { [genre: string]: string } = {
-      "romaanid": "Novels",
-      "lastekirjandus": "Children's Literature",
-      "jutustused": "Narratives",
-      "armastusromaanid": "Romance Novels",
-      "põnevusromaanid": "Thriller Novels",
-      "kriminaalromaanid": "Crime Novels",
-      "jutud": "Stories",
-      "noorsookirjandus": "Young Adult Literature",
-      "luuletused": "Poems",
-      "ajaloolised romaanid": "Historical Novels",
-      "näidendid": "Plays",
-      "novellid": "Short Stories",
-      "pildiraamatud": "Picture Books",
-      "muinasjutud": "Fairy Tales",
-      "fantaasiaromaanid": "Fantasy Novels",
-      "ulmeromaanid": "Science Fiction Novels",
-      "biograafilised romaanid": "Biographical Novels",
-      "komöödiad": "Comedies",
-      "mugandused": "Adaptations",
-      "rööptekstid": "Parallel Texts",
-      "loomajutud": "Animal Stories",
-      "mälestused": "Memoirs",
-      "suurtähtraamatud": "Large Print Books",
-      "psühholoogilised romaanid": "Psychological Novels",
-      "seiklusromaanid": "Adventure Novels",
-      "sõjaromaanid": "War Novels",
-      "lühiromaanid": "Short Novels",
-      "perekonnaromaanid": "Family Novels",
-      "huumor": "Humor",
-      "dokumentaalkirjandus": "Documentary Literature",
-      "vigurraamatud": "Trick Books",
-      "biograafiad": "Biographies",
-      "poeemid": "Poems (Epics)",
-      "õudusromaanid": "Horror Novels",
-      "ulmejutud": "Science Fiction Stories",
-      "autobiograafilised romaanid": "Autobiographical Novels",
-      "vaimulik ilukirjandus": "Religious Fiction",
-      "esseed": "Essays",
-      "autobiograafiad": "Autobiographies",
-      "satiirilised romaanid": "Satirical Novels",
-      "spiooniromaanid": "Spy Novels",
-      "reisikirjad": "Travel Writings",
-      "antoloogiad": "Anthologies",
-      "õudusjutud": "Horror Stories",
-      "värssjutud": "Verse Stories",
-      "päevikud": "Diaries",
-      "kriminaaljutud": "Crime Stories",
-      "tõlked": "Translations",
-      "päevikromaanid": "Diary Novels",
-      "tragöödiad": "Tragedies",
-      "unejutud": "Bedtime Stories",
-      "aforismid": "Aphorisms",
-      "värssdraamad": "Verse Dramas",
-      "koomiksid": "Comics",
-      "olukirjeldused": "Situational Descriptions",
-      "legendid": "Legends",
-      "tsitaadid": "Quotations",
-      "kommentaarid": "Commentaries",
-      "kogutud teosed": "Collected Works",
-      "graafilised romaanid": "Graphic Novels",
-      "poliitilised romaanid": "Political Novels",
-      "toiduretseptid": "Recipes",
-      "mereromaanid": "Maritime Novels",
-      "haikud": "Haikus",
-      "koolijutud": "School Stories",
-      "düstoopiad": "Dystopias",
-      "valmid": "Fables",
-      "satiir": "Satire",
-      "aimekirjandus": "Popular Science Literature",
-      "miniatuurid": "Miniatures",
-      "lood": "Tales",
-      "libretod": "Librettos",
-      "lühinäidendid": "Short Plays",
-      "kiriromaanid": "Epistolary Novels",
-      "katkendid": "Excerpts",
-      "loomamuinasjutud": "Animal Fairy Tales",
-      "illustratsioonid": "Illustrations",
-      "proosaluuletused": "Prose Poems",
-      "filmistsenaariumid": "Screenplays",
-      "autobiograafilised jutustused": "Autobiographical Narratives",
-      "följetonid": "Feuilletons",
-      "kirjad": "Letters",
-      "armastusluule": "Love Poetry",
-      "eeposed": "Epics",
-      "paroodiad": "Parodies",
-      "ballaadid": "Ballads",
-      "nõuanded": "Advice",
-      "haiglaromaanid": "Hospital Novels",
-      "pusled": "Puzzles",
-      "autograafid": "Autographs",
-      "nuputamisülesanded": "Brain Teasers",
-      "müüdid": "Myths",
-      "ajaloolised näidendid": "Historical Plays",
-      "humoreskid": "Humorous Sketches",
-      "anekdoodid": "Anecdotes",
-      "lastenäidendid": "Children's Plays",
-      "valitud teosed": "Selected Works",
-      "üliõpilastööd": "Student Papers",
-      "arenguromaanid": "Bildungsromans (Coming-of-Age Novels)",
-      "muistendid": "Folktales",
-      "käsiraamatud": "Handbooks",
-      "kõned": "Speeches",
-      "dialoogid": "Dialogues",
-      "laulumängud": "Singing Games",
-      "loodusjutud": "Nature Stories",
-      "laastud": "Sketches",
-      "laulutekstid": "Song Lyrics",
-      "diplomitööd": "Theses",
-      "värvimisraamatud": "Coloring Books",
-      "rüütliromaanid": "Chivalric Novels",
-      "õppematerjalid": "Study Materials",
-      "publitsistika": "Journalistic Literature",
-      "fantaasiakirjandus": "Fantasy Literature",
-      "harduskirjandus": "Devotional Literature",
-      "sketšid": "Sketches",
-      "mõtisklused": "Reflections",
-      "intervjuud": "Interviews",
-      "operetid": "Operettas",
-      "mõistujutud": "Allegories",
-      "muu": "Other",
-      "teadmata žanr": "Unknown Genre",
+    "romaanid": "Novels",
+    "lastekirjandus": "Children's Literature",
+    "jutustused": "Narratives",
+    "armastusromaanid": "Romance Novels",
+    "põnevusromaanid": "Thriller Novels",
+    "kriminaalromaanid": "Crime Novels",
+    "jutud": "Stories",
+    "noorsookirjandus": "Young Adult Literature",
+    "luuletused": "Poems",
+    "ajaloolised romaanid": "Historical Novels",
+    "näidendid": "Plays",
+    "novellid": "Short Stories",
+    "pildiraamatud": "Picture Books",
+    "muinasjutud": "Fairy Tales",
+    "fantaasiaromaanid": "Fantasy Novels",
+    "ulmeromaanid": "Science Fiction Novels",
+    "biograafilised romaanid": "Biographical Novels",
+    "komöödiad": "Comedies",
+    "mugandused": "Adaptations",
+    "rööptekstid": "Parallel Texts",
+    "loomajutud": "Animal Stories",
+    "mälestused": "Memoirs",
+    "suurtähtraamatud": "Large Print Books",
+    "psühholoogilised romaanid": "Psychological Novels",
+    "seiklusromaanid": "Adventure Novels",
+    "sõjaromaanid": "War Novels",
+    "lühiromaanid": "Short Novels",
+    "perekonnaromaanid": "Family Novels",
+    "huumor": "Humor",
+    "dokumentaalkirjandus": "Documentary Literature",
+    "vigurraamatud": "Trick Books",
+    "biograafiad": "Biographies",
+    "poeemid": "Poems (Epics)",
+    "õudusromaanid": "Horror Novels",
+    "ulmejutud": "Science Fiction Stories",
+    "autobiograafilised romaanid": "Autobiographical Novels",
+    "vaimulik ilukirjandus": "Religious Fiction",
+    "esseed": "Essays",
+    "autobiograafiad": "Autobiographies",
+    "satiirilised romaanid": "Satirical Novels",
+    "spiooniromaanid": "Spy Novels",
+    "reisikirjad": "Travel Writings",
+    "antoloogiad": "Anthologies",
+    "õudusjutud": "Horror Stories",
+    "värssjutud": "Verse Stories",
+    "päevikud": "Diaries",
+    "kriminaaljutud": "Crime Stories",
+    "tõlked": "Translations",
+    "päevikromaanid": "Diary Novels",
+    "tragöödiad": "Tragedies",
+    "unejutud": "Bedtime Stories",
+    "aforismid": "Aphorisms",
+    "värssdraamad": "Verse Dramas",
+    "koomiksid": "Comics",
+    "olukirjeldused": "Situational Descriptions",
+    "legendid": "Legends",
+    "tsitaadid": "Quotations",
+    "kommentaarid": "Commentaries",
+    "kogutud teosed": "Collected Works",
+    "graafilised romaanid": "Graphic Novels",
+    "poliitilised romaanid": "Political Novels",
+    "toiduretseptid": "Recipes",
+    "mereromaanid": "Maritime Novels",
+    "haikud": "Haikus",
+    "koolijutud": "School Stories",
+    "düstoopiad": "Dystopias",
+    "valmid": "Fables",
+    "satiir": "Satire",
+    "aimekirjandus": "Popular Science Literature",
+    "miniatuurid": "Miniatures",
+    "lood": "Tales",
+    "libretod": "Librettos",
+    "lühinäidendid": "Short Plays",
+    "kiriromaanid": "Epistolary Novels",
+    "katkendid": "Excerpts",
+    "loomamuinasjutud": "Animal Fairy Tales",
+    "illustratsioonid": "Illustrations",
+    "proosaluuletused": "Prose Poems",
+    "filmistsenaariumid": "Screenplays",
+    "autobiograafilised jutustused": "Autobiographical Narratives",
+    "följetonid": "Feuilletons",
+    "kirjad": "Letters",
+    "armastusluule": "Love Poetry",
+    "eeposed": "Epics",
+    "paroodiad": "Parodies",
+    "ballaadid": "Ballads",
+    "nõuanded": "Advice",
+    "haiglaromaanid": "Hospital Novels",
+    "pusled": "Puzzles",
+    "autograafid": "Autographs",
+    "nuputamisülesanded": "Brain Teasers",
+    "müüdid": "Myths",
+    "ajaloolised näidendid": "Historical Plays",
+    "humoreskid": "Humorous Sketches",
+    "anekdoodid": "Anecdotes",
+    "lastenäidendid": "Children's Plays",
+    "valitud teosed": "Selected Works",
+    "üliõpilastööd": "Student Papers",
+    "arenguromaanid": "Bildungsromans (Coming-of-Age Novels)",
+    "muistendid": "Folktales",
+    "käsiraamatud": "Handbooks",
+    "kõned": "Speeches",
+    "dialoogid": "Dialogues",
+    "laulumängud": "Singing Games",
+    "loodusjutud": "Nature Stories",
+    "laastud": "Sketches",
+    "laulutekstid": "Song Lyrics",
+    "diplomitööd": "Theses",
+    "värvimisraamatud": "Coloring Books",
+    "rüütliromaanid": "Chivalric Novels",
+    "õppematerjalid": "Study Materials",
+    "publitsistika": "Journalistic Literature",
+    "fantaasiakirjandus": "Fantasy Literature",
+    "harduskirjandus": "Devotional Literature",
+    "sketšid": "Sketches",
+    "mõtisklused": "Reflections",
+    "intervjuud": "Interviews",
+    "operetid": "Operettas",
+    "mõistujutud": "Allegories",
+    "muu": "Other",
+    "teadmata žanr": "Unknown Genre",
   }
-  
+
 
   // Function to load graph data and initialize UI components
   async function loadGraphDataAndInitialize() {
@@ -726,7 +730,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function generateGenreCheckboxes() {
     const genreCounts: { [genre: string]: number } = {};
     let totalGenres = 0;
-  
+
     graph.forEachEdge((edge, attributes) => {
       const genres = attributes.genres as string[] | undefined;
       if (genres && genres.length) {
@@ -745,15 +749,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         totalGenres++;
       }
     });
-  
+
     // Sort genres by descending frequency
     const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
-  
+
     // Lump anything below 0.15% into "muu"
     const threshold = 0.15; // 0.2%
     let leftoverCount = 0;
     const finalGenres: [string, number][] = [];
-  
+
     sortedGenres.forEach(([genre, count]) => {
       const percentage = (count / totalGenres) * 100;
       if (percentage < threshold) {
@@ -762,12 +766,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         finalGenres.push([genre, count]);
       }
     });
-  
+
     // Add a single "muu" if leftoverCount > 0
     if (leftoverCount > 0) {
       finalGenres.push(["muu", leftoverCount]);
     }
-  
+
     // Build the HTML for each final genre
     let htmlString = "";
     finalGenres.forEach(([genre, count]) => {
@@ -782,42 +786,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         </label>
       `;
     });
-  
+
     // Insert into container
     genreCheckboxesContainer.innerHTML = htmlString;
-  
+
     // Attach to state and set up event listeners
     const genreCheckboxes = genreCheckboxesContainer.querySelectorAll<HTMLInputElement>(
       'input[type="checkbox"]'
     );
     state.genreCheckboxes = genreCheckboxes;
-  
+
     genreCheckboxes.forEach((checkbox) => {
       if (checkbox.checked) {
         state.selectedGenres.add(checkbox.value);
       }
       checkbox.addEventListener("change", handleGenreCheckboxChange);
     });
-  }  
+  }
 
   function updateGenreCheckboxLabels() {
     // Only run if the checkboxes are present
     if (!state.genreCheckboxes) return;
-  
+
     // Decide which dictionary to use
     const useEnglish = (currentLanguage === "eng");
-  
+
     // Loop through existing checkboxes
     state.genreCheckboxes.forEach((cb) => {
       // The "value" is something like "luule", "muu", or "other"
       const genreCode = cb.value;
       // The Estonian label is stored in data-est-label (the original text from generation)
       const estLabel = cb.getAttribute("data-est-label") || genreCode;
-  
+
       // Find the text span
       const labelSpan = cb.parentElement?.querySelector(".item-name") as HTMLElement;
       if (!labelSpan) return;
-  
+
       if (useEnglish) {
         // If we have an English translation, use it
         if (genreLabelsEng[genreCode]) {
@@ -849,6 +853,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
     }
 
+    // Recompute selections so out-of-range nodes are dropped
+    recomputeSelections();
     renderer.refresh();
   }
 
@@ -868,6 +874,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
     }
 
+    // Recompute selections so out-of-range nodes are dropped
+    recomputeSelections();
     renderer.refresh();
   }
 
@@ -888,6 +896,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
     }
 
+    // Recompute selections so out-of-range nodes are dropped
+    recomputeSelections();
     renderer.refresh();
   }
 
@@ -928,6 +938,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
     }
 
+    // Recompute selections so out-of-range nodes are dropped
+    recomputeSelections();
     renderer.refresh();
   }
 
@@ -993,6 +1005,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
     }
 
+    // Recompute selections so out-of-range nodes are dropped
+    recomputeSelections();
     renderer.refresh();
   });
 
@@ -1009,6 +1023,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
     }
 
+    // Recompute selections so out-of-range nodes are dropped
+    recomputeSelections();
     renderer.refresh();
   });
 
@@ -1120,6 +1136,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     return neighbors;
   }
 
+  // Function to recompute node/edge selections after applying filters
+  function recomputeSelections() {
+    // 1) If we have a single selected node, recompute its neighbors
+    if (state.selectedNode) {
+      state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
+    }
+
+    // 2) If we have multiple selected nodes, union their neighbors again
+    if (state.multiSelectedNodes && state.multiSelectedNodes.size > 0) {
+      const newSet = new Set<string>();
+      for (const node of state.multiSelectedNodes) {
+        for (const neigh of getVisibleNeighbors(node)) {
+          newSet.add(neigh);
+        }
+      }
+      state.multiSelectedNeighbors = newSet;
+    } else {
+      state.multiSelectedNeighbors = undefined;
+    }
+  }
+
   // Bind search input interactions
   searchInput.addEventListener("input", () => {
     setSearchQuery(searchInput.value.trim());
@@ -1139,27 +1176,62 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Bind graph interactions
   renderer.on("enterNode", ({ node }) => {
-    if (!state.selectedNode && !state.selectedNeighbors) {
-      setHoveredNode(node);
-    }
+    // if (!state.selectedNode && !state.selectedNeighbors) {
+    setHoveredNode(node);
+    // }
   });
 
   renderer.on("leaveNode", () => {
     setHoveredNode(undefined);
   });
 
-  renderer.on("clickNode", ({ node }) => {
-    state.selectedNode = node;
-    state.selectedNeighbors = getVisibleNeighbors(state.selectedNode);
-    setHoveredNode(undefined);
+  renderer.on("clickNode", (e) => {
+    // Check if Ctrl or Meta is pressed
+    const domEvent = e.event.original as MouseEvent;
+    const isCtrlClick = domEvent.ctrlKey || domEvent.metaKey;
+    const node = e.node;
+
+    if (isCtrlClick) {
+      // 1) Toggle the node in state.multiSelectedNodes
+      if (state.multiSelectedNodes.has(node)) {
+        state.multiSelectedNodes.delete(node);
+      } else {
+        state.multiSelectedNodes.add(node);
+      }
+      // 2) Recompute neighbors for multiSelectedNodes
+      //    The simplest approach: union of neighbors for each multi-selected node
+      //    We'll store them in a new property, e.g., multiSelectedNeighbors
+      state.multiSelectedNeighbors = new Set<string>();
+      for (const n of state.multiSelectedNodes) {
+        for (const neighbor of getVisibleNeighbors(n)) {
+          state.multiSelectedNeighbors.add(neighbor);
+        }
+      }
+
+      // Do NOT modify state.selectedNode or state.selectedNeighbors
+      // so single-click logic remains intact.
+    } else {
+      // Original single-node logic
+      state.selectedNode = node;
+      state.selectedNeighbors = getVisibleNeighbors(node);
+      setHoveredNode(undefined);
+
+      // Clear any old multi-selections
+      state.multiSelectedNodes.clear();
+      state.multiSelectedNeighbors = undefined;
+    }
+
     renderer.refresh();
   });
+
 
   renderer.on("clickStage", () => {
     searchInput.value = "";          // Clear the search field
     state.searchQuery = "";          // Clear internal state
     state.selectedNode = undefined;
     state.selectedNeighbors = undefined;
+    state.multiSelectedNodes.clear();
+    state.multiSelectedNeighbors?.clear();
     setHoveredNode(undefined);
     renderer.refresh();
   });
@@ -1170,6 +1242,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.searchQuery = "";
       state.selectedNode = undefined;
       state.selectedNeighbors = undefined;
+      state.multiSelectedNodes.clear();
+      state.multiSelectedNeighbors?.clear();
       renderer.refresh();
     }
   });
@@ -1221,25 +1295,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Configure Edge Reducer
   renderer.setSetting("edgeReducer", (edge, data) => {
     const res: Partial<EdgeDisplayData> = { ...data };
-
     const edgeAttributes = graph.getEdgeAttributes(edge);
 
-    // Time range filtering based on works
+    // 1. Time range filtering
     const works = edgeAttributes.works as [string, number][] | undefined;
     const hasWorkInTimeRange = works
-      ? works.some((work) => work[1] >= state.minYear && work[1] <= state.maxYear)
+      ? works.some(([_, year]) => year >= state.minYear && year <= state.maxYear)
       : false;
-
     if (!hasWorkInTimeRange) {
       res.hidden = true;
       return res;
     }
 
-    // Genre filtering
+    // 2. Genre filtering
     if (state.selectedGenres.size > 0) {
       const edgeGenres = edgeAttributes.genres as string[] | undefined;
       const hasSelectedGenre = edgeGenres
-        ? edgeGenres.some((genre) => state.selectedGenres.has(genre))
+        ? edgeGenres.some((g) => state.selectedGenres.has(g))
         : false;
       if (!hasSelectedGenre) {
         res.hidden = true;
@@ -1251,7 +1323,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return res;
     }
 
-    // Language filtering
+    // 3. Language filtering
     if (state.selectedLanguages.size > 0) {
       const edgeLanguages = edgeAttributes.languages as string[] | undefined;
       const hasSelectedLanguage = edgeLanguages
@@ -1267,24 +1339,39 @@ document.addEventListener("DOMContentLoaded", async () => {
       return res;
     }
 
-    // Selection and Search Suggestions
+    // 4. Combine single and multi-selected nodes
+    const selectedSet = new Set<string>();
     if (state.selectedNode) {
-      if (!graph.hasExtremity(edge, state.selectedNode)) {
+      selectedSet.add(state.selectedNode);
+    }
+    if (state.multiSelectedNodes && state.multiSelectedNodes.size > 0) {
+      for (const nd of state.multiSelectedNodes) {
+        selectedSet.add(nd);
+      }
+    }
+
+    const source = graph.source(edge);
+    const target = graph.target(edge);
+
+    // 5. If there's at least one selected node...
+    if (selectedSet.size > 0) {
+      // Show edge only if it connects to at least one selected node
+      const connectsToSelection = selectedSet.has(source) || selectedSet.has(target);
+      if (!connectsToSelection) {
         res.hidden = true;
         return res;
       }
     }
-
-    if (state.suggestions) {
-      const source = graph.source(edge);
-      const target = graph.target(edge);
+    // 6. Otherwise, if we have suggestions...
+    else if (state.suggestions) {
+      // Show edge only if both endpoints are in suggestions
       if (!state.suggestions.has(source) || !state.suggestions.has(target)) {
         res.hidden = true;
         return res;
       }
     }
 
-    // Do not hide edges on hover
+    // If none of the above hid the edge, show it
     res.hidden = false;
     return res;
   });
@@ -1293,38 +1380,64 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderer.setSetting("nodeReducer", (node, data) => {
     const res: Partial<NodeDisplayData> = { ...data };
 
-    // Check if node has any visible edges
+    // 1) If this node has no visible edges under current filters,
+    //    hide it right away.
     if (!nodeHasVisibleEdges(node)) {
       res.label = "";
       res.color = "#f6f6f6";
       return res;
     }
 
-    // Hovered Node
+    // 2) Handle "hoveredNode" (unchanged logic).
     if (state.hoveredNode === node) {
       res.label = graph.getNodeAttribute(node, "label") as string;
       res.color = data.color;
       return res;
     }
 
-    // Selected Node
+    // 3) Combine single- and multi-selected sets
+    const selectedSet = new Set<string>();
     if (state.selectedNode) {
-      if (state.selectedNode === node) {
+      selectedSet.add(state.selectedNode);
+    }
+    if (state.multiSelectedNodes && state.multiSelectedNodes.size > 0) {
+      for (const m of state.multiSelectedNodes) {
+        selectedSet.add(m);
+      }
+    }
+
+    // 4) Also combine their neighbors
+    const neighborSet = new Set<string>();
+    if (state.selectedNeighbors) {
+      for (const n of state.selectedNeighbors) {
+        neighborSet.add(n);
+      }
+    }
+    if (state.multiSelectedNeighbors) {
+      for (const n of state.multiSelectedNeighbors) {
+        neighborSet.add(n);
+      }
+    }
+
+    // 5) If any nodes are selected:
+    if (selectedSet.size > 0) {
+      if (selectedSet.has(node)) {
+        // Highlight the selected node
         res.highlighted = true;
         res.label = graph.getNodeAttribute(node, "label") as string;
-      } else if (state.selectedNeighbors?.has(node)) {
-        // Neighbor of selected node
+      } else if (neighborSet.has(node)) {
+        // A neighbor of one or more selected nodes
         res.label = graph.getNodeAttribute(node, "label") as string;
         res.color = data.color;
       } else {
-        // Non-neighbor nodes when a node is selected
+        // Not selected, nor a neighbor of selected
         res.label = "";
         res.color = "#f6f6f6";
       }
       return res;
     }
 
-    // Search Suggestions
+    // 6) If there are search suggestions, apply that
     if (state.suggestions) {
       if (!state.suggestions.has(node)) {
         res.label = "";
@@ -1333,6 +1446,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
+    // If no filters are excluding it, return as-is
     return res;
   });
 
