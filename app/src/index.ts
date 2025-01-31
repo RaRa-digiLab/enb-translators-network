@@ -516,6 +516,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
       console.error("Error loading graph data:", error);
     }
+    renderer.refresh()
   }
 
   function setLanguage(lang: "est" | "eng") {
