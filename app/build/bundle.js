@@ -5853,7 +5853,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             descriptionContent: `
       <p>
           See rakendus visualiseerib võrgustiku kujul eesti tõlkekirjandust 19. sajandi algusest tänapäevani.
-          Võrgustik koosneb 9807 võõrkeelsest autorist ja 4027 tõlkijast, kes nende ilukirjanduslikku loomingut on eestindanud.
+          Võrgustik koosneb 8959 võõrkeelsest autorist ja 3472 tõlkijast, kes nende ilukirjanduslikku loomingut on eestindanud.
           Tõlkijaid ja autoreid ühendavad kaared kujutavad tõlgitud teoseid, värvid sümboliseerivad erinevaid keeli.
         </p>
         <p>Võrgustiku avastamiseks:</p>
@@ -5890,7 +5890,7 @@ document.addEventListener("DOMContentLoaded", () => __awaiter(void 0, void 0, vo
             descriptionContent: `
       <p>
         This application visualizes Estonian translated literature in the form of a network, spanning from the early 19th century to the present day.
-        The network consists of 9,807 foreign authors and 4,027 translators who have translated their literary works into Estonian.
+        The network consists of 8,959 foreign authors and 3,472 translators who have translated their literary works into Estonian.
         The connections between translators and authors represent translated works, while the colors symbolize different languages.
       </p>
       <p>Explore the network:</p>
